@@ -193,3 +193,40 @@ Verify in Vercel Dashboard → Project → Cron Jobs.
 vercel rollback  # Roll back to previous deployment
 ```
 
+
+---
+
+## Step 6: Configure Supabase Auth Providers
+
+### Email Auth (Required)
+In Supabase Dashboard → Authentication → Providers → Email:
+- ✅ Enable Email provider
+- ✅ Enable Email Confirmations  
+- Set **Site URL**: `https://getgroomgrid.com`
+- Add **Redirect URLs** (Authentication → URL Configuration):
+  - `https://getgroomgrid.com/auth/callback`
+  - `https://getgroomgrid.com/api/auth/callback`
+  - `http://localhost:3000/auth/callback` (for local dev)
+
+### Google OAuth (Required)
+1. Go to [Google Cloud Console](https://console.cloud.google.com) → APIs & Services → Credentials
+2. Create **OAuth 2.0 Client ID** (Web Application type)
+3. Add Authorized redirect URIs:
+   - `https://<your-project>.supabase.co/auth/v1/callback`
+   - `http://localhost:3000/auth/callback`
+4. Copy **Client ID** and **Client Secret**
+5. In Supabase → Authentication → Providers → Google:
+   - Paste Client ID and Client Secret
+   - Enable Google provider
+
+### Site URL & Redirect URLs
+Authentication → URL Configuration:
+- **Site URL**: `https://getgroomgrid.com`
+- **Allowed Redirect URLs**:
+  ```
+  https://getgroomgrid.com/auth/callback
+  https://getgroomgrid.com/api/auth/callback
+  http://localhost:3000/auth/callback
+  http://localhost:3000/api/auth/callback
+  ```
+
