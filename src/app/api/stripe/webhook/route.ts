@@ -24,8 +24,8 @@ export async function POST(req: Request) {
 
         if (userId) {
           await updateProfile(userId, {
-            stripe_customer_id: session.customer,
-            stripe_subscription_id: session.subscription,
+            stripe_customer_id: typeof session.customer === 'string' ? session.customer : undefined,
+            stripe_subscription_id: typeof session.subscription === 'string' ? session.subscription : undefined,
           });
         }
         break;

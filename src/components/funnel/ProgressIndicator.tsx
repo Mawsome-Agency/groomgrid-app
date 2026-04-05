@@ -59,6 +59,6 @@ export default function ProgressIndicator({ currentStep, totalSteps, stepLabels 
   );
 }
 
-function cn(...classes: string[]) {
+function cn(...classes: (string | boolean | undefined | null)[]) {
   return classes.filter(Boolean).join(' ');
 }

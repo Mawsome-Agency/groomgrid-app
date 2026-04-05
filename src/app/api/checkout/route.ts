@@ -2,16 +2,19 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createCheckoutSession } from '@/lib/stripe';
 import { getProfile } from '@/lib/supabase';
 import { trackPlanSelected } from '@/lib/ga4';
+import { Database } from '@/types/supabase';
+
+type Profile = Database['public']['Tables']['profiles']['Row'];
 
 export async function POST(req: NextRequest) {
   try {
-    const { userId, planType } = await req.json();
+    const { userId, planType, customerEmail } = await req.json();
 
     if (!userId || !planType) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    const profile = await getProfile(userId);
+    const profile = await getProfile(userId) as Profile | null;
     if (!profile) {
       return NextResponse.json({ error: 'Profile not found' }, { status: 404 });
     }
@@ -22,7 +25,7 @@ export async function POST(req: NextRequest) {
     const session = await createCheckoutSession({
       userId,
       planType: planType as 'solo' | 'salon' | 'enterprise',
-      customerEmail: profile.user_id,
+      customerEmail: customerEmail || `${userId}@groomgrid.app`,
       businessName: profile.business_name,
     });
 

@@ -1,14 +1,30 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { Database } from '@/types/supabase';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+type Profile = Database['public']['Tables']['profiles']['Row'];
 
-export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
+// Lazy client initialization — avoids build-time failures when env vars aren't set
+let _supabase: SupabaseClient<Database> | null = null;
+
+export function getSupabaseClient(): SupabaseClient<Database> {
+  if (!_supabase) {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    if (!supabaseUrl || !supabaseAnonKey) {
+      throw new Error('Missing Supabase environment variables');
+    }
+    _supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
+  }
+  return _supabase;
+}
+
+// Keep backward-compatible export for client components
+export const supabase = typeof window !== 'undefined' ? getSupabaseClient() : null as any;
 
 // Helper functions for auth
 export async function signUp(email: string, password: string, businessName: string) {
-  const { data, error } = await supabase.auth.signUp({
+  const client = getSupabaseClient();
+  const { data, error } = await client.auth.signUp({
     email,
     password,
     options: {
@@ -18,41 +34,46 @@ export async function signUp(email: string, password: string, businessName: stri
       emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
     },
   });
-  
+
   if (error) throw error;
   return data;
 }
 
 export async function signIn(email: string, password: string) {
-  const { data, error } = await supabase.auth.signInWithPassword({
+  const client = getSupabaseClient();
+  const { data, error } = await client.auth.signInWithPassword({
     email,
     password,
   });
-  
+
   if (error) throw error;
   return data;
 }
 
 export async function signOut() {
-  const { error } = await supabase.auth.signOut();
+  const client = getSupabaseClient();
+  const { error } = await client.auth.signOut();
   if (error) throw error;
 }
 
 export async function getCurrentUser() {
-  const { data: { user }, error } = await supabase.auth.getUser();
+  const client = getSupabaseClient();
+  const { data: { user }, error } = await client.auth.getUser();
   if (error) throw error;
   return user;
 }
 
 export async function getSession() {
-  const { data: { session }, error } = await supabase.auth.getSession();
+  const client = getSupabaseClient();
+  const { data: { session }, error } = await client.auth.getSession();
   if (error) throw error;
   return session;
 }
 
 // Profile functions
-export async function createProfile(userId: string, businessName: string) {
-  const { data, error } = await supabase
+export async function createProfile(userId: string, businessName: string): Promise<Profile> {
+  const client = getSupabaseClient();
+  const { data, error } = await client
     .from('profiles')
     .insert({
       user_id: userId,
@@ -65,24 +86,29 @@ export async function createProfile(userId: string, businessName: string) {
     })
     .select()
     .single();
-  
+
   if (error) throw error;
-  return data;
+  return data as Profile;
 }
 
-export async function getProfile(userId: string) {
-  const { data, error } = await supabase
+export async function getProfile(userId: string): Promise<Profile | null> {
+  const client = getSupabaseClient();
+  const { data, error } = await client
     .from('profiles')
     .select('*')
     .eq('user_id', userId)
     .single();
-  
-  if (error) throw error;
-  return data;
+
+  if (error) {
+    if (error.code === 'PGRST116') return null; // not found
+    throw error;
+  }
+  return data as Profile;
 }
 
-export async function updateProfile(userId: string, updates: any) {
-  const { data, error } = await supabase
+export async function updateProfile(userId: string, updates: Partial<Profile>): Promise<Profile> {
+  const client = getSupabaseClient();
+  const { data, error } = await client
     .from('profiles')
     .update({
       ...updates,
@@ -91,13 +117,14 @@ export async function updateProfile(userId: string, updates: any) {
     .eq('user_id', userId)
     .select()
     .single();
-  
+
   if (error) throw error;
-  return data;
+  return data as Profile;
 }
 
-export async function updateOnboardingStep(userId: string, step: number) {
-  const { data, error } = await supabase
+export async function updateOnboardingStep(userId: string, step: number): Promise<Profile> {
+  const client = getSupabaseClient();
+  const { data, error } = await client
     .from('profiles')
     .update({
       onboarding_step: step,
@@ -107,13 +134,14 @@ export async function updateOnboardingStep(userId: string, step: number) {
     .eq('user_id', userId)
     .select()
     .single();
-  
+
   if (error) throw error;
-  return data;
+  return data as Profile;
 }
 
-export async function skipOnboarding(userId: string, reason?: string) {
-  const { data, error } = await supabase
+export async function skipOnboarding(userId: string, _reason?: string): Promise<Profile> {
+  const client = getSupabaseClient();
+  const { data, error } = await client
     .from('profiles')
     .update({
       onboarding_step: 3,
@@ -123,7 +151,7 @@ export async function skipOnboarding(userId: string, reason?: string) {
     .eq('user_id', userId)
     .select()
     .single();
-  
+
   if (error) throw error;
-  return data;
+  return data as Profile;
 }
