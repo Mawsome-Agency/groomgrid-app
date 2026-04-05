@@ -155,3 +155,34 @@ export async function skipOnboarding(userId: string, _reason?: string): Promise<
   if (error) throw error;
   return data as Profile;
 }
+
+export async function signInWithGoogle(redirectTo?: string) {
+  const client = getSupabaseClient();
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? window.location.origin;
+  const callbackUrl = redirectTo
+    ? `${appUrl}/auth/callback?next=${encodeURIComponent(redirectTo)}`
+    : `${appUrl}/auth/callback`;
+
+  const { data, error } = await client.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: callbackUrl,
+      queryParams: {
+        access_type: 'offline',
+        prompt: 'consent',
+      },
+    },
+  });
+
+  if (error) throw error;
+  return data;
+}
+
+export async function resetPassword(email: string) {
+  const client = getSupabaseClient();
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? window.location.origin;
+  const { error } = await client.auth.resetPasswordForEmail(email, {
+    redirectTo: `${appUrl}/auth/callback?next=/reset-password`,
+  });
+  if (error) throw error;
+}
