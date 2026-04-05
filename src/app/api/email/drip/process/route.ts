@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
   }
 
   const supabase = createAdminClient()
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://app.getgroomgrid.com'
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://getgroomgrid.com'
 
   const { data: pendingEmails, error: fetchError } = await supabase
     .from('drip_email_queue')

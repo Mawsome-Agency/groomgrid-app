@@ -1,6 +1,6 @@
 # GroomGrid App — Production Deployment Guide
 
-> Deploy target: **https://app.getgroomgrid.com**
+> Deploy target: **https://getgroomgrid.com**
 
 ## Prerequisites Checklist
 
@@ -91,9 +91,9 @@ STRIPE_PRICE_ENTERPRISE            = price_...
 RESEND_API_KEY                     = re_...
 CRON_SECRET                        = <generate with: openssl rand -base64 32>
 
-NEXT_PUBLIC_APP_URL                = https://app.getgroomgrid.com
+NEXT_PUBLIC_APP_URL                = https://getgroomgrid.com
 NEXTAUTH_SECRET                    = <generate with: openssl rand -base64 32>
-NEXTAUTH_URL                       = https://app.getgroomgrid.com
+NEXTAUTH_URL                       = https://getgroomgrid.com
 
 NEXT_PUBLIC_GA4_MEASUREMENT_ID     = G-XXXXXXXXXX
 ```
@@ -103,7 +103,7 @@ NEXT_PUBLIC_GA4_MEASUREMENT_ID     = G-XXXXXXXXXX
 ## Step 5: Configure Stripe Webhook
 
 1. Stripe Dashboard → Developers → Webhooks → Add Endpoint
-2. URL: `https://app.getgroomgrid.com/api/stripe/webhook`
+2. URL: `https://getgroomgrid.com/api/stripe/webhook`
 3. Events to listen for:
    - `checkout.session.completed`
    - `customer.subscription.created`
@@ -133,15 +133,15 @@ In GoDaddy (already accessible via API), add:
 
 ```
 Type: CNAME
-Name: app
+Name: @
 Value: cname.vercel-dns.com
 TTL: 600
 ```
 
-The DNS record for `app.getgroomgrid.com` → `cname.vercel-dns.com` has been added automatically.
+The root domain `getgroomgrid.com` points to Vercel. All app routes live under the root domain — no subdomain split.
 
 Then in Vercel Dashboard → Project → Settings → Domains:
-- Add `app.getgroomgrid.com`
+- Add `getgroomgrid.com` (and `www.getgroomgrid.com` with redirect to root)
 - Vercel will verify and provision SSL automatically
 
 ---
@@ -163,8 +163,8 @@ The GitHub Actions workflow will automatically:
 
 After deployment, test the full funnel:
 
-1. **Signup**: https://app.getgroomgrid.com/signup
-2. **Plan selection**: https://app.getgroomgrid.com/plans
+1. **Signup**: https://getgroomgrid.com/signup
+2. **Plan selection**: https://getgroomgrid.com/plans
 3. **Stripe checkout**: Click a plan → complete Stripe checkout with test card `4242 4242 4242 4242`
 4. **Onboarding**: Complete the 3-step onboarding flow
 5. **Dashboard**: Verify user lands on dashboard

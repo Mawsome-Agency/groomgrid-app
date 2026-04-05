@@ -71,9 +71,9 @@ CREATE TRIGGER on_auth_user_created
 ## Authentication Settings
 
 1. Go to **Authentication > URL Configuration**
-2. Set **Site URL** to: `https://app.getgroomgrid.com`
+2. Set **Site URL** to: `https://getgroomgrid.com`
 3. Set **Redirect URLs** to:
-   - `https://app.getgroomgrid.com/auth/callback`
+   - `https://getgroomgrid.com/auth/callback`
    - `https://localhost:3000/auth/callback` (for development)
 
 ## Email Templates

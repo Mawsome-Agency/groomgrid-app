@@ -47,7 +47,7 @@ Create the following subscription products in your Stripe dashboard:
 
 1. Go to **Developers > Webhooks**
 2. Click **Add endpoint**
-3. Set endpoint URL: `https://app.getgroomgrid.com/api/stripe/webhook`
+3. Set endpoint URL: `https://getgroomgrid.com/api/stripe/webhook`
 4. Select events to send:
    - `checkout.session.completed`
    - `customer.subscription.created`
