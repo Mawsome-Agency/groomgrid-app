@@ -1,0 +1,228 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { Plan } from '@/types';
+import PlanCard from '@/components/funnel/PlanCard';
+import Testimonial from '@/components/funnel/Testimonial';
+import ValueProp from '@/components/funnel/ValueProp';
+import { createClient } from '@supabase/supabase-js';
+import { getProfile } from '@/lib/supabase';
+import { trackPageView } from '@/lib/ga4';
+
+const PLANS: Plan[] = [
+  {
+    id: 'solo',
+    name: 'Solo',
+    type: 'solo',
+    price: 29,
+    interval: 'monthly',
+    stripe_price_id: 'price_solo_placeholder',
+    features: [
+      '1 groomer account',
+      'Unlimited clients & appointments',
+      'Automated reminders',
+      'Revenue tracking',
+      'Mobile app access',
+    ],
+  },
+  {
+    id: 'salon',
+    name: 'Salon',
+    type: 'salon',
+    price: 79,
+    interval: 'monthly',
+    stripe_price_id: 'price_salon_placeholder',
+    popular: true,
+    features: [
+      'Everything in Solo',
+      'Up to 5 groomer accounts',
+      'Team scheduling',
+      'Staff performance metrics',
+      'Priority support',
+    ],
+  },
+  {
+    id: 'enterprise',
+    name: 'Enterprise',
+    type: 'enterprise',
+    price: 149,
+    interval: 'monthly',
+    stripe_price_id: 'price_enterprise_placeholder',
+    features: [
+      'Everything in Salon',
+      'Unlimited groomers',
+      'Custom branding',
+      'API access',
+      'Dedicated account manager',
+    ],
+  },
+];
+
+const TESTIMONIALS = [
+  {
+    name: 'Sarah Mitchell',
+    business: 'Paws on Wheels',
+    quote: 'GroomGrid cut my booking time in half. I can focus on the dogs, not the paperwork.',
+  },
+  {
+    name: 'James Rodriguez',
+    business: 'Fur Perfect Salon',
+    quote: 'My team loves the mobile app. We can check schedules from anywhere and no-shows dropped 40%.',
+  },
+];
+
+export default function PlansPage() {
+  const router = useRouter();
+  const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    trackPageView('/plans', 'Plan Selection');
+    checkAuth();
+  }, []);
+
+  const checkAuth = async () => {
+    try {
+      const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+
+      if (!user) {
+        router.push('/signup');
+      }
+    } catch (err) {
+      console.error('Auth check failed:', err);
+    }
+  };
+
+  const handleSelectPlan = async (plan: Plan) => {
+    if (!user) return;
+
+    setSelectedPlan(plan);
+    setLoading(true);
+
+    try {
+      // Create checkout session
+      const response = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: user.id,
+          planType: plan.type,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        throw new Error(data.error || 'Failed to create checkout');
+      }
+    } catch (err: any) {
+      console.error('Checkout error:', err);
+      alert(err.message || 'Failed to proceed to checkout');
+      setLoading(false);
+      setSelectedPlan(null);
+    }
+  };
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-stone-50 flex items-center justify-center">
+        <div className="text-center">Loading...</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-stone-50">
+      {/* Header */}
+      <header className="bg-white border-b border-stone-200">
+        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+          <h1 className="text-2xl font-bold text-green-600">GroomGrid</h1>
+          <button
+            onClick={() => {
+              const supabase = createClient(
+                process.env.NEXT_PUBLIC_SUPABASE_URL!,
+                process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+              );
+              supabase.auth.signOut();
+              router.push('/');
+            }}
+            className="text-stone-600 hover:text-stone-900 text-sm"
+          >
+            Sign Out
+          </button>
+        </div>
+      </header>
+
+      <main className="max-w-7xl mx-auto px-4 py-12">
+        {/* Hero Section */}
+        <div className="text-center mb-12">
+          <h2 className="text-4xl font-bold text-stone-900 mb-4">Choose Your Plan</h2>
+          <p className="text-xl text-stone-600">All plans include a 14-day free trial</p>
+        </div>
+
+        {/* Value Props */}
+        <div className="mb-12">
+          <ValueProp />
+        </div>
+
+        {/* Plan Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+          {PLANS.map((plan) => (
+            <PlanCard
+              key={plan.id}
+              plan={plan}
+              selected={selectedPlan?.id === plan.id}
+              onSelect={() => handleSelectPlan(plan)}
+            />
+          ))}
+        </div>
+
+        {/* Testimonials */}
+        <div className="mb-12">
+          <h3 className="text-2xl font-bold text-stone-900 mb-6 text-center">
+            Trusted by Professional Groomers
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            {TESTIMONIALS.map((testimonial, index) => (
+              <Testimonial key={index} {...testimonial} />
+            ))}
+          </div>
+        </div>
+
+        {/* FAQ Section */}
+        <div className="max-w-2xl mx-auto">
+          <h3 className="text-2xl font-bold text-stone-900 mb-6 text-center">Frequently Asked Questions</h3>
+          <div className="space-y-4">
+            <div className="bg-white rounded-xl p-6">
+              <h4 className="font-semibold text-stone-900 mb-2">What happens after the free trial?</h4>
+              <p className="text-stone-600 text-sm">
+                After 14 days, you'll be charged for your chosen plan. You can cancel anytime before the trial ends with no charge.
+              </p>
+            </div>
+            <div className="bg-white rounded-xl p-6">
+              <h4 className="font-semibold text-stone-900 mb-2">Can I change plans later?</h4>
+              <p className="text-stone-600 text-sm">
+                Yes! You can upgrade or downgrade your plan at any time from your account settings.
+              </p>
+            </div>
+            <div className="bg-white rounded-xl p-6">
+              <h4 className="font-semibold text-stone-900 mb-2">Is my data secure?</h4>
+              <p className="text-stone-600 text-sm">
+                Absolutely. We use industry-standard encryption and your data is backed up daily.
+              </p>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+}
