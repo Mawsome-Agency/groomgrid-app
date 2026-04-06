@@ -1,7 +1,7 @@
 import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
-import { updateProfile } from '@/lib/supabase';
+import prisma from '@/lib/prisma';
 
 export async function POST(req: Request) {
   const body = await req.text();
@@ -23,9 +23,12 @@ export async function POST(req: Request) {
         const userId = session.metadata?.userId;
 
         if (userId) {
-          await updateProfile(userId, {
-            stripe_customer_id: typeof session.customer === 'string' ? session.customer : undefined,
-            stripe_subscription_id: typeof session.subscription === 'string' ? session.subscription : undefined,
+          await prisma.profile.update({
+            where: { userId },
+            data: {
+              stripeCustomerId: typeof session.customer === 'string' ? session.customer : undefined,
+              stripeSubscriptionId: typeof session.subscription === 'string' ? session.subscription : undefined,
+            },
           });
         }
         break;
@@ -37,8 +40,11 @@ export async function POST(req: Request) {
         const userId = subscription.metadata?.userId;
 
         if (userId) {
-          await updateProfile(userId, {
-            subscription_status: subscription.status === 'active' ? 'active' : 'past_due',
+          await prisma.profile.update({
+            where: { userId },
+            data: {
+              subscriptionStatus: subscription.status === 'active' ? 'active' : 'past_due',
+            },
           });
         }
         break;
@@ -49,7 +55,10 @@ export async function POST(req: Request) {
         const userId = subscription.metadata?.userId;
 
         if (userId) {
-          await updateProfile(userId, { subscription_status: 'cancelled' });
+          await prisma.profile.update({
+            where: { userId },
+            data: { subscriptionStatus: 'cancelled' },
+          });
         }
         break;
       }

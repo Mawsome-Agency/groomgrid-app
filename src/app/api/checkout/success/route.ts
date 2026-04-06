@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
+
+export const dynamic = 'force-dynamic';
 import { getCheckoutSession } from '@/lib/stripe';
-import { updateProfile } from '@/lib/supabase';
+import prisma from '@/lib/prisma';
 import { trackCheckoutCompleted } from '@/lib/ga4';
 
 export async function GET(req: NextRequest) {
@@ -13,17 +15,20 @@ export async function GET(req: NextRequest) {
     }
 
     const session = await getCheckoutSession(session_id);
-    
+
     if (!session.metadata?.userId) {
       return NextResponse.json({ error: 'Invalid session' }, { status: 400 });
     }
 
-    await updateProfile(session.metadata.userId, {
-      stripe_customer_id: session.customer as string,
-      stripe_subscription_id: session.subscription as string,
-      plan_type: session.metadata.planType as 'solo' | 'salon' | 'enterprise',
-      subscription_status: 'trial',
-      trial_ends_at: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
+    await prisma.profile.update({
+      where: { userId: session.metadata.userId },
+      data: {
+        stripeCustomerId: typeof session.customer === 'string' ? session.customer : undefined,
+        stripeSubscriptionId: typeof session.subscription === 'string' ? session.subscription : undefined,
+        planType: session.metadata.planType as string,
+        subscriptionStatus: 'trial',
+        trialEndsAt: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
+      },
     });
 
     trackCheckoutCompleted(session_id, session.metadata.planType, true);

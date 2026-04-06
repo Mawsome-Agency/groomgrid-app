@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
-import { createAdminClient } from '@/lib/supabase/admin'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/next-auth-options'
+import prisma from '@/lib/prisma'
 
 interface TrackBody {
   eventName: string
@@ -23,29 +24,26 @@ export async function POST(req: NextRequest) {
   }
 
   // Auth required for analytics
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
+  const session = await getServerSession(authOptions)
+  if (!session?.user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const admin = createAdminClient()
-  const { error } = await admin.from('analytics_events').insert({
-    user_id: user.id,
-    event_name: eventName,
-    properties: properties ?? {},
-    session_id: sessionId ?? null,
-  })
+  try {
+    await prisma.analyticsEvent.create({
+      data: {
+        userId: session.user.id,
+        eventName,
+        properties: (properties ?? {}) as object,
+        sessionId: sessionId ?? null,
+      },
+    })
 
-  if (error) {
+    return NextResponse.json({ success: true })
+  } catch (error: any) {
     return NextResponse.json(
       { error: `Failed to track event: ${error.message}` },
       { status: 500 }
     )
   }
-
-  return NextResponse.json({ success: true })
 }

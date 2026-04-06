@@ -2,12 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSession, signOut } from 'next-auth/react';
 import { Plan } from '@/types';
 import PlanCard from '@/components/funnel/PlanCard';
 import Testimonial from '@/components/funnel/Testimonial';
 import ValueProp from '@/components/funnel/ValueProp';
-import { createClient } from '@supabase/supabase-js';
-import { getProfile } from '@/lib/supabase';
 import { trackPageView } from '@/lib/ga4';
 
 const PLANS: Plan[] = [
@@ -74,46 +73,34 @@ const TESTIMONIALS = [
 
 export default function PlansPage() {
   const router = useRouter();
+  const { data: session, status } = useSession();
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
   const [loading, setLoading] = useState(false);
-  const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
     trackPageView('/plans', 'Plan Selection');
-    checkAuth();
   }, []);
 
-  const checkAuth = async () => {
-    try {
-      const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-      );
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
-
-      if (!user) {
-        router.push('/signup');
-      }
-    } catch (err) {
-      console.error('Auth check failed:', err);
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/login');
     }
-  };
+  }, [status]);
 
   const handleSelectPlan = async (plan: Plan) => {
-    if (!user) return;
+    if (!session?.user?.id) return;
 
     setSelectedPlan(plan);
     setLoading(true);
 
     try {
-      // Create checkout session
       const response = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          userId: user.id,
+          userId: session.user.id,
           planType: plan.type,
+          customerEmail: session.user.email,
         }),
       });
 
@@ -132,7 +119,7 @@ export default function PlansPage() {
     }
   };
 
-  if (!user) {
+  if (status === 'loading' || !session) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-stone-50 flex items-center justify-center">
         <div className="text-center">Loading...</div>
@@ -147,14 +134,7 @@ export default function PlansPage() {
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <h1 className="text-2xl font-bold text-green-600">GroomGrid</h1>
           <button
-            onClick={() => {
-              const supabase = createClient(
-                process.env.NEXT_PUBLIC_SUPABASE_URL!,
-                process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-              );
-              supabase.auth.signOut();
-              router.push('/');
-            }}
+            onClick={() => signOut({ callbackUrl: '/' })}
             className="text-stone-600 hover:text-stone-900 text-sm"
           >
             Sign Out

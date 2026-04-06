@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/next-auth-options';
 import { createCheckoutSession } from '@/lib/stripe';
-import { getProfile } from '@/lib/supabase';
+import prisma from '@/lib/prisma';
 import { trackPlanSelected } from '@/lib/ga4';
-import { Database } from '@/types/supabase';
-
-type Profile = Database['public']['Tables']['profiles']['Row'];
 
 export async function POST(req: NextRequest) {
   try {
@@ -14,7 +13,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    const profile = await getProfile(userId) as Profile | null;
+    const profile = await prisma.profile.findUnique({ where: { userId } });
     if (!profile) {
       return NextResponse.json({ error: 'Profile not found' }, { status: 404 });
     }
@@ -26,7 +25,7 @@ export async function POST(req: NextRequest) {
       userId,
       planType: planType as 'solo' | 'salon' | 'enterprise',
       customerEmail: customerEmail || `${userId}@groomgrid.app`,
-      businessName: profile.business_name,
+      businessName: profile.businessName,
     });
 
     return NextResponse.json({ url: session.url });
