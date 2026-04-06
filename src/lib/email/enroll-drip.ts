@@ -1,4 +1,4 @@
-import { createAdminClient } from '@/lib/supabase/admin'
+import prisma from '@/lib/prisma'
 
 const DRIP_DAYS = [0, 1, 3, 7, 14]
 
@@ -7,18 +7,13 @@ export async function enrollUserInDrip(
   email: string,
   signupDate: Date = new Date()
 ): Promise<void> {
-  const supabase = createAdminClient()
-
   const rows = DRIP_DAYS.map((day) => ({
-    user_id: userId,
+    userId,
     email,
-    sequence_step: day,
-    scheduled_at: new Date(
-      signupDate.getTime() + day * 24 * 60 * 60 * 1000
-    ).toISOString(),
+    sequenceStep: day,
+    scheduledAt: new Date(signupDate.getTime() + day * 24 * 60 * 60 * 1000),
     status: 'pending',
   }))
 
-  const { error } = await supabase.from('drip_email_queue').insert(rows)
-  if (error) throw new Error(`Failed to enroll user in drip: ${error.message}`)
+  await prisma.dripEmailQueue.createMany({ data: rows })
 }

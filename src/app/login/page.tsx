@@ -3,9 +3,8 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { AlertCircle, ArrowRight, Lock, Mail, Chrome } from 'lucide-react';
-import { signIn } from '@/lib/supabase';
-import { createClient } from '@/lib/supabase/client';
+import { signIn } from 'next-auth/react';
+import { AlertCircle, ArrowRight, Lock, Mail } from 'lucide-react';
 
 function LoginForm() {
   const router = useRouter();
@@ -13,7 +12,6 @@ function LoginForm() {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [googleLoading, setGoogleLoading] = useState(false);
 
   useEffect(() => {
     const urlError = searchParams.get('error');
@@ -26,46 +24,24 @@ function LoginForm() {
     setLoading(true);
 
     try {
-      await signIn(formData.email, formData.password);
-      router.push('/dashboard');
-      router.refresh();
-    } catch (err: any) {
-      const message = err.message || 'Failed to sign in';
-      // Make Supabase error messages more user-friendly
-      if (message.includes('Invalid login credentials')) {
-        setError('Invalid email or password. Please check your credentials and try again.');
-      } else if (message.includes('Email not confirmed')) {
-        setError('Please verify your email before signing in. Check your inbox for a confirmation link.');
-      } else {
-        setError(message);
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleGoogleSignIn = async () => {
-    setError('');
-    setGoogleLoading(true);
-
-    try {
-      const supabase = createClient();
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-          queryParams: {
-            access_type: 'offline',
-            prompt: 'consent',
-          },
-        },
+      const result = await signIn('credentials', {
+        email: formData.email,
+        password: formData.password,
+        redirect: false,
       });
 
-      if (error) throw error;
-      // Redirect happens automatically via OAuth flow
+      if (result?.error) {
+        setError('Invalid email or password. Please check your credentials and try again.');
+        return;
+      }
+
+      const next = searchParams.get('next') || '/dashboard';
+      router.push(next);
+      router.refresh();
     } catch (err: any) {
-      setError(err.message || 'Failed to sign in with Google');
-      setGoogleLoading(false);
+      setError(err.message || 'Failed to sign in');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -88,31 +64,6 @@ function LoginForm() {
             <span>{error}</span>
           </div>
         )}
-
-        {/* Google OAuth */}
-        <button
-          type="button"
-          onClick={handleGoogleSignIn}
-          disabled={googleLoading || loading}
-          className="w-full flex items-center justify-center gap-3 px-6 py-3 rounded-xl border-2 border-stone-200 text-stone-700 font-medium hover:bg-stone-50 hover:border-stone-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all mb-6"
-        >
-          {googleLoading ? (
-            <div className="w-5 h-5 border-2 border-stone-400 border-t-transparent rounded-full animate-spin" />
-          ) : (
-            <Chrome className="w-5 h-5 text-stone-500" />
-          )}
-          {googleLoading ? 'Redirecting...' : 'Continue with Google'}
-        </button>
-
-        {/* Divider */}
-        <div className="relative mb-6">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-stone-200" />
-          </div>
-          <div className="relative flex justify-center text-sm">
-            <span className="px-4 bg-white text-stone-500">or sign in with email</span>
-          </div>
-        </div>
 
         {/* Email/Password Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -160,7 +111,7 @@ function LoginForm() {
 
           <button
             type="submit"
-            disabled={loading || googleLoading}
+            disabled={loading}
             className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-green-500 text-white font-semibold hover:bg-green-600 disabled:bg-stone-300 disabled:cursor-not-allowed transition-colors"
           >
             {loading ? (

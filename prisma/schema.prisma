@@ -1,0 +1,88 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  passwordHash  String?  @map("password_hash")
+  businessName  String?  @map("business_name")
+  emailVerified Boolean  @default(false) @map("email_verified")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  profile         Profile?
+  dripQueue       DripEmailQueue[]
+  feedback        Feedback[]
+  analyticsEvents AnalyticsEvent[]
+
+  @@map("users")
+}
+
+model Profile {
+  id                   String    @id @default(cuid())
+  userId               String    @unique @map("user_id")
+  businessName         String    @map("business_name")
+  phone                String?
+  planType             String    @default("solo") @map("plan_type")
+  subscriptionStatus   String    @default("trial") @map("subscription_status")
+  trialEndsAt          DateTime? @map("trial_ends_at")
+  onboardingCompleted  Boolean   @default(false) @map("onboarding_completed")
+  onboardingStep       Int       @default(0) @map("onboarding_step")
+  stripeCustomerId     String?   @map("stripe_customer_id")
+  stripeSubscriptionId String?   @map("stripe_subscription_id")
+  createdAt            DateTime  @default(now()) @map("created_at")
+  updatedAt            DateTime  @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("profiles")
+}
+
+model DripEmailQueue {
+  id           String    @id @default(cuid())
+  userId       String    @map("user_id")
+  email        String
+  sequenceStep Int       @map("sequence_step")
+  scheduledAt  DateTime  @map("scheduled_at")
+  sentAt       DateTime? @map("sent_at")
+  status       String    @default("pending")
+  errorMessage String?   @map("error_message")
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("drip_email_queue")
+}
+
+model Feedback {
+  id        String   @id @default(cuid())
+  userId    String?  @map("user_id")
+  type      String
+  score     Int?
+  page      String?
+  message   String?
+  metadata  Json?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@map("feedback")
+}
+
+model AnalyticsEvent {
+  id         String   @id @default(cuid())
+  userId     String   @map("user_id")
+  eventName  String   @map("event_name")
+  properties Json?
+  sessionId  String?  @map("session_id")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("analytics_events")
+}

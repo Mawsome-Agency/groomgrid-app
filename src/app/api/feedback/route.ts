@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
-import { createAdminClient } from '@/lib/supabase/admin'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/next-auth-options'
+import prisma from '@/lib/prisma'
 
 type FeedbackType = 'nps' | 'thumbs' | 'bug' | 'feature'
 
@@ -32,31 +33,26 @@ export async function POST(req: NextRequest) {
   }
 
   // Get session (nullable — anonymous feedback OK)
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const session = await getServerSession(authOptions)
 
-  const admin = createAdminClient()
-  const { data, error } = await admin
-    .from('feedback')
-    .insert({
-      user_id: user?.id ?? null,
-      type,
-      score: score ?? null,
-      page: page ?? null,
-      message: message ?? null,
-      metadata: metadata ?? {},
+  try {
+    const feedback = await prisma.feedback.create({
+      data: {
+        userId: session?.user?.id ?? null,
+        type,
+        score: score ?? null,
+        page: page ?? null,
+        message: message ?? null,
+        metadata: (metadata ?? {}) as object,
+      },
+      select: { id: true },
     })
-    .select('id')
-    .single()
 
-  if (error) {
+    return NextResponse.json({ success: true, id: feedback.id })
+  } catch (error: any) {
     return NextResponse.json(
       { error: `Failed to save feedback: ${error.message}` },
       { status: 500 }
     )
   }
-
-  return NextResponse.json({ success: true, id: data.id })
 }

@@ -2,90 +2,107 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import ProgressIndicator from '@/components/funnel/ProgressIndicator';
 import Step1AddClient from '@/components/onboarding/Step1AddClient';
 import Step2Appointment from '@/components/onboarding/Step2Appointment';
 import Step3BusinessHours from '@/components/onboarding/Step3BusinessHours';
 import CompletionScreen from '@/components/onboarding/CompletionScreen';
-import { getCurrentUser } from '@/lib/supabase';
-import { getProfile, updateOnboardingStep, skipOnboarding } from '@/lib/supabase';
 import { trackOnboardingStep, trackOnboardingSkipped, trackPageView } from '@/lib/ga4';
 
 export default function OnboardingPage() {
   const router = useRouter();
+  const { data: session, status } = useSession();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState<any>(null);
 
   // State for onboarding data
   const [clientData, setClientData] = useState<any>(null);
-  const [appointmentData, setAppointmentData] = useState<any>(null);
-  const [hoursData, setHoursData] = useState<any>(null);
 
   const STEPS = ['Client', 'Appointment', 'Hours'];
 
   useEffect(() => {
     trackPageView('/onboarding', 'Onboarding');
-    checkAuthAndProfile();
   }, []);
 
-  const checkAuthAndProfile = async () => {
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/login');
+      return;
+    }
+
+    if (status === 'authenticated' && session?.user?.id) {
+      checkProfile(session.user.id);
+    }
+  }, [status, session]);
+
+  const checkProfile = async (userId: string) => {
     try {
-      const currentUser = await getCurrentUser();
-      if (!currentUser) {
-        router.push('/signup');
+      const res = await fetch(`/api/profile?userId=${userId}`);
+      if (!res.ok) {
+        router.push('/login');
         return;
       }
-      setUser(currentUser);
+      const data = await res.json();
+      const profile = data.profile;
 
-      const profile = await getProfile(currentUser.id);
       if (!profile) {
-        router.push('/signup');
+        router.push('/login');
         return;
       }
 
-      // If onboarding already completed, redirect to dashboard
       if (profile.onboarding_completed) {
         router.push('/dashboard');
         return;
       }
 
-      // Resume from current step
       if (profile.onboarding_step > 0) {
         setStep(profile.onboarding_step + 1);
       }
     } catch (err) {
-      console.error('Auth check failed:', err);
-      router.push('/signup');
+      console.error('Profile check failed:', err);
+      router.push('/login');
     } finally {
       setLoading(false);
     }
   };
 
+  const updateStep = async (step: number) => {
+    if (!session?.user?.id) return;
+    await fetch('/api/profile', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: session.user.id, onboardingStep: step }),
+    });
+  };
+
   const handleStep1Next = (client: any) => {
     setClientData(client);
-    updateOnboardingStep(user.id, 1);
+    updateStep(1);
     trackOnboardingStep(1);
     setStep(2);
   };
 
-  const handleStep2Next = (appointment: any) => {
-    setAppointmentData(appointment);
-    updateOnboardingStep(user.id, 2);
+  const handleStep2Next = (_appointment: any) => {
+    updateStep(2);
     trackOnboardingStep(2);
     setStep(3);
   };
 
-  const handleStep3Next = (hours: any) => {
-    setHoursData(hours);
-    updateOnboardingStep(user.id, 3);
+  const handleStep3Next = (_hours: any) => {
+    updateStep(3);
     trackOnboardingStep(3);
     setStep(4);
   };
 
   const handleSkip = async () => {
+    if (!session?.user?.id) return;
     trackOnboardingSkipped();
-    await skipOnboarding(user.id);
+    await fetch('/api/profile', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: session.user.id, onboardingCompleted: true, onboardingStep: 3 }),
+    });
     router.push('/dashboard');
   };
 
@@ -93,7 +110,7 @@ export default function OnboardingPage() {
     router.push('/dashboard');
   };
 
-  if (loading) {
+  if (status === 'loading' || loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-stone-50 flex items-center justify-center">
         <div className="text-center">Loading...</div>

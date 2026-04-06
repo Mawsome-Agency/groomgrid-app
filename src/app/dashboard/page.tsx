@@ -2,48 +2,48 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSession, signOut } from 'next-auth/react';
 import { Calendar, Users, DollarSign, Plus, LogOut, Settings, Menu, X } from 'lucide-react';
-import { getCurrentUser, getProfile, signOut } from '@/lib/supabase';
 import { trackPageView } from '@/lib/ga4';
 
 export default function DashboardPage() {
   const router = useRouter();
-  const [user, setUser] = useState<any>(null);
+  const { data: session, status } = useSession();
   const [profile, setProfile] = useState<any>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     trackPageView('/dashboard', 'Dashboard');
-    checkAuth();
   }, []);
 
-  const checkAuth = async () => {
-    try {
-      const currentUser = await getCurrentUser();
-      if (!currentUser) {
-        router.push('/signup');
-        return;
-      }
-      setUser(currentUser);
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/login');
+      return;
+    }
 
-      const userProfile = await getProfile(currentUser.id);
-      if (!userProfile) {
-        router.push('/signup');
-        return;
+    if (status === 'authenticated' && session?.user?.id) {
+      fetchProfile(session.user.id);
+    }
+  }, [status, session]);
+
+  const fetchProfile = async (userId: string) => {
+    try {
+      const res = await fetch(`/api/profile?userId=${userId}`);
+      if (res.ok) {
+        const data = await res.json();
+        setProfile(data.profile);
       }
-      setProfile(userProfile);
     } catch (err) {
-      console.error('Auth check failed:', err);
-      router.push('/signup');
+      console.error('Failed to fetch profile:', err);
     }
   };
 
   const handleSignOut = async () => {
-    await signOut();
-    router.push('/');
+    await signOut({ callbackUrl: '/' });
   };
 
-  if (!user || !profile) {
+  if (status === 'loading' || !session) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-stone-50 flex items-center justify-center">
         <div className="text-center">Loading...</div>
@@ -51,10 +51,12 @@ export default function DashboardPage() {
     );
   }
 
-  const isTrial = profile.subscription_status === 'trial';
-  const trialDaysLeft = profile.trial_ends_at
+  const isTrial = profile?.subscription_status === 'trial';
+  const trialDaysLeft = profile?.trial_ends_at
     ? Math.max(0, Math.ceil((new Date(profile.trial_ends_at).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
     : 0;
+
+  const businessName = profile?.business_name || session.user.name || 'My Business';
 
   return (
     <div className="min-h-screen bg-stone-50">
@@ -63,7 +65,7 @@ export default function DashboardPage() {
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <div>
             <h1 className="text-xl font-bold text-green-600">GroomGrid</h1>
-            <p className="text-xs text-stone-500">{profile.business_name}</p>
+            <p className="text-xs text-stone-500">{businessName}</p>
           </div>
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -104,7 +106,7 @@ export default function DashboardPage() {
           <aside className="hidden lg:block">
             <div className="bg-white rounded-2xl shadow-sm p-6 sticky top-8">
               <h1 className="text-2xl font-bold text-green-600 mb-6">GroomGrid</h1>
-              
+
               <nav className="space-y-2">
                 <a href="#" className="flex items-center gap-3 px-4 py-3 rounded-xl bg-green-50 text-green-700 font-medium">
                   <Calendar className="w-5 h-5" /> Today
