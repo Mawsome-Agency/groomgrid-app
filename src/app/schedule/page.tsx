@@ -20,6 +20,11 @@ interface Appointment {
   pet?: { name: string; breed?: string };
 }
 
+interface Client {
+  id: string;
+  name: string;
+}
+
 const SERVICES = [
   { name: 'Full Groom', duration: 120, price: 65 },
   { name: 'Bath + Brush', duration: 60, price: 40 },
@@ -38,10 +43,8 @@ export default function SchedulePage() {
   const searchParams = useSearchParams();
   const { data: session } = useSession();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [clients, setClients] = useState<Client[]>([]);
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [selectedClient, setSelectedClient] = useState<string | null>(
-    searchParams.get('clientId')
-  );
   const [showBookModal, setShowBookModal] = useState(false);
   const [bookFormData, setBookFormData] = useState({
     clientId: searchParams.get('clientId') || '',
@@ -60,6 +63,7 @@ export default function SchedulePage() {
   useEffect(() => {
     if (session?.user?.id) {
       fetchAppointments();
+      fetchClients();
     }
   }, [session, currentDate]);
 
@@ -77,8 +81,18 @@ export default function SchedulePage() {
       }
     } catch (err) {
       console.error('Failed to fetch appointments:', err);
-    } finally {
-      setLoading(false);
+    }
+  };
+
+  const fetchClients = async () => {
+    try {
+      const res = await fetch('/api/clients');
+      if (res.ok) {
+        const data = await res.json();
+        setClients(data.clients);
+      }
+    } catch (err) {
+      console.error('Failed to fetch clients:', err);
     }
   };
 
@@ -87,15 +101,13 @@ export default function SchedulePage() {
     const month = date.getMonth();
     const firstDay = new Date(year, month, 1);
     const lastDay = new Date(year, month + 1, 0);
-    const startDay = firstDay.getDay(); // 0 = Sunday
+    const startDay = firstDay.getDay();
     const totalDays = lastDay.getDate();
 
     const days = [];
-    // Add empty cells for days before the first day of the month
     for (let i = 0; i < startDay; i++) {
       days.push(null);
     }
-    // Add actual days
     for (let i = 1; i <= totalDays; i++) {
       days.push(new Date(year, month, i));
     }
@@ -178,7 +190,6 @@ export default function SchedulePage() {
 
   return (
     <div className="min-h-screen bg-stone-50">
-      {/* Header */}
       <header className="bg-white border-b border-stone-200 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <h1 className="text-2xl font-bold text-stone-900">Schedule</h1>
@@ -192,7 +203,6 @@ export default function SchedulePage() {
       </header>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Calendar Controls */}
         <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
           <div className="flex items-center justify-between mb-6">
             <button
@@ -212,16 +222,13 @@ export default function SchedulePage() {
             </button>
           </div>
 
-          {/* Calendar Grid */}
           <div className="grid grid-cols-7 gap-1">
-            {/* Day headers */}
             {dayNames.map((day) => (
               <div key={day} className="text-center text-sm font-medium text-stone-500 py-2">
                 {day}
               </div>
             ))}
             
-            {/* Calendar days */}
             {days.map((day, index) => {
               if (!day) {
                 return <div key={`empty-${index}`} className="h-24" />;
@@ -278,7 +285,6 @@ export default function SchedulePage() {
           </div>
         </div>
 
-        {/* Appointments for selected date */}
         {loading ? (
           <div className="text-center py-8 text-stone-600">Loading...</div>
         ) : (
@@ -367,7 +373,6 @@ export default function SchedulePage() {
         )}
       </div>
 
-      {/* Book Appointment Modal */}
       {showBookModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
@@ -387,7 +392,11 @@ export default function SchedulePage() {
                     className="w-full px-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   >
                     <option value="">Select a client</option>
-                    {/* TODO: Fetch and populate clients */}
+                    {clients.map((client) => (
+                      <option key={client.id} value={client.id}>
+                        {client.name}
+                      </option>
+                    ))}
                   </select>
                 </div>
 
