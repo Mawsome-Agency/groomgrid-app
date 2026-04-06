@@ -4,9 +4,18 @@ import prisma from './prisma'
 
 export { prisma }
 
+// Extended Session type with user id
+interface ExtendedSession {
+  user?: {
+    id: string
+    email: string
+    name?: string | null
+  }
+}
+
 // Get current session (server-side)
-export async function getSession() {
-  return getServerSession(authOptions)
+export async function getSession(): Promise<ExtendedSession | null> {
+  return getServerSession(authOptions) as Promise<ExtendedSession | null>
 }
 
 // Get current user from session

@@ -16,8 +16,10 @@ export async function PATCH(
   { params }: { params: { id: string } }
 ) {
   try {
-    const user = await getSession();
-    if (!user?.id) {
+    const session = await getSession();
+    const userId = session?.user?.id;
+    
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -29,7 +31,7 @@ export async function PATCH(
       where: { id: appointmentId },
     });
 
-    if (!existing || existing.userId !== user.id) {
+    if (!existing || existing.userId !== userId) {
       return NextResponse.json({ error: 'Appointment not found' }, { status: 404 });
     }
 
@@ -57,7 +59,7 @@ export async function PATCH(
       }
 
       // Parse time (format: "10:00 AM")
-      const [hours, minutes] = time.split(':').map(v => parseInt(v.split(' ')[0]));
+      const [hours, minutes] = time.split(':').map((v: string) => parseInt(v.split(' ')[0]));
       const isPm = time.includes('PM');
       const adjustedHours = isPm && hours !== 12 ? hours + 12 : hours === 12 && !isPm ? 0 : hours;
 
@@ -69,7 +71,7 @@ export async function PATCH(
       // Check for conflicts (excluding this appointment)
       const conflicts = await prisma.appointment.findMany({
         where: {
-          userId: user.id,
+          userId: userId,
           status: { in: ['scheduled', 'confirmed'] },
           id: { not: appointmentId },
           OR: [

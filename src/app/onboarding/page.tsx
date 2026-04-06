@@ -6,18 +6,31 @@ import { useSession } from 'next-auth/react';
 import ProgressIndicator from '@/components/funnel/ProgressIndicator';
 import Step1AddClient from '@/components/onboarding/Step1AddClient';
 import Step2Appointment from '@/components/onboarding/Step2Appointment';
-import Step3BusinessHours from '@/components/onboarding/Step3BusinessHours';
+import Step3BusinessHours, { BusinessHoursForm } from '@/components/onboarding/Step3BusinessHours';
 import CompletionScreen from '@/components/onboarding/CompletionScreen';
 import { trackOnboardingStep, trackOnboardingSkipped, trackPageView } from '@/lib/ga4';
+
+// Days in the order the business-hours API expects (index 0 = Sunday)
+const DAYS_API_ORDER = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'] as const;
 
 export default function OnboardingPage() {
   const router = useRouter();
   const { data: session, status } = useSession();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [stepLoading, setStepLoading] = useState(false);
+  const [stepError, setStepError] = useState<string | null>(null);
 
-  // State for onboarding data
-  const [clientData, setClientData] = useState<any>(null);
+  // State for onboarding data — includes API-returned ids after Step 1
+  const [clientData, setClientData] = useState<{
+    name: string;
+    petName: string;
+    phone?: string;
+    email?: string;
+    breed?: string;
+    id?: string;
+    petId?: string;
+  } | null>(null);
 
   const STEPS = ['Client', 'Appointment', 'Hours'];
 
@@ -67,32 +80,146 @@ export default function OnboardingPage() {
     }
   };
 
-  const updateStep = async (step: number) => {
+  const updateProfileStep = async (step: number, completed = false) => {
     if (!session?.user?.id) return;
     await fetch('/api/profile', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId: session.user.id, onboardingStep: step }),
+      body: JSON.stringify({
+        userId: session.user.id,
+        onboardingStep: step,
+        ...(completed && { onboardingCompleted: true }),
+      }),
     });
   };
 
-  const handleStep1Next = (client: any) => {
-    setClientData(client);
-    updateStep(1);
-    trackOnboardingStep(1);
-    setStep(2);
+  // ── Step 1: Create client + pet ────────────────────────────────────────────
+  const handleStep1Next = async (client: {
+    name: string;
+    phone: string;
+    email: string;
+    petName: string;
+    breed: string;
+  }) => {
+    setStepError(null);
+    setStepLoading(true);
+    try {
+      // 1a. Create the client record
+      const clientRes = await fetch('/api/clients', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: client.name, email: client.email, phone: client.phone }),
+      });
+
+      if (!clientRes.ok) {
+        const err = await clientRes.json().catch(() => ({}));
+        throw new Error(err.error || 'Failed to create client');
+      }
+
+      const { client: savedClient } = await clientRes.json();
+
+      // 1b. Create the pet record (optional — only if a pet name was given)
+      let savedPetId: string | undefined;
+      if (client.petName) {
+        const petRes = await fetch(`/api/clients/${savedClient.id}/pets`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: client.petName, breed: client.breed }),
+        });
+
+        if (petRes.ok) {
+          const { pet } = await petRes.json();
+          savedPetId = pet.id;
+        }
+        // Non-fatal if pet creation fails — appointment step will handle missing petId gracefully
+      }
+
+      setClientData({ ...client, id: savedClient.id, petId: savedPetId });
+      await updateProfileStep(1);
+      trackOnboardingStep(1);
+      setStep(2);
+    } catch (err) {
+      console.error('Step 1 failed:', err);
+      setStepError(err instanceof Error ? err.message : 'Failed to save client. Please try again.');
+    } finally {
+      setStepLoading(false);
+    }
   };
 
-  const handleStep2Next = (_appointment: any) => {
-    updateStep(2);
-    trackOnboardingStep(2);
-    setStep(3);
+  // ── Step 2: Create appointment ─────────────────────────────────────────────
+  const handleStep2Next = async (appointment: {
+    service: string;
+    date: string;
+    time: string;
+    notes: string;
+  }) => {
+    setStepError(null);
+    setStepLoading(true);
+    try {
+      if (!clientData?.id) throw new Error('Client data is missing — please restart onboarding');
+
+      const res = await fetch('/api/appointments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          clientId: clientData.id,
+          petId: clientData.petId,
+          service: appointment.service,
+          date: appointment.date,
+          time: appointment.time,
+          notes: appointment.notes,
+        }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || 'Failed to create appointment');
+      }
+
+      await updateProfileStep(2);
+      trackOnboardingStep(2);
+      setStep(3);
+    } catch (err) {
+      console.error('Step 2 failed:', err);
+      setStepError(err instanceof Error ? err.message : 'Failed to save appointment. Please try again.');
+    } finally {
+      setStepLoading(false);
+    }
   };
 
-  const handleStep3Next = (_hours: any) => {
-    updateStep(3);
-    trackOnboardingStep(3);
-    setStep(4);
+  // ── Step 3: Save business hours ────────────────────────────────────────────
+  const handleStep3Next = async (hours: BusinessHoursForm) => {
+    setStepError(null);
+    setStepLoading(true);
+    try {
+      // API expects an array indexed 0–6 where 0 = Sunday
+      const hoursArray = DAYS_API_ORDER.map((day) => ({
+        enabled: hours[day].enabled,
+        open: hours[day].open,
+        close: hours[day].close,
+      }));
+
+      const res = await fetch('/api/business-hours', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ hours: hoursArray }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || 'Failed to save business hours');
+      }
+
+      // Mark onboarding complete
+      await updateProfileStep(3, true);
+      trackOnboardingStep(3);
+      setStep(4);
+    } catch (err) {
+      console.error('Step 3 failed:', err);
+      setStepError(err instanceof Error ? err.message : 'Failed to save business hours. Please try again.');
+    } finally {
+      setStepLoading(false);
+    }
   };
 
   const handleSkip = async () => {
@@ -130,10 +257,18 @@ export default function OnboardingPage() {
         )}
 
         <div className="bg-white rounded-2xl shadow-xl p-8">
+          {/* Step-level error banner */}
+          {stepError && (
+            <div className="mb-4 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-sm text-red-700">
+              {stepError}
+            </div>
+          )}
+
           {step === 1 && (
             <Step1AddClient
               onNext={handleStep1Next}
               onSkip={handleSkip}
+              isLoading={stepLoading}
             />
           )}
 
@@ -143,6 +278,7 @@ export default function OnboardingPage() {
               petName={clientData.petName}
               onNext={handleStep2Next}
               onSkip={handleSkip}
+              isLoading={stepLoading}
             />
           )}
 
@@ -150,6 +286,7 @@ export default function OnboardingPage() {
             <Step3BusinessHours
               onNext={handleStep3Next}
               onSkip={handleSkip}
+              isLoading={stepLoading}
             />
           )}
 

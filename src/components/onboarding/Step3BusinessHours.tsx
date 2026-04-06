@@ -1,13 +1,13 @@
 import { useState } from 'react';
-import { Check, X, ArrowRight, Clock } from 'lucide-react';
+import { Check, ArrowRight, Clock, Loader2 } from 'lucide-react';
 
-interface DayHours {
+export interface DayHours {
   enabled: boolean;
   open: string;
   close: string;
 }
 
-interface BusinessHoursForm {
+export interface BusinessHoursForm {
   monday: DayHours;
   tuesday: DayHours;
   wednesday: DayHours;
@@ -25,9 +25,14 @@ const TIME_OPTIONS = [
   '6:30 PM', '7:00 PM',
 ];
 
-export default function Step3BusinessHours({ onNext, onSkip }: {
-  onNext: (hours: BusinessHoursForm) => void;
+export default function Step3BusinessHours({
+  onNext,
+  onSkip,
+  isLoading = false,
+}: {
+  onNext: (hours: BusinessHoursForm) => Promise<void> | void;
   onSkip: () => void;
+  isLoading?: boolean;
 }) {
   const [hours, setHours] = useState<BusinessHoursForm>({
     monday: { enabled: true, open: '8:00 AM', close: '6:00 PM' },
@@ -38,6 +43,8 @@ export default function Step3BusinessHours({ onNext, onSkip }: {
     saturday: { enabled: true, open: '9:00 AM', close: '3:00 PM' },
     sunday: { enabled: false, open: '9:00 AM', close: '3:00 PM' },
   });
+
+  const [isSaving, setIsSaving] = useState(false);
 
   const hasEnabledDays = Object.values(hours).some(day => day.enabled);
 
@@ -61,6 +68,13 @@ export default function Step3BusinessHours({ onNext, onSkip }: {
     });
   };
 
+  const handleNext = async () => {
+    if (!hasEnabledDays) return;
+    setIsSaving(true);
+    await onNext(hours);
+    setIsSaving(false);
+  };
+
   const DAYS = [
     { key: 'monday', label: 'Mon' },
     { key: 'tuesday', label: 'Tue' },
@@ -82,10 +96,9 @@ export default function Step3BusinessHours({ onNext, onSkip }: {
         {DAYS.map((day) => (
           <div
             key={day.key}
-            className={cn(
-              "flex items-center gap-3 p-3 rounded-xl border transition-all",
+            className={`flex items-center gap-3 p-3 rounded-xl border transition-all ${
               hours[day.key].enabled ? "bg-white border-stone-200" : "bg-stone-50 border-stone-100 opacity-60"
-            )}
+            }`}
           >
             <div className="flex-shrink-0 w-20">
               <span className="text-sm font-semibold text-stone-900">{day.label}</span>
@@ -93,16 +106,14 @@ export default function Step3BusinessHours({ onNext, onSkip }: {
             
             <button
               onClick={() => toggleDay(day.key as keyof BusinessHoursForm)}
-              className={cn(
-                "relative w-11 h-6 rounded-full transition-colors flex-shrink-0",
+              className={`relative w-11 h-6 rounded-full transition-colors flex-shrink-0 ${
                 hours[day.key].enabled ? "bg-green-500" : "bg-stone-300"
-              )}
+              }`}
             >
               <span
-                className={cn(
-                  "absolute top-1 w-4 h-4 rounded-full bg-white transition-transform",
+                className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform ${
                   hours[day.key].enabled ? "left-6" : "left-1"
-                )}
+                }`}
               />
             </button>
 
@@ -142,17 +153,21 @@ export default function Step3BusinessHours({ onNext, onSkip }: {
           Skip for now
         </button>
         <button
-          onClick={() => hasEnabledDays && onNext(hours)}
-          disabled={!hasEnabledDays}
+          onClick={handleNext}
+          disabled={!hasEnabledDays || isLoading || isSaving}
           className="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-green-500 text-white hover:bg-green-600 disabled:bg-stone-300 disabled:cursor-not-allowed transition-colors"
         >
-          Complete Setup <Check className="w-5 h-5" />
+          {isLoading || isSaving ? (
+            <>
+              <Loader2 className="w-5 h-5 animate-spin" /> Saving...
+            </>
+          ) : (
+            <>
+              Complete Setup <Check className="w-5 h-5" />
+            </>
+          )}
         </button>
       </div>
     </div>
   );
-}
-
-function cn(...classes: string[]) {
-  return classes.filter(Boolean).join(' ');
 }

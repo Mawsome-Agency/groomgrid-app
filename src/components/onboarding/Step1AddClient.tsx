@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowRight, Phone, Mail } from 'lucide-react';
+import { ArrowRight, Phone, Mail, Loader2 } from 'lucide-react';
 
 interface ClientForm {
   name: string;
@@ -9,7 +9,15 @@ interface ClientForm {
   breed: string;
 }
 
-export default function Step1AddClient({ onNext, onSkip }: { onNext: (client: ClientForm) => void; onSkip: () => void }) {
+export default function Step1AddClient({
+  onNext,
+  onSkip,
+  isLoading = false,
+}: {
+  onNext: (client: ClientForm) => void;
+  onSkip: () => void;
+  isLoading?: boolean;
+}) {
   const [client, setClient] = useState<ClientForm>({
     name: '',
     phone: '',
@@ -35,7 +43,8 @@ export default function Step1AddClient({ onNext, onSkip }: { onNext: (client: Cl
             value={client.name}
             onChange={(e) => setClient({ ...client, name: e.target.value })}
             placeholder="e.g., Sarah Cooper"
-            className="w-full px-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            disabled={isLoading}
+            className="w-full px-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-green-500 focus:border-transparent disabled:bg-stone-50 disabled:cursor-not-allowed"
           />
         </div>
 
@@ -49,7 +58,8 @@ export default function Step1AddClient({ onNext, onSkip }: { onNext: (client: Cl
                 value={client.phone}
                 onChange={(e) => setClient({ ...client, phone: e.target.value })}
                 placeholder="(505) 555-0192"
-                className="w-full pl-10 pr-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                disabled={isLoading}
+                className="w-full pl-10 pr-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-green-500 focus:border-transparent disabled:bg-stone-50 disabled:cursor-not-allowed"
               />
             </div>
           </div>
@@ -62,7 +72,8 @@ export default function Step1AddClient({ onNext, onSkip }: { onNext: (client: Cl
                 value={client.email}
                 onChange={(e) => setClient({ ...client, email: e.target.value })}
                 placeholder="sarah@email.com"
-                className="w-full pl-10 pr-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                disabled={isLoading}
+                className="w-full pl-10 pr-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-green-500 focus:border-transparent disabled:bg-stone-50 disabled:cursor-not-allowed"
               />
             </div>
           </div>
@@ -78,7 +89,8 @@ export default function Step1AddClient({ onNext, onSkip }: { onNext: (client: Cl
                 value={client.petName}
                 onChange={(e) => setClient({ ...client, petName: e.target.value })}
                 placeholder="e.g., Bailey"
-                className="w-full px-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                disabled={isLoading}
+                className="w-full px-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-green-500 focus:border-transparent disabled:bg-stone-50 disabled:cursor-not-allowed"
               />
             </div>
             <div>
@@ -88,7 +100,8 @@ export default function Step1AddClient({ onNext, onSkip }: { onNext: (client: Cl
                 value={client.breed}
                 onChange={(e) => setClient({ ...client, breed: e.target.value })}
                 placeholder="e.g., Labrador"
-                className="w-full px-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                disabled={isLoading}
+                className="w-full px-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-green-500 focus:border-transparent disabled:bg-stone-50 disabled:cursor-not-allowed"
               />
             </div>
           </div>
@@ -98,16 +111,26 @@ export default function Step1AddClient({ onNext, onSkip }: { onNext: (client: Cl
       <div className="flex gap-3">
         <button
           onClick={onSkip}
-          className="px-6 py-3 rounded-xl border border-stone-300 text-stone-600 hover:bg-stone-50 transition-colors"
+          disabled={isLoading}
+          className="px-6 py-3 rounded-xl border border-stone-300 text-stone-600 hover:bg-stone-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           Skip for now
         </button>
         <button
-          onClick={() => isValid && onNext(client)}
-          disabled={!isValid}
+          onClick={() => isValid && !isLoading && onNext(client)}
+          disabled={!isValid || isLoading}
           className="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-green-500 text-white hover:bg-green-600 disabled:bg-stone-300 disabled:cursor-not-allowed transition-colors"
         >
-          Add Client <ArrowRight className="w-5 h-5" />
+          {isLoading ? (
+            <>
+              <Loader2 className="w-5 h-5 animate-spin" />
+              Saving…
+            </>
+          ) : (
+            <>
+              Add Client <ArrowRight className="w-5 h-5" />
+            </>
+          )}
         </button>
       </div>
     </div>
