@@ -6,11 +6,30 @@ import { useSession, signOut } from 'next-auth/react';
 import { Calendar, Users, DollarSign, Plus, LogOut, Settings, Menu, X } from 'lucide-react';
 import { trackPageView } from '@/lib/ga4';
 
+interface Appointment {
+  id: string;
+  service: string;
+  startTime: string;
+  status: string;
+  client: { name: string };
+  pet?: { name: string };
+}
+
+interface Client {
+  id: string;
+  name: string;
+  _count: { appointments: number };
+}
+
 export default function DashboardPage() {
   const router = useRouter();
   const { data: session, status } = useSession();
   const [profile, setProfile] = useState<any>(null);
+  const [todayAppointments, setTodayAppointments] = useState<Appointment[]>([]);
+  const [clientCount, setClientCount] = useState(0);
+  const [weekRevenue, setWeekRevenue] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     trackPageView('/dashboard', 'Dashboard');
@@ -23,19 +42,63 @@ export default function DashboardPage() {
     }
 
     if (status === 'authenticated' && session?.user?.id) {
-      fetchProfile(session.user.id);
+      fetchDashboardData();
     }
   }, [status, session]);
 
-  const fetchProfile = async (userId: string) => {
+  const fetchDashboardData = async () => {
     try {
-      const res = await fetch(`/api/profile?userId=${userId}`);
-      if (res.ok) {
-        const data = await res.json();
+      const [profileRes, appointmentsRes, clientsRes] = await Promise.all([
+        fetch(`/api/profile?userId=${session.user.id}`),
+        fetch('/api/clients'),
+        fetch('/api/appointments'),
+      ]);
+
+      if (profileRes.ok) {
+        const data = await profileRes.json();
         setProfile(data.profile);
       }
+
+      if (clientsRes.ok) {
+        const data = await clientsRes.json();
+        setClientCount(data.clients.length);
+      }
+
+      if (appointmentsRes.ok) {
+        const data = await appointmentsRes.json();
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const endOfToday = new Date(today);
+        endOfToday.setHours(23, 59, 59, 999);
+
+        const todayApps = data.appointments.filter((appt: Appointment) => {
+          const apptTime = new Date(appt.startTime);
+          return apptTime >= today && apptTime <= endOfToday;
+        });
+        setTodayAppointments(todayApps);
+
+        // Calculate revenue for the last 7 days (completed appointments only)
+        const weekAgo = new Date();
+        weekAgo.setDate(weekAgo.getDate() - 7);
+        const weekApps = data.appointments.filter((appt: Appointment) => {
+          const apptTime = new Date(appt.startTime);
+          return apptTime >= weekAgo && appt.status === 'completed';
+        });
+        const revenue = weekApps.reduce((sum: number, appt: Appointment) => {
+          const servicePrices: Record<string, number> = {
+            'Full Groom': 65,
+            'Bath + Brush': 40,
+            'Nail Trim': 20,
+            'Teeth Brushing': 15,
+          };
+          return sum + (servicePrices[appt.service] || 0);
+        }, 0);
+        setWeekRevenue(revenue);
+      }
     } catch (err) {
-      console.error('Failed to fetch profile:', err);
+      console.error('Failed to fetch dashboard data:', err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -43,7 +106,20 @@ export default function DashboardPage() {
     await signOut({ callbackUrl: '/' });
   };
 
-  if (status === 'loading' || !session) {
+  const handleStatusChange = async (appointmentId: string, newStatus: string) => {
+    try {
+      await fetch(`/api/appointments/${appointmentId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      await fetchDashboardData();
+    } catch (err) {
+      console.error('Failed to update appointment:', err);
+    }
+  };
+
+  if (status === 'loading' || loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-stone-50 flex items-center justify-center">
         <div className="text-center">Loading...</div>
@@ -79,16 +155,16 @@ export default function DashboardPage() {
       {/* Mobile Menu */}
       {mobileMenuOpen && (
         <div className="lg:hidden bg-white border-b border-stone-200 px-4 py-4 space-y-3">
-          <a href="#" className="flex items-center gap-2 text-stone-900 font-medium">
+          <a href="/dashboard" className="flex items-center gap-2 text-stone-900 font-medium">
             <Calendar className="w-5 h-5" /> Today
           </a>
-          <a href="#" className="flex items-center gap-2 text-stone-600">
+          <a href="/schedule" className="flex items-center gap-2 text-stone-600">
             <Calendar className="w-5 h-5" /> Schedule
           </a>
-          <a href="#" className="flex items-center gap-2 text-stone-600">
+          <a href="/clients" className="flex items-center gap-2 text-stone-600">
             <Users className="w-5 h-5" /> Clients
           </a>
-          <a href="#" className="flex items-center gap-2 text-stone-600">
+          <a href="/settings" className="flex items-center gap-2 text-stone-600">
             <Settings className="w-5 h-5" /> Settings
           </a>
           <button
@@ -108,16 +184,16 @@ export default function DashboardPage() {
               <h1 className="text-2xl font-bold text-green-600 mb-6">GroomGrid</h1>
 
               <nav className="space-y-2">
-                <a href="#" className="flex items-center gap-3 px-4 py-3 rounded-xl bg-green-50 text-green-700 font-medium">
+                <a href="/dashboard" className="flex items-center gap-3 px-4 py-3 rounded-xl bg-green-50 text-green-700 font-medium">
                   <Calendar className="w-5 h-5" /> Today
                 </a>
-                <a href="#" className="flex items-center gap-3 px-4 py-3 rounded-xl text-stone-600 hover:bg-stone-50 transition-colors">
+                <a href="/schedule" className="flex items-center gap-3 px-4 py-3 rounded-xl text-stone-600 hover:bg-stone-50 transition-colors">
                   <Calendar className="w-5 h-5" /> Schedule
                 </a>
-                <a href="#" className="flex items-center gap-3 px-4 py-3 rounded-xl text-stone-600 hover:bg-stone-50 transition-colors">
+                <a href="/clients" className="flex items-center gap-3 px-4 py-3 rounded-xl text-stone-600 hover:bg-stone-50 transition-colors">
                   <Users className="w-5 h-5" /> Clients
                 </a>
-                <a href="#" className="flex items-center gap-3 px-4 py-3 rounded-xl text-stone-600 hover:bg-stone-50 transition-colors">
+                <a href="/settings" className="flex items-center gap-3 px-4 py-3 rounded-xl text-stone-600 hover:bg-stone-50 transition-colors">
                   <Settings className="w-5 h-5" /> Settings
                 </a>
               </nav>
@@ -164,8 +240,8 @@ export default function DashboardPage() {
                   </div>
                   <span className="text-sm text-stone-500">Today</span>
                 </div>
-                <p className="text-3xl font-bold text-stone-900">0</p>
-                <p className="text-xs text-stone-500 mt-1">appointments</p>
+                <p className="text-3xl font-bold text-stone-900">{todayAppointments.length}</p>
+                <p className="text-xs text-stone-500 mt-1">appointment{todayAppointments.length !== 1 ? 's' : ''}</p>
               </div>
 
               <div className="bg-white rounded-2xl shadow-sm p-6">
@@ -175,7 +251,7 @@ export default function DashboardPage() {
                   </div>
                   <span className="text-sm text-stone-500">Clients</span>
                 </div>
-                <p className="text-3xl font-bold text-stone-900">0</p>
+                <p className="text-3xl font-bold text-stone-900">{clientCount}</p>
                 <p className="text-xs text-stone-500 mt-1">total</p>
               </div>
 
@@ -186,37 +262,101 @@ export default function DashboardPage() {
                   </div>
                   <span className="text-sm text-stone-500">Revenue</span>
                 </div>
-                <p className="text-3xl font-bold text-stone-900">$0</p>
+                <p className="text-3xl font-bold text-stone-900">${weekRevenue}</p>
                 <p className="text-xs text-stone-500 mt-1">this week</p>
               </div>
             </div>
 
+            {/* Today's Appointments */}
+            <div className="bg-white rounded-2xl shadow-sm p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold text-stone-900">Today's Appointments</h2>
+                <a href="/schedule" className="text-sm text-green-600 hover:text-green-700">
+                  View Calendar →
+                </a>
+              </div>
+
+              {todayAppointments.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-stone-500 mb-4">No appointments scheduled for today</p>
+                  <a
+                    href="/schedule"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+                  >
+                    <Plus className="w-4 h-4" /> Book Appointment
+                  </a>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {todayAppointments
+                    .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime())
+                    .map((appt) => (
+                      <div
+                        key={appt.id}
+                        className={`border rounded-xl p-4 ${
+                          appt.status === 'completed' ? 'border-green-200 bg-green-50' :
+                          appt.status === 'cancelled' ? 'border-stone-200 bg-stone-50' :
+                          'border-stone-200'
+                        }`}
+                      >
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <p className="font-semibold text-stone-900">{appt.service}</p>
+                            <p className="text-sm text-stone-600">
+                              {new Date(appt.startTime).toLocaleTimeString('en-US', {
+                                hour: 'numeric',
+                                minute: '2-digit'
+                              })} · {appt.client.name}
+                              {appt.pet && <span> · {appt.pet.name}</span>}
+                            </p>
+                          </div>
+                          {appt.status === 'scheduled' && (
+                            <button
+                              onClick={() => handleStatusChange(appt.id, 'completed')}
+                              className="p-2 text-green-600 hover:bg-green-100 rounded-lg transition-colors"
+                              title="Mark as complete"
+                            >
+                              <Calendar className="w-5 h-5" />
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              )}
+            </div>
+
             {/* FAB */}
-            <button className="fixed bottom-6 right-6 lg:hidden w-14 h-14 rounded-full bg-green-500 text-white shadow-lg hover:bg-green-600 transition-colors flex items-center justify-center">
+            <button
+              onClick={() => router.push('/schedule')}
+              className="fixed bottom-6 right-6 lg:hidden w-14 h-14 rounded-full bg-green-500 text-white shadow-lg hover:bg-green-600 transition-colors flex items-center justify-center"
+            >
               <Plus className="w-6 h-6" />
             </button>
 
-            {/* Welcome Card */}
-            <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-2xl p-8 text-white">
-              <h2 className="text-2xl font-bold mb-2">Welcome to GroomGrid!</h2>
-              <p className="text-green-100 mb-6">
-                Your account is set up and ready. Here's how to get started:
-              </p>
-              <div className="space-y-3">
-                <div className="flex items-start gap-3">
-                  <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center text-sm flex-shrink-0">1</div>
-                  <p>Add your first client from the Clients tab</p>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center text-sm flex-shrink-0">2</div>
-                  <p>Book your first appointment</p>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center text-sm flex-shrink-0">3</div>
-                  <p>Set your business hours in Settings</p>
+            {/* Welcome Card (shown only if no data) */}
+            {todayAppointments.length === 0 && clientCount === 0 && weekRevenue === 0 && (
+              <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-2xl p-8 text-white">
+                <h2 className="text-2xl font-bold mb-2">Welcome to GroomGrid!</h2>
+                <p className="text-green-100 mb-6">
+                  Your account is set up and ready. Here's how to get started:
+                </p>
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3">
+                    <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center text-sm flex-shrink-0">1</div>
+                    <p>Add your first client from the <a href="/clients" className="underline">Clients tab</a></p>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center text-sm flex-shrink-0">2</div>
+                    <p>Book your first appointment</p>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center text-sm flex-shrink-0">3</div>
+                    <p>Set your business hours in Settings</p>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </main>
         </div>
       </div>
