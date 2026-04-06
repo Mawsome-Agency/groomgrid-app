@@ -1,10 +1,10 @@
-interface EmailContent {
+export interface EmailContent {
   subject: string
   html: string
   text: string
 }
 
-const BRAND = {
+export const BRAND = {
   primary: '#22c55e',
   bg: '#fafaf9',
   text: '#292524',
@@ -13,7 +13,7 @@ const BRAND = {
   white: '#ffffff',
 }
 
-function emailWrapper(body: string): string {
+export function emailWrapper(body: string): string {
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -55,15 +55,15 @@ function emailWrapper(body: string): string {
 </html>`
 }
 
-function ctaButton(label: string, href: string): string {
+export function ctaButton(label: string, href: string): string {
   return `<a href="${href}" style="display:inline-block;background-color:${BRAND.primary};color:${BRAND.white};font-weight:600;font-size:15px;padding:14px 28px;border-radius:8px;text-decoration:none;margin-top:24px;">${label}</a>`
 }
 
-function h1(text: string): string {
+export function h1(text: string): string {
   return `<h1 style="margin:0 0 16px 0;font-size:24px;font-weight:700;color:${BRAND.text};line-height:1.3;">${text}</h1>`
 }
 
-function p(text: string, muted = false): string {
+export function p(text: string, muted = false): string {
   return `<p style="margin:0 0 14px 0;font-size:15px;line-height:1.6;color:${muted ? BRAND.textMuted : BRAND.text};">${text}</p>`
 }
 
