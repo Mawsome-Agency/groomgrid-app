@@ -19,6 +19,9 @@ model User {
   dripQueue       DripEmailQueue[]
   feedback        Feedback[]
   analyticsEvents AnalyticsEvent[]
+  clients         Client[]
+  appointments    Appointment[]
+  businessHours   BusinessHours[]
 
   @@map("users")
 }
@@ -41,6 +44,81 @@ model Profile {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("profiles")
+}
+
+model Client {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  name      String
+  email     String?
+  phone     String?
+  address   String?
+  notes     String?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  pets Pet[]
+  appointments Appointment[]
+
+  @@map("clients")
+}
+
+model Pet {
+  id          String   @id @default(cuid())
+  clientId    String   @map("client_id")
+  name        String
+  breed       String?
+  size        String?  // small, medium, large, giant
+  age         String?
+  specialNotes String?  @map("special_notes")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  client       Client       @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  appointments Appointment[]
+
+  @@map("pets")
+}
+
+model Appointment {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  clientId  String   @map("client_id")
+  petId     String?  @map("pet_id")
+  service   String   // Full Groom, Bath + Brush, Nail Trim, etc.
+  startTime DateTime @map("start_time")
+  endTime   DateTime @map("end_time")
+  price     Int      // in cents
+  status    String   @default("scheduled") // scheduled, completed, cancelled, no_show
+  notes     String?
+  invoiceId String?  @map("invoice_id")
+  reminderSent Boolean @default(false) @map("reminder_sent")
+  noShowCharged Boolean @default(false) @map("no_show_charged")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  pet    Pet?   @relation(fields: [petId], references: [id], onDelete: SetNull)
+
+  @@map("appointments")
+}
+
+model BusinessHours {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  dayOfWeek Int      @map("day_of_week") // 0 = Sunday, 1 = Monday, etc.
+  openTime  String   @map("open_time")   // "08:00"
+  closeTime String   @map("close_time")  // "18:00"
+  enabled   Boolean  @default(true)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, dayOfWeek])
+  @@map("business_hours")
 }
 
 model DripEmailQueue {
