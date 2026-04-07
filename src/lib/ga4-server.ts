@@ -154,3 +154,26 @@ export async function trackSubscriptionCancelledServer(
     userId
   );
 }
+
+export async function trackSubscriptionStartedServer(
+  userId: string,
+  subscriptionId: string,
+  planType: string,
+  status: string,
+  price: number
+): Promise<void> {
+  await trackServerEvent(
+    userId,
+    {
+      name: 'subscription_started',
+      params: {
+        subscription_id: subscriptionId,
+        plan_type: planType,
+        subscription_status: status,
+        price: price,
+        currency: 'USD',
+      },
+    },
+    userId
+  );
+}

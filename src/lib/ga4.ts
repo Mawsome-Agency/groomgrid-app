@@ -79,6 +79,29 @@ export function trackOnboardingSkipped(reason?: string) {
   });
 }
 
+export function trackAccountCreated(userId: string, businessName: string) {
+  trackEvent('account_created', {
+    user_id: userId,
+    business_name: businessName,
+    timestamp: new Date().toISOString(),
+  });
+}
+
+export function trackSubscriptionStarted(
+  userId: string,
+  planType: string,
+  price: number,
+  currency: string = 'USD'
+) {
+  trackEvent('subscription_started', {
+    user_id: userId,
+    plan_type: planType,
+    price: price,
+    currency: currency,
+    timestamp: new Date().toISOString(),
+  });
+}
+
 export function trackPageView(pagePath: string, pageTitle: string) {
   trackEvent('page_view', {
     page_path: pagePath,
