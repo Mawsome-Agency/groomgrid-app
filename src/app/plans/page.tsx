@@ -7,7 +7,7 @@ import { Plan } from '@/types';
 import PlanCard from '@/components/funnel/PlanCard';
 import Testimonial from '@/components/funnel/Testimonial';
 import ValueProp from '@/components/funnel/ValueProp';
-import { trackPageView } from '@/lib/ga4';
+import { trackPageView, trackPlanSelected } from '@/lib/ga4';
 
 const PLANS: Plan[] = [
   {
@@ -92,6 +92,9 @@ export default function PlansPage() {
 
     setSelectedPlan(plan);
     setLoading(true);
+
+    // Fire client-side GA4 event before redirect — window.gtag is available here
+    trackPlanSelected(plan.type, plan.price);
 
     try {
       const response = await fetch('/api/checkout', {

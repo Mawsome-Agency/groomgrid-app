@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 export const dynamic = 'force-dynamic';
 import { getCheckoutSession } from '@/lib/stripe';
 import prisma from '@/lib/prisma';
-import { trackCheckoutCompleted } from '@/lib/ga4';
+import { trackCheckoutCompletedServer } from '@/lib/ga4-server';
 
 export async function GET(req: NextRequest) {
   try {
@@ -20,18 +20,23 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid session' }, { status: 400 });
     }
 
+    const userId = session.metadata.userId;
+    const planType = (session.metadata.planType as string) ?? 'unknown';
+
     await prisma.profile.update({
-      where: { userId: session.metadata.userId },
+      where: { userId },
       data: {
         stripeCustomerId: typeof session.customer === 'string' ? session.customer : undefined,
         stripeSubscriptionId: typeof session.subscription === 'string' ? session.subscription : undefined,
-        planType: session.metadata.planType as string,
+        planType,
         subscriptionStatus: 'trial',
         trialEndsAt: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
       },
     });
 
-    trackCheckoutCompleted(session_id, session.metadata.planType, true);
+    // Fire server-side GA4 event via Measurement Protocol
+    // (window.gtag is unavailable in server routes — requires GA4_API_SECRET in .env)
+    await trackCheckoutCompletedServer(userId, session_id, planType, true);
 
     return NextResponse.redirect(new URL(`/onboarding?session_id=${session_id}`, req.url));
   } catch (error: any) {

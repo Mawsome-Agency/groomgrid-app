@@ -3,7 +3,9 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/next-auth-options';
 import { createCheckoutSession } from '@/lib/stripe';
 import prisma from '@/lib/prisma';
-import { trackPlanSelected } from '@/lib/ga4';
+
+// Note: trackPlanSelected is intentionally fired client-side (plans/page.tsx)
+// before this API call. window.gtag is unavailable in server routes.
 
 export async function POST(req: NextRequest) {
   try {
@@ -17,9 +19,6 @@ export async function POST(req: NextRequest) {
     if (!profile) {
       return NextResponse.json({ error: 'Profile not found' }, { status: 404 });
     }
-
-    const prices: Record<string, number> = { solo: 29, salon: 79, enterprise: 149 };
-    trackPlanSelected(planType, prices[planType]);
 
     const session = await createCheckoutSession({
       userId,
