@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getSession } from '@/lib/auth';
+import { getCurrentUser } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 
 // GET /api/business-hours - Get business hours for current user
 export async function GET(req: NextRequest) {
   try {
-    const user = await getSession();
+    const user = await getCurrentUser();
     if (!user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
 // POST /api/business-hours - Save business hours for current user
 export async function POST(req: NextRequest) {
   try {
-    const user = await getSession();
+    const user = await getCurrentUser();
     if (!user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }

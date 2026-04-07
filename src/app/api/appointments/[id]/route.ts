@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getSession } from '@/lib/auth';
+import { getCurrentUser } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 
 // Service definitions with duration in minutes and price in cents
@@ -16,7 +16,7 @@ export async function PATCH(
   { params }: { params: { id: string } }
 ) {
   try {
-    const user = await getSession();
+    const user = await getCurrentUser();
     if (!user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -57,7 +57,7 @@ export async function PATCH(
       }
 
       // Parse time (format: "10:00 AM")
-      const [hours, minutes] = time.split(':').map(v => parseInt(v.split(' ')[0]));
+      const [hours, minutes] = time.split(':').map((v: string) => parseInt(v.split(' ')[0]));
       const isPm = time.includes('PM');
       const adjustedHours = isPm && hours !== 12 ? hours + 12 : hours === 12 && !isPm ? 0 : hours;
 

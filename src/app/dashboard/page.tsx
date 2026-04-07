@@ -49,7 +49,7 @@ export default function DashboardPage() {
   const fetchDashboardData = async () => {
     try {
       const [profileRes, appointmentsRes, clientsRes] = await Promise.all([
-        fetch(`/api/profile?userId=${session.user.id}`),
+        fetch(`/api/profile?userId=${session?.user?.id}`),
         fetch('/api/clients'),
         fetch('/api/appointments'),
       ]);
@@ -132,7 +132,7 @@ export default function DashboardPage() {
     ? Math.max(0, Math.ceil((new Date(profile.trial_ends_at).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
     : 0;
 
-  const businessName = profile?.business_name || session.user.name || 'My Business';
+  const businessName = profile?.business_name || session?.user?.name || 'My Business';
 
   return (
     <div className="min-h-screen bg-stone-50">
