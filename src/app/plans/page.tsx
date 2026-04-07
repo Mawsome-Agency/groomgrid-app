@@ -81,14 +81,14 @@ export default function PlansPage() {
     trackPageView('/plans', 'Plan Selection');
   }, []);
 
-  useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push('/login');
-    }
-  }, [status]);
+  // No auth redirect — /plans is publicly accessible so anyone can view pricing
 
   const handleSelectPlan = async (plan: Plan) => {
-    if (!session?.user?.id) return;
+    // Unauthenticated users go to signup with plan context
+    if (status === 'unauthenticated' || !session?.user?.id) {
+      router.push(`/signup?plan=${plan.type}`);
+      return;
+    }
 
     setSelectedPlan(plan);
     setLoading(true);
@@ -122,7 +122,8 @@ export default function PlansPage() {
     }
   };
 
-  if (status === 'loading' || !session) {
+  // Only block render during initial auth state load — not for unauthenticated users
+  if (status === 'loading') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-stone-50 flex items-center justify-center">
         <div className="text-center">Loading...</div>
@@ -136,12 +137,29 @@ export default function PlansPage() {
       <header className="bg-white border-b border-stone-200">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <h1 className="text-2xl font-bold text-green-600">GroomGrid</h1>
-          <button
-            onClick={() => signOut({ callbackUrl: '/' })}
-            className="text-stone-600 hover:text-stone-900 text-sm"
-          >
-            Sign Out
-          </button>
+          {session ? (
+            <button
+              onClick={() => signOut({ callbackUrl: '/' })}
+              className="text-stone-600 hover:text-stone-900 text-sm"
+            >
+              Sign Out
+            </button>
+          ) : (
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => router.push('/login')}
+                className="text-stone-600 hover:text-stone-900 text-sm"
+              >
+                Sign In
+              </button>
+              <button
+                onClick={() => router.push('/signup')}
+                className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700 transition-colors"
+              >
+                Get Started
+              </button>
+            </div>
+          )}
         </div>
       </header>
 
