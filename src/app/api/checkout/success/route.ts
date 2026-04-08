@@ -47,7 +47,7 @@ export async function GET(req: NextRequest) {
       0
     );
 
-    return NextResponse.redirect(new URL(`/onboarding?session_id=${session_id}`, req.url));
+    return NextResponse.redirect(new URL(`/checkout/success?session_id=${session_id}`, req.url));
   } catch (error: any) {
     console.error('Checkout success error:', error);
     return NextResponse.redirect(new URL('/plans', req.url));
