@@ -12,13 +12,18 @@
 
 ```
 Internet → nginx (443/80) → PM2 processes
-                          ├── groomgrid-prod  (port 3000) → getgroomgrid.com
-                          └── groomgrid-staging (port 3001) → staging.getgroomgrid.com
+                          ├── groomgrid-landing (port 3002) → getgroomgrid.com
+                          ├── groomgrid-prod     (port 3000) → app.getgroomgrid.com
+                          └── groomgrid-staging  (port 3001) → staging.getgroomgrid.com
 
 Both apps share:
   - PostgreSQL (local, groomgrid_prod / groomgrid_staging)
   - SSL certs via Certbot (wildcard: *.getgroomgrid.com)
   - Node.js 22 / PM2
+
+Redirects (from getgroomgrid.com → app.getgroomgrid.com):
+  - /signup → /signup
+  - /plans  → /plans
 ```
 
 ---
@@ -88,6 +93,13 @@ pm2 save
 pm2 status
 curl -o /dev/null -sw "%{http_code}" https://getgroomgrid.com/
 # Expected: 200
+
+# Test redirects
+curl -sI https://getgroomgrid.com/signup | grep -E "^Location:"
+# Expected: Location: https://app.getgroomgrid.com/signup
+
+curl -sI https://getgroomgrid.com/plans | grep -E "^Location:"
+# Expected: Location: https://app.getgroomgrid.com/plans
 ```
 
 ---
@@ -122,7 +134,7 @@ Both prod and staging have their own `.env.local` at the app root.
 | `STRIPE_PRICE_SOLO` | price_ ID for Solo $29/mo plan |
 | `STRIPE_PRICE_SALON` | price_ ID for Salon $79/mo plan |
 | `STRIPE_PRICE_ENTERPRISE` | price_ ID for Enterprise $149/mo plan |
-| `NEXT_PUBLIC_APP_URL` | https://getgroomgrid.com |
+| `NEXT_PUBLIC_APP_URL` | https://app.getgroomgrid.com (for app) or https://getgroomgrid.com (for landing) |
 | `RESEND_API_KEY` | re_ key for transactional email |
 | `CRON_SECRET` | Secret token for cron job auth |
 | `NEXT_PUBLIC_GA4_MEASUREMENT_ID` | G-XXXXXXXXXX |
@@ -140,8 +152,17 @@ cd /var/www/groomgrid/prod && pm2 restart groomgrid-prod
 ## nginx Configuration
 
 Configs live at `/etc/nginx/sites-enabled/`:
-- `groomgrid-prod` → routes `getgroomgrid.com` → `localhost:3000`
+- `groomgrid-landing` → routes `getgroomgrid.com` → `localhost:3002`
+- `groomgrid-app` → routes `app.getgroomgrid.com` → `localhost:3000`
+- `groomgrid-prod` → routes `getgroomgrid.com` → `localhost:3002` (marketing site)
 - `groomgrid-staging` → routes `staging.getgroomgrid.com` → `localhost:3001`
+
+**Important Redirects:**
+The marketing site (`getgroomgrid.com`) redirects certain paths to the app subdomain:
+- `getgroomgrid.com/signup` → `app.getgroomgrid.com/signup`
+- `getgroomgrid.com/plans` → `app.getgroomgrid.com/plans`
+
+These redirects are configured in the `groomgrid-prod` nginx config (location blocks for `/signup` and `/plans`).
 
 To reload nginx after config changes:
 ```bash
@@ -260,10 +281,19 @@ pm2 list
 
 echo ""
 echo "=== HTTP Check ==="
-PROD_CODE=$(curl -o /dev/null -sw "%{http_code}" https://getgroomgrid.com/)
+LANDING_CODE=$(curl -o /dev/null -sw "%{http_code}" https://getgroomgrid.com/)
+APP_CODE=$(curl -o /dev/null -sw "%{http_code}" https://app.getgroomgrid.com/)
 STAGING_CODE=$(curl -o /dev/null -sw "%{http_code}" https://staging.getgroomgrid.com/)
-echo "Production: $PROD_CODE"
+echo "Landing (getgroomgrid.com): $LANDING_CODE"
+echo "App (app.getgroomgrid.com): $APP_CODE"
 echo "Staging: $STAGING_CODE"
+
+echo ""
+echo "=== Redirect Check ==="
+SIGNUP_REDIRECT=$(curl -sI https://getgroomgrid.com/signup | grep -o "https://app.getgroomgrid.com/signup")
+PLANS_REDIRECT=$(curl -sI https://getgroomgrid.com/plans | grep -o "https://app.getgroomgrid.com/plans")
+echo "Signup redirect: ${SIGNUP_REDIRECT:-FAILED}"
+echo "Plans redirect: ${PLANS_REDIRECT:-FAILED}"
 
 echo ""
 echo "=== DB Check ==="
