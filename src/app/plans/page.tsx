@@ -16,7 +16,7 @@ const PLANS: Plan[] = [
     type: 'solo',
     price: 29,
     interval: 'monthly',
-    stripe_price_id: 'price_solo_placeholder',
+    stripe_price_id: '', // resolved server-side via STRIPE_PRICE_SOLO env var
     features: [
       '1 groomer account',
       'Unlimited clients & appointments',
@@ -31,7 +31,7 @@ const PLANS: Plan[] = [
     type: 'salon',
     price: 79,
     interval: 'monthly',
-    stripe_price_id: 'price_salon_placeholder',
+    stripe_price_id: '', // resolved server-side via STRIPE_PRICE_SALON env var
     popular: true,
     features: [
       'Everything in Solo',
@@ -47,7 +47,7 @@ const PLANS: Plan[] = [
     type: 'enterprise',
     price: 149,
     interval: 'monthly',
-    stripe_price_id: 'price_enterprise_placeholder',
+    stripe_price_id: '', // resolved server-side via STRIPE_PRICE_ENTERPRISE env var
     features: [
       'Everything in Salon',
       'Unlimited groomers',
