@@ -1,14 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
 import prisma from '@/lib/prisma';
-
-// Service definitions with duration in minutes and price in cents
-const SERVICES: Record<string, { duration: number; price: number }> = {
-  'Full Groom': { duration: 120, price: 6500 },
-  'Bath + Brush': { duration: 60, price: 4000 },
-  'Nail Trim': { duration: 15, price: 2000 },
-  'Teeth Brushing': { duration: 10, price: 1500 },
-};
+import { SERVICE_MAP } from '@/lib/services';
+import { estimateGroomingTime } from '@/lib/breed-intelligence';
 
 // GET /api/appointments - List appointments with optional date filtering
 export async function GET(req: NextRequest) {
@@ -77,7 +71,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Client not found' }, { status: 404 });
     }
 
-    // Verify the pet belongs to the client (if provided)
+    // Look up pet for breed/size info (used for intelligent time estimation)
+    let petBreed: string | null = null;
+    let petSize: string | null = null;
+
     if (petId) {
       const pet = await prisma.pet.findUnique({
         where: { id: petId },
@@ -86,13 +83,18 @@ export async function POST(req: NextRequest) {
       if (!pet || pet.clientId !== clientId) {
         return NextResponse.json({ error: 'Pet not found' }, { status: 404 });
       }
+
+      petBreed = pet.breed;
+      petSize = pet.size;
     }
 
-    // Calculate start and end times
-    const serviceInfo = SERVICES[service];
+    // Validate service and calculate breed-aware duration
+    const serviceInfo = SERVICE_MAP[service];
     if (!serviceInfo) {
       return NextResponse.json({ error: 'Invalid service' }, { status: 400 });
     }
+
+    const estimate = estimateGroomingTime(service, petBreed, petSize);
 
     // Parse date and time (format: "2024-04-06", "10:00 AM")
     const [hours, minutes] = time.split(':').map((v: string) => parseInt(v.split(' ')[0]));
@@ -102,7 +104,7 @@ export async function POST(req: NextRequest) {
     const startTime = new Date(date);
     startTime.setHours(adjustedHours, minutes, 0, 0);
 
-    const endTime = new Date(startTime.getTime() + serviceInfo.duration * 60 * 1000);
+    const endTime = new Date(startTime.getTime() + estimate.duration * 60 * 1000);
 
     // Check for conflicts with existing appointments
     const conflicts = await prisma.appointment.findMany({
@@ -142,7 +144,7 @@ export async function POST(req: NextRequest) {
         service,
         startTime,
         endTime,
-        price: serviceInfo.price,
+        price: serviceInfo.basePrice,
         status: 'scheduled',
         notes,
       },
