@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowRight, Clock, Scissors } from 'lucide-react';
+import { ArrowRight, Clock, Scissors, Loader2 } from 'lucide-react';
 
 interface AppointmentForm {
   service: string;
@@ -20,11 +20,18 @@ const TIME_SLOTS = [
   '11:00 AM', '11:30 AM', '12:00 PM', '1:00 PM', '2:00 PM', '3:00 PM',
 ];
 
-export default function Step2Appointment({ clientName, petName, onNext, onSkip }: {
+export default function Step2Appointment({
+  clientName,
+  petName,
+  onNext,
+  onSkip,
+  isLoading = false,
+}: {
   clientName: string;
   petName: string;
   onNext: (appointment: AppointmentForm) => void;
   onSkip: () => void;
+  isLoading?: boolean;
 }) {
   const [appointment, setAppointment] = useState<AppointmentForm>({
     service: 'Full Groom',
@@ -51,9 +58,10 @@ export default function Step2Appointment({ clientName, petName, onNext, onSkip }
             {SERVICES.map((service) => (
               <button
                 key={service.name}
-                onClick={() => setAppointment({ ...appointment, service: service.name })}
+                onClick={() => !isLoading && setAppointment({ ...appointment, service: service.name })}
+                disabled={isLoading}
                 className={cn(
-                  "p-4 rounded-xl border-2 text-left transition-all",
+                  "p-4 rounded-xl border-2 text-left transition-all disabled:cursor-not-allowed",
                   appointment.service === service.name
                     ? "border-green-500 bg-green-50"
                     : "border-stone-200 bg-white hover:border-green-300"
@@ -79,16 +87,18 @@ export default function Step2Appointment({ clientName, petName, onNext, onSkip }
               type="date"
               value={appointment.date}
               onChange={(e) => setAppointment({ ...appointment, date: e.target.value })}
-              className="flex-1 px-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              disabled={isLoading}
+              className="flex-1 px-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-green-500 focus:border-transparent disabled:bg-stone-50 disabled:cursor-not-allowed"
             />
           </div>
           <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
             {TIME_SLOTS.map((slot) => (
               <button
                 key={slot}
-                onClick={() => setAppointment({ ...appointment, time: slot })}
+                onClick={() => !isLoading && setAppointment({ ...appointment, time: slot })}
+                disabled={isLoading}
                 className={cn(
-                  "py-2 px-3 rounded-lg text-sm font-medium transition-all",
+                  "py-2 px-3 rounded-lg text-sm font-medium transition-all disabled:cursor-not-allowed",
                   appointment.time === slot
                     ? "bg-green-500 text-white"
                     : "bg-stone-100 text-stone-700 hover:bg-stone-200"
@@ -107,7 +117,8 @@ export default function Step2Appointment({ clientName, petName, onNext, onSkip }
             onChange={(e) => setAppointment({ ...appointment, notes: e.target.value })}
             placeholder="Any special instructions..."
             rows={3}
-            className="w-full px-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
+            disabled={isLoading}
+            className="w-full px-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none disabled:bg-stone-50 disabled:cursor-not-allowed"
           />
         </div>
       </div>
@@ -115,16 +126,26 @@ export default function Step2Appointment({ clientName, petName, onNext, onSkip }
       <div className="flex gap-3">
         <button
           onClick={onSkip}
-          className="px-6 py-3 rounded-xl border border-stone-300 text-stone-600 hover:bg-stone-50 transition-colors"
+          disabled={isLoading}
+          className="px-6 py-3 rounded-xl border border-stone-300 text-stone-600 hover:bg-stone-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           Skip for now
         </button>
         <button
-          onClick={() => isValid && onNext(appointment)}
-          disabled={!isValid}
+          onClick={() => isValid && !isLoading && onNext(appointment)}
+          disabled={!isValid || isLoading}
           className="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-green-500 text-white hover:bg-green-600 disabled:bg-stone-300 disabled:cursor-not-allowed transition-colors"
         >
-          Book Appointment <ArrowRight className="w-5 h-5" />
+          {isLoading ? (
+            <>
+              <Loader2 className="w-5 h-5 animate-spin" />
+              Saving…
+            </>
+          ) : (
+            <>
+              Book Appointment <ArrowRight className="w-5 h-5" />
+            </>
+          )}
         </button>
       </div>
     </div>
