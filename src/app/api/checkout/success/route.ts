@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 export const dynamic = 'force-dynamic';
 import { getCheckoutSession } from '@/lib/stripe';
 import prisma from '@/lib/prisma';
-import { trackCheckoutCompletedServer } from '@/lib/ga4-server';
+import { trackCheckoutCompletedServer, trackSubscriptionStartedServer } from '@/lib/ga4-server';
 
 export async function GET(req: NextRequest) {
   try {
@@ -37,6 +37,15 @@ export async function GET(req: NextRequest) {
     // Fire server-side GA4 event via Measurement Protocol
     // (window.gtag is unavailable in server routes — requires GA4_API_SECRET in .env)
     await trackCheckoutCompletedServer(userId, session_id, planType, true);
+
+    // Track subscription started event (conversion event)
+    await trackSubscriptionStartedServer(
+      userId,
+      session.subscription as string,
+      planType,
+      'trial',
+      0
+    );
 
     return NextResponse.redirect(new URL(`/onboarding?session_id=${session_id}`, req.url));
   } catch (error: any) {

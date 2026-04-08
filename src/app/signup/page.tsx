@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { signIn } from 'next-auth/react';
 import { AlertCircle, ArrowRight, Lock, Building, Mail } from 'lucide-react';
-import { trackSignupStarted } from '@/lib/ga4';
+import { trackSignupStarted, trackAccountCreated } from '@/lib/ga4';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -50,6 +50,9 @@ export default function SignupPage() {
         }
         return;
       }
+
+      // Track account creation event
+      trackAccountCreated(data.userId, formData.businessName);
 
       // Sign in immediately after signup
       const result = await signIn('credentials', {
