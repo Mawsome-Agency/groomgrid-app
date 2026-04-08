@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { ArrowRight, Clock, Scissors, Loader2 } from 'lucide-react';
+import { SERVICES, formatPrice, formatDuration } from '@/lib/services';
 
 interface AppointmentForm {
   service: string;
@@ -7,13 +8,6 @@ interface AppointmentForm {
   time: string;
   notes: string;
 }
-
-const SERVICES = [
-  { name: 'Full Groom', duration: '2 hrs', price: '$65' },
-  { name: 'Bath + Brush', duration: '1 hr', price: '$40' },
-  { name: 'Nail Trim', duration: '15 min', price: '$20' },
-  { name: 'Teeth Brushing', duration: '10 min', price: '$15' },
-];
 
 const TIME_SLOTS = [
   '8:00 AM', '8:30 AM', '9:00 AM', '9:30 AM', '10:00 AM', '10:30 AM',
@@ -72,8 +66,8 @@ export default function Step2Appointment({
                   <span className="font-semibold text-stone-900">{service.name}</span>
                 </div>
                 <div className="flex justify-between text-xs text-stone-500">
-                  <span>{service.duration}</span>
-                  <span>{service.price}</span>
+                  <span>{formatDuration(service.baseDuration)}</span>
+                  <span>{formatPrice(service.basePrice)}</span>
                 </div>
               </button>
             ))}

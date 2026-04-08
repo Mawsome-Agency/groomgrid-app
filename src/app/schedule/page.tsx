@@ -5,11 +5,13 @@ export const dynamic = 'force-dynamic';
 import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { 
-  ChevronLeft, ChevronRight, Calendar as CalendarIcon, Plus, 
-  Clock, User, Scissors, CheckCircle, XCircle, AlertCircle 
+import {
+  ChevronLeft, ChevronRight, Calendar as CalendarIcon, Plus,
+  Clock, User, Scissors, CheckCircle, XCircle, AlertCircle
 } from 'lucide-react';
 import { trackPageView } from '@/lib/ga4';
+import { SERVICES } from '@/lib/services';
+import { formatPrice, formatDuration } from '@/lib/services';
 
 interface Appointment {
   id: string;
@@ -26,13 +28,6 @@ interface Client {
   id: string;
   name: string;
 }
-
-const SERVICES = [
-  { name: 'Full Groom', duration: 120, price: 65 },
-  { name: 'Bath + Brush', duration: 60, price: 40 },
-  { name: 'Nail Trim', duration: 15, price: 20 },
-  { name: 'Teeth Brushing', duration: 10, price: 15 },
-];
 
 const TIME_SLOTS = [
   '8:00 AM', '8:30 AM', '9:00 AM', '9:30 AM', '10:00 AM', '10:30 AM',
@@ -425,8 +420,8 @@ function SchedulePageInner() {
                           <span className="font-semibold text-stone-900">{service.name}</span>
                         </div>
                         <div className="flex justify-between text-xs text-stone-500">
-                          <span>{service.duration} min</span>
-                          <span>${service.price}</span>
+                          <span>{formatDuration(service.baseDuration)}</span>
+                          <span>{formatPrice(service.basePrice)}</span>
                         </div>
                       </button>
                     ))}
