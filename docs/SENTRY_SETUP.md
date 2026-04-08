@@ -35,8 +35,9 @@ SENTRY_PROJECT="groomgrid"
 Add the Sentry DSN and project details to production:
 ```bash
 # Add to /var/www/groomgrid/prod/.env.local
-SENTRY_DSN="https://xxxxx@oxxxx.ingest.sentry.io/xxxxx"
-NEXT_PUBLIC_SENTRY_DSN="https://xxxxx@oxxxx.ingest.sentry.io/xxxxx"
+# Get the DSN from your Sentry project settings → Project Settings → Client Keys (DSN)
+SENTRY_DSN="<paste-your-sentry-dsn-here>"
+NEXT_PUBLIC_SENTRY_DSN="<paste-your-sentry-dsn-here>"
 SENTRY_ORG="your-org-name"
 SENTRY_PROJECT="groomgrid"
 ```

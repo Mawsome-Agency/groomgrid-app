@@ -25,8 +25,9 @@ Steps:
 **Action Required:** Add these to `/var/www/groomgrid/prod/.env.local`
 
 ```bash
-SENTRY_DSN="https://xxxxx@oxxxx.ingest.sentry.io/xxxxx"
-NEXT_PUBLIC_SENTRY_DSN="https://xxxxx@oxxxx.ingest.sentry.io/xxxxx"
+# Get DSN from Sentry project settings (Project Settings → Client Keys → DSN)
+SENTRY_DSN="<paste-your-sentry-dsn-here>"
+NEXT_PUBLIC_SENTRY_DSN="<paste-your-sentry-dsn-here>"
 SENTRY_ORG="your-org-name"
 SENTRY_PROJECT="groomgrid"
 ```
@@ -41,7 +42,7 @@ curl -X POST http://localhost:3001/api/companies/cmm79fsxz00ephmk3xjtx9scd/integ
     "type": "SENTRY",
     "name": "Sentry Error Monitoring",
     "credentials": {
-      "dsn": "https://xxxxx@oxxxx.ingest.sentry.io/xxxxx",
+      "dsn": "<paste-your-sentry-dsn-here>",
       "org": "your-org-name",
       "project": "groomgrid"
     },
