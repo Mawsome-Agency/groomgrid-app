@@ -93,8 +93,9 @@ model Appointment {
   status    String   @default("scheduled") // scheduled, completed, cancelled, no_show
   notes     String?
   invoiceId String?  @map("invoice_id")
-  reminderSent Boolean @default(false) @map("reminder_sent")
-  noShowCharged Boolean @default(false) @map("no_show_charged")
+  reminderSent      Boolean @default(false) @map("reminder_sent")
+  dayOfReminderSent Boolean @default(false) @map("day_of_reminder_sent")
+  noShowCharged     Boolean @default(false) @map("no_show_charged")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
