@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/next-auth-options';
 import { createCheckoutSession } from '@/lib/stripe';
 import prisma from '@/lib/prisma';
+import { trackPaymentInitiatedServer } from '@/lib/ga4-server';
 
 // Note: trackPlanSelected is intentionally fired client-side (plans/page.tsx)
 // before this API call. window.gtag is unavailable in server routes.
@@ -27,7 +28,10 @@ export async function POST(req: NextRequest) {
       businessName: profile.businessName,
     });
 
-    return NextResponse.json({ url: session.url });
+    // Track payment initiated event
+    await trackPaymentInitiatedServer(userId, session.id, planType);
+
+    return NextResponse.json({ url: session.url, sessionId: session.id });
   } catch (error: any) {
     console.error('Checkout error:', error);
     return NextResponse.json({ error: error.message || 'Failed to create checkout session' }, { status: 500 });
