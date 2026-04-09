@@ -9,13 +9,16 @@ interface TestimonialProps {
 
 export default function Testimonial({ name, business, quote, avatar }: TestimonialProps) {
   return (
-    <div className="bg-stone-50 rounded-2xl p-6">
-      <Quote className="w-8 h-8 text-green-500 mb-4" />
-      <p className="text-stone-700 mb-4 italic">"{quote}"</p>
-      <div>
+    <figure className="bg-stone-50 rounded-2xl p-6">
+      {/* Quote icon is decorative — meaning is in the blockquote text */}
+      <Quote className="w-8 h-8 text-green-500 mb-4" aria-hidden="true" />
+      <blockquote>
+        <p className="text-stone-700 mb-4 italic">&ldquo;{quote}&rdquo;</p>
+      </blockquote>
+      <figcaption>
         <p className="font-semibold text-stone-900">{name}</p>
         <p className="text-sm text-stone-500">{business}</p>
-      </div>
-    </div>
+      </figcaption>
+    </figure>
   );
 }

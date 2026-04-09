@@ -9,7 +9,11 @@ interface ValuePropItemProps {
 function ValuePropItem({ icon, title, description }: ValuePropItemProps) {
   return (
     <div className="flex gap-4 p-4 rounded-xl bg-white border border-stone-100">
-      <div className="flex-shrink-0 w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
+      {/* Icon container is decorative — meaning is conveyed by the title */}
+      <div
+        className="flex-shrink-0 w-12 h-12 rounded-full bg-green-100 flex items-center justify-center"
+        aria-hidden="true"
+      >
         {icon}
       </div>
       <div>

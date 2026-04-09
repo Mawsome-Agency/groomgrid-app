@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { signIn } from 'next-auth/react';
 import { AlertCircle, ArrowRight, Lock, Mail } from 'lucide-react';
+import { fieldId } from '@/lib/accessibility';
 
 function LoginForm() {
   const router = useRouter();
@@ -47,39 +48,52 @@ function LoginForm() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-stone-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full">
+      <main
+        id="main-content"
+        className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full"
+        aria-label="Sign In"
+      >
         {/* Header */}
         <div className="text-center mb-8">
-          <Link href="/" className="inline-block mb-4">
-            <span className="text-2xl font-bold text-green-600">GroomGrid</span>
+          <Link href="/" className="inline-block mb-4" aria-label="GroomGrid home">
+            <span className="text-2xl font-bold text-green-600" aria-hidden="true">GroomGrid</span>
           </Link>
           <h1 className="text-3xl font-bold text-stone-900 mb-2">Welcome back</h1>
           <p className="text-stone-600">Sign in to your account</p>
         </div>
 
-        {/* Error Alert */}
+        {/* Error Alert — role="alert" announces to screen readers immediately */}
         {error && (
-          <div className="flex items-start gap-2 p-3 rounded-lg bg-red-50 text-red-700 text-sm mb-6">
-            <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+          <div
+            role="alert"
+            aria-live="assertive"
+            className="flex items-start gap-2 p-3 rounded-lg bg-red-50 text-red-700 text-sm mb-6"
+          >
+            <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" aria-hidden="true" />
             <span>{error}</span>
           </div>
         )}
 
         {/* Email/Password Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4" noValidate>
           <div>
-            <label className="block text-sm font-medium text-stone-700 mb-1">
+            <label
+              htmlFor={fieldId('email')}
+              className="block text-sm font-medium text-stone-700 mb-1"
+            >
               Email Address
             </label>
             <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-stone-400" />
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-stone-400" aria-hidden="true" />
               <input
+                id={fieldId('email')}
                 type="email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 placeholder="you@example.com"
                 required
                 autoComplete="email"
+                aria-required="true"
                 className="w-full pl-10 pr-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
               />
             </div>
@@ -87,7 +101,12 @@ function LoginForm() {
 
           <div>
             <div className="flex items-center justify-between mb-1">
-              <label className="block text-sm font-medium text-stone-700">Password</label>
+              <label
+                htmlFor={fieldId('password')}
+                className="block text-sm font-medium text-stone-700"
+              >
+                Password
+              </label>
               <Link
                 href="/forgot-password"
                 className="text-xs text-green-600 hover:underline"
@@ -96,14 +115,16 @@ function LoginForm() {
               </Link>
             </div>
             <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-stone-400" />
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-stone-400" aria-hidden="true" />
               <input
+                id={fieldId('password')}
                 type="password"
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 placeholder="Your password"
                 required
                 autoComplete="current-password"
+                aria-required="true"
                 className="w-full pl-10 pr-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
               />
             </div>
@@ -112,28 +133,33 @@ function LoginForm() {
           <button
             type="submit"
             disabled={loading}
+            aria-busy={loading}
             className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-green-500 text-white font-semibold hover:bg-green-600 disabled:bg-stone-300 disabled:cursor-not-allowed transition-colors"
           >
             {loading ? (
               <>
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                Signing in...
+                <div
+                  className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"
+                  aria-hidden="true"
+                />
+                <span>Signing in…</span>
               </>
             ) : (
               <>
-                Sign In <ArrowRight className="w-5 h-5" />
+                <span>Sign In</span>
+                <ArrowRight className="w-5 h-5" aria-hidden="true" />
               </>
             )}
           </button>
         </form>
 
         <p className="text-center text-sm text-stone-600 mt-6">
-          Don't have an account?{' '}
+          Don&apos;t have an account?{' '}
           <Link href="/signup" className="text-green-600 hover:underline font-medium">
             Start free trial
           </Link>
         </p>
-      </div>
+      </main>
     </div>
   );
 }
@@ -142,7 +168,7 @@ export default function LoginPage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-stone-50 flex items-center justify-center">
-        <div className="text-stone-500">Loading...</div>
+        <div className="text-stone-500" role="status" aria-live="polite">Loading…</div>
       </div>
     }>
       <LoginForm />

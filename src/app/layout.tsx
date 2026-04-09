@@ -34,6 +34,10 @@ export default function RootLayout({
         </Script>
       </head>
       <body className={inter.className}>
+        {/* Skip navigation link — allows keyboard users to bypass repeated header nav */}
+        <a href="#main-content" className="skip-link">
+          Skip to main content
+        </a>
         <SessionProvider>{children}</SessionProvider>
       </body>
     </html>
