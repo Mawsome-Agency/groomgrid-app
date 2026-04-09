@@ -167,3 +167,14 @@ model AnalyticsEvent {
 
   @@map("analytics_events")
 }
+
+model PaymentEvent {
+  id        String    @id @default(cuid())
+  paymentId String    @map("payment_id")
+  eventType String    @map("event_type") // PAYMENT_INITIATED, PAYMENT_CONFIRMED, COMPLETION_PROCESSED
+  payload   Json?
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  @@unique([paymentId, eventType])
+  @@map("payment_events")
+}
