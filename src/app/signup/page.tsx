@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { signIn } from 'next-auth/react';
 import { AlertCircle, ArrowRight, Lock, Building, Mail } from 'lucide-react';
-import { trackSignupStarted, trackAccountCreated } from '@/lib/ga4';
+import { trackSignupStarted, trackAccountCreated, trackSignupError } from '@/lib/ga4';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -43,6 +43,7 @@ export default function SignupPage() {
 
       if (!res.ok) {
         const message = data.error || 'Failed to create account';
+        trackSignupError(message, 'api_response');
         if (message.includes('already in use')) {
           setError('An account with this email already exists. Try signing in instead.');
         } else {
@@ -62,6 +63,7 @@ export default function SignupPage() {
       });
 
       if (result?.error) {
+        trackSignupError(result.error, 'sign_in');
         setError('Account created but sign-in failed. Please sign in manually.');
         router.push('/login');
         return;
@@ -69,6 +71,7 @@ export default function SignupPage() {
 
       router.push('/plans');
     } catch (err: any) {
+      trackSignupError(err.message || 'network_error', 'catch_block');
       setError(err.message || 'Failed to create account');
     } finally {
       setLoading(false);

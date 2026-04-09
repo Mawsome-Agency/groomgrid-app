@@ -6,6 +6,8 @@ import {
   trackSubscriptionCreatedServer,
   trackSubscriptionUpdatedServer,
   trackSubscriptionCancelledServer,
+  trackPaymentSuccessServer,
+  trackPaymentFailedServer,
 } from '@/lib/ga4-server';
 
 export async function POST(req: Request) {
@@ -131,6 +133,13 @@ export async function POST(req: Request) {
               where: { userId: profile.userId },
               data: { subscriptionStatus: 'active' },
             });
+
+            // Track payment success in GA4
+            await trackPaymentSuccessServer(
+              profile.userId,
+              invoice.id,
+              invoice.amount_paid || 0
+            );
           }
         }
         break;
@@ -150,6 +159,13 @@ export async function POST(req: Request) {
               where: { userId: profile.userId },
               data: { subscriptionStatus: 'past_due' },
             });
+
+            // Track payment failure in GA4
+            await trackPaymentFailedServer(
+              profile.userId,
+              invoice.id,
+              invoice.last_payment_error?.message || 'unknown'
+            );
           }
         }
         break;
