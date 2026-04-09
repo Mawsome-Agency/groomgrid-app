@@ -177,3 +177,58 @@ export async function trackSubscriptionStartedServer(
     userId
   );
 }
+
+export async function trackPaymentInitiatedServer(
+  userId: string,
+  sessionId: string,
+  planType: string
+): Promise<void> {
+  await trackServerEvent(
+    userId,
+    {
+      name: 'payment_initiated',
+      params: {
+        session_id: sessionId,
+        plan_type: planType,
+      },
+    },
+    userId
+  );
+}
+
+export async function trackPaymentSuccessServer(
+  userId: string,
+  invoiceId: string,
+  amount: number
+): Promise<void> {
+  await trackServerEvent(
+    userId,
+    {
+      name: 'payment_success',
+      params: {
+        invoice_id: invoiceId,
+        amount,
+        currency: 'USD',
+      },
+    },
+    userId
+  );
+}
+
+export async function trackPaymentFailedServer(
+  userId: string,
+  invoiceId: string,
+  reason: string
+): Promise<void> {
+  await trackServerEvent(
+    userId,
+    {
+      name: 'payment_failed',
+      params: {
+        invoice_id: invoiceId,
+        reason,
+      },
+    },
+    userId
+  );
+}

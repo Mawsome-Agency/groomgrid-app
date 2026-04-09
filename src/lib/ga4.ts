@@ -108,3 +108,10 @@ export function trackPageView(pagePath: string, pageTitle: string) {
     page_title: pageTitle,
   });
 }
+export function trackSignupError(error: string, context: string) {
+  trackEvent('signup_error', {
+    error,
+    context,
+    timestamp: new Date().toISOString(),
+  });
+}
