@@ -107,7 +107,7 @@ export default function PlansPage() {
         })
         .catch((err) => {
           console.error('Failed to check welcome status:', err);
-          // Don't block the page if check fails
+          // Don't block page if check fails
         });
     }
   }, [status, session, router]);
