@@ -43,7 +43,7 @@ export async function createCheckoutSession({
         businessName,
       },
     },
-    success_url: `${process.env.NEXT_PUBLIC_APP_URL}/onboarding?session_id={CHECKOUT_SESSION_ID}`,
+    success_url: `${process.env.NEXT_PUBLIC_APP_URL}/onboarding/welcome?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/plans`,
     allow_promotion_codes: true,
     billing_address_collection: 'required',

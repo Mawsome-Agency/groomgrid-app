@@ -52,7 +52,7 @@ async function getEngagementData() {
     take: 100,
   })
 
-  return users.map((u) => ({
+  return users.map((u: any) => ({
     userId: u.id,
     email: u.email,
     businessName: u.profile?.businessName ?? null,
@@ -77,7 +77,7 @@ export default async function EngagementPage() {
   const total = rows.length
   const avgScore =
     rows.length > 0
-      ? Math.round(rows.reduce((sum, r) => sum + r.engagementScore, 0) / rows.length)
+      ? Math.round(rows.reduce((sum: number, r: any) => sum + r.engagementScore, 0) / rows.length)
       : 0
 
   return (
@@ -106,13 +106,13 @@ export default async function EngagementPage() {
           <div className="rounded-xl border border-stone-200 bg-white p-5">
             <p className="text-sm text-stone-500">High Engagement</p>
             <p className="mt-1 text-2xl font-bold text-green-600">
-              {rows.filter((r) => r.engagementScore > 50).length}
+              {rows.filter((r: any) => r.engagementScore > 50).length}
             </p>
           </div>
           <div className="rounded-xl border border-stone-200 bg-white p-5">
             <p className="text-sm text-stone-500">At Risk</p>
             <p className="mt-1 text-2xl font-bold text-red-600">
-              {rows.filter((r) => r.engagementScore < 20).length}
+              {rows.filter((r: any) => r.engagementScore < 20).length}
             </p>
           </div>
         </div>
@@ -163,7 +163,7 @@ export default async function EngagementPage() {
                     </td>
                   </tr>
                 )}
-                {rows.map((row) => (
+                {rows.map((row: any) => (
                   <tr
                     key={row.userId}
                     className="hover:bg-stone-50 transition-colors"

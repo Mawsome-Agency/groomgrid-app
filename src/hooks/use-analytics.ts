@@ -13,6 +13,12 @@ export const ANALYTICS_EVENTS = {
   SETTINGS_UPDATED: 'settings_updated',
   REMINDER_ENABLED: 'reminder_enabled',
   UPGRADE_CLICKED: 'upgrade_clicked',
+  EMPTY_STATE_CTA_CLICKED: 'empty_state_cta_clicked',
+  // Onboarding events
+  ONBOARDING_STEP_VIEWED: 'onboarding_step_viewed',
+  ONBOARDING_STEP_COMPLETED: 'onboarding_step_completed',
+  ONBOARDING_SKIPPED: 'onboarding_skipped',
+  FIRST_APPOINTMENT_CREATED: 'first_appointment_created',
 } as const
 
 export type AnalyticsEvent = (typeof ANALYTICS_EVENTS)[keyof typeof ANALYTICS_EVENTS]

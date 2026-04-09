@@ -4,7 +4,9 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
 import { Calendar, Users, DollarSign, Plus, LogOut, Settings, Menu, X } from 'lucide-react';
-import { trackPageView } from '@/lib/ga4';
+import { trackPageView, trackEmptyStateCta } from '@/lib/ga4';
+import { EmptyState } from '@/components/ui/EmptyState';
+import { EmptyCalendarIllustration } from '@/components/illustrations/EmptyCalendarIllustration';
 
 interface Appointment {
   id: string;
@@ -49,7 +51,7 @@ export default function DashboardPage() {
   const fetchDashboardData = async () => {
     try {
       const [profileRes, appointmentsRes, clientsRes] = await Promise.all([
-        fetch(`/api/profile?userId=${session.user.id}`),
+        fetch(`/api/profile?userId=${session?.user?.id}`),
         fetch('/api/clients'),
         fetch('/api/appointments'),
       ]);
@@ -132,7 +134,7 @@ export default function DashboardPage() {
     ? Math.max(0, Math.ceil((new Date(profile.trial_ends_at).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
     : 0;
 
-  const businessName = profile?.business_name || session.user.name || 'My Business';
+  const businessName = profile?.business_name || session?.user?.name || 'My Business';
 
   return (
     <div className="min-h-screen bg-stone-50">
@@ -277,15 +279,21 @@ export default function DashboardPage() {
               </div>
 
               {todayAppointments.length === 0 ? (
-                <div className="text-center py-8">
-                  <p className="text-stone-500 mb-4">No appointments scheduled for today</p>
-                  <a
-                    href="/schedule"
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
-                  >
-                    <Plus className="w-4 h-4" /> Book Appointment
-                  </a>
-                </div>
+                <EmptyState
+                  illustration={<EmptyCalendarIllustration />}
+                  headline="Your schedule is wide open"
+                  subcopy="Add your first appointment"
+                  primaryCta={{
+                    label: 'Add Appointment',
+                    href: '/schedule',
+                    onClick: () => trackEmptyStateCta('dashboard', 'Add Appointment'),
+                  }}
+                  secondaryCta={{
+                    label: 'Watch 60 second demo',
+                    href: 'https://www.youtube.com/watch?v=dQw4w9WgXc', // Placeholder demo link
+                    onClick: () => trackEmptyStateCta('dashboard', 'Watch Demo'),
+                  }}
+                />
               ) : (
                 <div className="space-y-3">
                   {todayAppointments

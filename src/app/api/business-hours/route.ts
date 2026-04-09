@@ -6,12 +6,12 @@ import prisma from '@/lib/prisma';
 export async function GET(req: NextRequest) {
   try {
     const user = await getSession();
-    if (!user?.id) {
+    if (!user?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const businessHours = await prisma.businessHours.findMany({
-      where: { userId: user.id },
+      where: { userId: user.user.id },
       orderBy: { dayOfWeek: 'asc' },
     });
 
@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const user = await getSession();
-    if (!user?.id) {
+    if (!user?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
 
     // Delete existing hours for this user
     await prisma.businessHours.deleteMany({
-      where: { userId: user.id },
+      where: { userId: user.user.id },
     });
 
     // Create new hours
@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
       hours.map((hour: any, index: number) =>
         prisma.businessHours.create({
           data: {
-            userId: user.id,
+            userId: user.user.id,
             dayOfWeek: index,
             openTime: hour.open || '09:00',
             closeTime: hour.close || '17:00',

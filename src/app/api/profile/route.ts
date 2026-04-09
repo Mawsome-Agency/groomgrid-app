@@ -24,11 +24,12 @@ export async function PATCH(req: NextRequest) {
 
   try {
     const body = await req.json()
-    const { onboardingStep, onboardingCompleted, ...rest } = body
+    const { onboardingStep, onboardingCompleted, planType, ...rest } = body
 
     const data: Record<string, unknown> = {}
     if (onboardingStep !== undefined) data.onboardingStep = onboardingStep
     if (onboardingCompleted !== undefined) data.onboardingCompleted = onboardingCompleted
+    if (planType !== undefined) data.planType = planType
     if (rest.businessName !== undefined) data.businessName = rest.businessName
     if (rest.phone !== undefined) data.phone = rest.phone
 

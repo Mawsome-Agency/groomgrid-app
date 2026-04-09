@@ -13,11 +13,11 @@ export function initGA4() {
   if (!GA4_MEASUREMENT_ID) return;
 
   window.dataLayer = window.dataLayer || [];
-  
+
   window.gtag = function gtag() {
     window.dataLayer?.push(arguments);
   };
-  
+
   window.gtag('js', new Date());
   window.gtag('config', GA4_MEASUREMENT_ID);
 }
@@ -37,6 +37,20 @@ export function trackSignupStarted(businessName: string) {
   });
 }
 
+export function trackAccountCreated(userId: string, businessName: string) {
+  trackEvent('account_created', {
+    user_id: userId,
+    business_name: businessName,
+    timestamp: new Date().toISOString(),
+  });
+}
+
+export function trackSignupWelcomeViewed() {
+  trackEvent('signup_welcome_viewed', {
+    timestamp: new Date().toISOString(),
+  });
+}
+
 export function trackEmailVerified(userId: string) {
   trackEvent('email_verified', {
     user_id: userId,
@@ -52,6 +66,21 @@ export function trackPlanSelected(planType: string, planPrice: number) {
   });
 }
 
+export function trackPlanReviewShown(planType?: string) {
+  trackEvent('plan_review_shown', {
+    plan_type: planType || 'none',
+    timestamp: new Date().toISOString(),
+  });
+}
+
+export function trackPlanFeaturesExpanded(planId: string, planType: string) {
+  trackEvent('plan_features_expanded', {
+    plan_id: planId,
+    plan_type: planType,
+    timestamp: new Date().toISOString(),
+  });
+}
+
 export function trackCheckoutCompleted(
   sessionId: string,
   planType: string,
@@ -61,6 +90,13 @@ export function trackCheckoutCompleted(
     session_id: sessionId,
     plan_type: planType,
     trial_started: trialStarted,
+    timestamp: new Date().toISOString(),
+  });
+}
+
+export function trackOnboardingStepViewed(step: number) {
+  trackEvent('onboarding_step_viewed', {
+    step,
     timestamp: new Date().toISOString(),
   });
 }
@@ -83,5 +119,13 @@ export function trackPageView(pagePath: string, pageTitle: string) {
   trackEvent('page_view', {
     page_path: pagePath,
     page_title: pageTitle,
+  });
+}
+
+export function trackEmptyStateCta(location: string, ctaLabel: string) {
+  trackEvent('empty_state_cta_clicked', {
+    location,
+    cta_label: ctaLabel,
+    timestamp: new Date().toISOString(),
   });
 }

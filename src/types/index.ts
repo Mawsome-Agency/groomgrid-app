@@ -47,6 +47,36 @@ export interface OnboardingData {
   skip_reason?: string;
 }
 
+// New Onboarding State for 5-step flow
+export type BusinessType = 'solo' | 'salon';
+
+export interface OnboardingState {
+  currentStep: number;                    // 1–5, persists across refreshes
+  businessType: BusinessType | null;      // from step 2
+  petName: string | null;                 // from step 3
+  breed: string | null;                   // from step 3 (searchable dropdown)
+  appointmentDatetime: string | null;     // ISO 8601, from step 3
+  clientName: string | null;              // optional, from step 3
+  aiSuggestion: AISuggestion | null;      // from step 4 (caches AI result)
+  startedAt: string | null;               // ISO 8601, tracks time to completion
+  completedAt: string | null;             // ISO 8601, set when ready page completes
+}
+
+export interface AISuggestion {
+  noShowRisk: 'low' | 'med' | 'high';
+  duration: number;                       // minutes
+  durationLabel: string;                  // e.g. "60–75 min"
+  confidence: number;                     // 0–1
+  createdAt: string;                      // ISO 8601 for cache invalidation
+}
+
+export interface BreedTiming {
+  name: string;
+  minMin: number;
+  maxMin: number;
+  size: 'small' | 'medium' | 'large' | 'giant';
+}
+
 // GA4 Event Types
 export interface GA4Event {
   name: string;

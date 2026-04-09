@@ -9,7 +9,7 @@ export async function POST(
 ) {
   try {
     const user = await getSession();
-    if (!user?.id) {
+    if (!user?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -20,7 +20,7 @@ export async function POST(
       where: { id: clientId },
     });
 
-    if (!client || client.userId !== user.id) {
+    if (!client || client.userId !== user.user.id) {
       return NextResponse.json({ error: 'Client not found' }, { status: 404 });
     }
 

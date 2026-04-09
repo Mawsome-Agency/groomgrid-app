@@ -38,7 +38,7 @@ export async function GET(req: NextRequest) {
     // (window.gtag is unavailable in server routes — requires GA4_API_SECRET in .env)
     await trackCheckoutCompletedServer(userId, session_id, planType, true);
 
-    return NextResponse.redirect(new URL(`/onboarding?session_id=${session_id}`, req.url));
+    return NextResponse.redirect(new URL(`/onboarding/welcome?session_id=${session_id}`, req.url));
   } catch (error: any) {
     console.error('Checkout success error:', error);
     return NextResponse.redirect(new URL('/plans', req.url));

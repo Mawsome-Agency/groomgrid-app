@@ -14,7 +14,7 @@ const SERVICES: Record<string, { duration: number; price: number }> = {
 export async function GET(req: NextRequest) {
   try {
     const user = await getSession();
-    if (!user?.id) {
+    if (!user?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
     const startDate = searchParams.get('startDate');
     const endDate = searchParams.get('endDate');
 
-    const whereClause: any = { userId: user.id };
+    const whereClause: any = { userId: user.user.id };
 
     if (startDate && endDate) {
       whereClause.startTime = {
@@ -55,7 +55,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const user = await getSession();
-    if (!user?.id) {
+    if (!user?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
       where: { id: clientId },
     });
 
-    if (!client || client.userId !== user.id) {
+    if (!client || client.userId !== user.user.id) {
       return NextResponse.json({ error: 'Client not found' }, { status: 404 });
     }
 
@@ -95,7 +95,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Parse date and time (format: "2024-04-06", "10:00 AM")
-    const [hours, minutes] = time.split(':').map(v => parseInt(v.split(' ')[0]));
+    const [hours, minutes] = time.split(':').map((v: string) => parseInt(v.split(' ')[0]));
     const isPm = time.includes('PM');
     const adjustedHours = isPm && hours !== 12 ? hours + 12 : hours === 12 && !isPm ? 0 : hours;
 
@@ -107,7 +107,7 @@ export async function POST(req: NextRequest) {
     // Check for conflicts with existing appointments
     const conflicts = await prisma.appointment.findMany({
       where: {
-        userId: user.id,
+        userId: user.user.id,
         status: { in: ['scheduled', 'confirmed'] },
         OR: [
           {
@@ -136,7 +136,7 @@ export async function POST(req: NextRequest) {
     // Create the appointment
     const appointment = await prisma.appointment.create({
       data: {
-        userId: user.id,
+        userId: user.user.id,
         clientId,
         petId,
         service,

@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
       prisma.user.count(),
     ])
 
-    const data = users.map((u) => ({
+    const data = users.map((u: any) => ({
       user_id: u.id,
       email: u.email,
       business_name: u.profile?.businessName ?? null,

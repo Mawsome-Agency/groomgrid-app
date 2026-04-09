@@ -6,12 +6,12 @@ import prisma from '@/lib/prisma';
 export async function GET(req: NextRequest) {
   try {
     const user = await getSession();
-    if (!user?.id) {
+    if (!user?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const clients = await prisma.client.findMany({
-      where: { userId: user.id },
+      where: { userId: user.user.id },
       include: {
         pets: true,
         _count: {
@@ -32,7 +32,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const user = await getSession();
-    if (!user?.id) {
+    if (!user?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
 
     const client = await prisma.client.create({
       data: {
-        userId: user.id,
+        userId: user.user.id,
         name,
         email,
         phone,
