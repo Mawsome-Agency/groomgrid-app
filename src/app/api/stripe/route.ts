@@ -24,6 +24,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing required field: planType' }, { status: 400 });
     }
 
+    // FIX 1: Add planType validation
+    const VALID_PLANS = ["solo", "salon", "enterprise"];
+    if (!VALID_PLANS.includes(planType)) {
+      return NextResponse.json({ error: "Invalid plan type" }, { status: 400 });
+    }
+
     const userId = authSession.user.id;
     const customerEmail = authSession.user.email ?? `${userId}@groomgrid.app`;
 
@@ -42,6 +48,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ url: session.url });
   } catch (error: any) {
     console.error('Stripe checkout error:', error);
-    return NextResponse.json({ error: error.message || 'Failed to create checkout session' }, { status: 500 });
+    // FIX 2: Sanitize error response (don't leak internal error details)
+    return NextResponse.json({ error: "Failed to create checkout session" }, { status: 500 });
   }
 }
