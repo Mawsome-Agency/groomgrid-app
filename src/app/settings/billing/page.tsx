@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
 import {
   Settings, Calendar, Users, LogOut, Menu, X,
-  ArrowLeft, CreditCard, Check, AlertCircle, ExternalLink,
+  ArrowLeft, CreditCard, Check, AlertCircle, ExternalLink, RefreshCw, Mail,
 } from 'lucide-react';
 import { trackPageView } from '@/lib/ga4';
 
@@ -62,12 +62,20 @@ const PLAN_DISPLAY: Record<string, { label: string; color: string }> = {
   enterprise: { label: 'Enterprise', color: 'bg-orange-100 text-orange-700' },
 };
 
+const SUBSCRIPTION_DISPLAY: Record<string, { label: string; color: string; icon: string }> = {
+  trial: { label: 'Free Trial', color: 'bg-green-100 text-green-700', icon: '✨' },
+  active: { label: 'Active', color: 'bg-green-100 text-green-700', icon: '✓' },
+  past_due: { label: 'Payment Issue', color: 'bg-amber-100 text-amber-700', icon: '⚠️' },
+  cancelled: { label: 'Cancelled', color: 'bg-red-100 text-red-700', icon: '○' },
+};
+
 export default function BillingSettingsPage() {
   const router = useRouter();
   const { data: session, status } = useSession();
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [paymentFailedDismissed, setPaymentFailedDismissed] = useState(false);
 
   useEffect(() => {
     trackPageView('/settings/billing', 'Settings - Billing');
@@ -99,6 +107,14 @@ export default function BillingSettingsPage() {
 
   const handleSignOut = async () => signOut({ callbackUrl: '/' });
 
+  const handleRetryPayment = () => {
+    router.push('/plans');
+  };
+
+  const handleContactSupport = () => {
+    window.location.href = 'mailto:help@getgroomgrid.com?subject=Payment%20Issue&body=' + encodeURIComponent(`I'm having trouble with my subscription payment.\n\nPlan: ${planType}\nStatus: ${subStatus}\n\nPlease help me resolve this issue.`);
+  };
+
   if (status === 'loading' || loading) {
     return (
       <div className="min-h-screen bg-stone-50 flex items-center justify-center">
@@ -114,6 +130,8 @@ export default function BillingSettingsPage() {
     ? Math.max(0, Math.ceil((new Date(trialEndsAt).getTime() - Date.now()) / 86400000))
     : 0;
   const planDisplay = PLAN_DISPLAY[planType] || PLAN_DISPLAY.trial;
+  const subDisplay = SUBSCRIPTION_DISPLAY[subStatus] || SUBSCRIPTION_DISPLAY.trial;
+  const showPaymentFailed = subStatus === 'past_due' && !paymentFailedDismissed;
 
   return (
     <div className="min-h-screen bg-stone-50">
@@ -181,6 +199,60 @@ export default function BillingSettingsPage() {
               <span className="text-stone-900 font-medium">Billing & Plan</span>
             </div>
 
+            {/* Payment Failed Banner */}
+            {showPaymentFailed && (
+              <div
+                className="bg-amber-50 border-2 border-amber-200 rounded-2xl p-6 mb-6"
+                role="alert"
+                aria-live="polite"
+              >
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-start gap-3">
+                    <span className="text-2xl" aria-hidden="true">⚠️</span>
+                    <div>
+                      <h2 className="text-lg font-semibold text-amber-900 mb-2">Payment Issue</h2>
+                      <p className="text-amber-800">
+                        We couldn't process your last payment. Don't worry — your trial is still active and you won't lose access.
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setPaymentFailedDismissed(true)}
+                    className="text-amber-600 hover:text-amber-800 text-sm font-medium"
+                    aria-label="Dismiss payment warning"
+                  >
+                    Dismiss
+                  </button>
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <button
+                    onClick={handleRetryPayment}
+                    className="flex-1 bg-amber-600 text-white font-semibold py-2.5 px-4 rounded-xl hover:bg-amber-700 transition-colors flex items-center justify-center gap-2"
+                    aria-label="Retry payment"
+                  >
+                    <RefreshCw className="w-4 h-4" aria-hidden="true" />
+                    Retry Payment
+                  </button>
+                  <button
+                    onClick={handleContactSupport}
+                    className="flex-1 bg-white text-amber-700 font-semibold py-2.5 px-4 rounded-xl hover:bg-amber-50 border-2 border-amber-300 transition-colors flex items-center justify-center gap-2"
+                    aria-label="Contact support for help"
+                  >
+                    <Mail className="w-4 h-4" aria-hidden="true" />
+                    Contact Support
+                  </button>
+                </div>
+
+                <div className="mt-4 bg-amber-100 rounded-xl p-4 flex items-start gap-2">
+                  <span aria-hidden="true" className="text-base">💡</span>
+                  <p className="text-amber-900 text-sm">
+                    Your 14-day free trial continues while you resolve this. Take your time!
+                  </p>
+                </div>
+              </div>
+            )}
+
             <div className="space-y-6">
               {/* Current plan summary */}
               <div className="bg-white rounded-2xl shadow-sm p-6">
@@ -203,6 +275,9 @@ export default function BillingSettingsPage() {
                         <span className="font-semibold text-stone-900">Current Plan</span>
                         <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${planDisplay.color}`}>
                           {planDisplay.label}
+                        </span>
+                        <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${subDisplay.color}`}>
+                          <span aria-hidden="true">{subDisplay.icon}</span> {subDisplay.label}
                         </span>
                       </div>
                       {subStatus === 'trial' && (
@@ -237,7 +312,7 @@ export default function BillingSettingsPage() {
                         Upgrade before your trial ends
                       </p>
                       <p className="text-xs text-amber-700 mt-0.5">
-                        After the trial, your account will be read-only until you subscribe.
+                        After trial, your account will be read-only until you subscribe.
                       </p>
                     </div>
                   </div>
@@ -310,7 +385,7 @@ export default function BillingSettingsPage() {
               <div className="bg-stone-50 rounded-xl p-4 text-sm text-stone-500 flex items-start gap-2">
                 <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0 text-stone-400" />
                 Payments are processed securely by Stripe. Need help with billing?{' '}
-                <a href="mailto:support@getgroomgrid.com" className="text-green-600 hover:underline ml-1">
+                <a href="mailto:help@getgroomgrid.com" className="text-green-600 hover:underline ml-1">
                   Contact support
                 </a>
               </div>
