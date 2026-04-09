@@ -13,6 +13,7 @@ export const ANALYTICS_EVENTS = {
   SETTINGS_UPDATED: 'settings_updated',
   REMINDER_ENABLED: 'reminder_enabled',
   UPGRADE_CLICKED: 'upgrade_clicked',
+  EMPTY_STATE_CTA_CLICKED: 'empty_state_cta_clicked',
 } as const
 
 export type AnalyticsEvent = (typeof ANALYTICS_EVENTS)[keyof typeof ANALYTICS_EVENTS]

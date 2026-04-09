@@ -1,17 +1,15 @@
 'use client';
 
-export const dynamic = 'force-dynamic';
-
-import { useEffect, useState, Suspense } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import {
   ChevronLeft, ChevronRight, Calendar as CalendarIcon, Plus,
   Clock, User, Scissors, CheckCircle, XCircle, AlertCircle
 } from 'lucide-react';
-import { trackPageView } from '@/lib/ga4';
-import { SERVICES } from '@/lib/services';
-import { formatPrice, formatDuration } from '@/lib/services';
+import { trackPageView, trackEmptyStateCta } from '@/lib/ga4';
+import { EmptyState } from '@/components/ui/EmptyState';
+import { SleepingDogIllustration } from '@/components/illustrations/SleepingDogIllustration';
 
 interface Appointment {
   id: string;
@@ -29,13 +27,20 @@ interface Client {
   name: string;
 }
 
+const SERVICES = [
+  { name: 'Full Groom', duration: 120, price: 65 },
+  { name: 'Bath + Brush', duration: 60, price: 40 },
+  { name: 'Nail Trim', duration: 15, price: 20 },
+  { name: 'Teeth Brushing', duration: 10, price: 15 },
+];
+
 const TIME_SLOTS = [
   '8:00 AM', '8:30 AM', '9:00 AM', '9:30 AM', '10:00 AM', '10:30 AM',
   '11:00 AM', '11:30 AM', '12:00 PM', '12:30 PM', '1:00 PM', '1:30 PM',
   '2:00 PM', '2:30 PM', '3:00 PM', '3:30 PM', '4:00 PM', '4:30 PM', '5:00 PM',
 ];
 
-function SchedulePageInner() {
+export default function SchedulePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { data: session } = useSession();
@@ -290,9 +295,18 @@ function SchedulePageInner() {
               {monthNames[currentDate.getMonth()]}'s Appointments
             </h3>
             {appointments.length === 0 ? (
-              <p className="text-stone-500 text-center py-8">
-                No appointments this month
-              </p>
+              <EmptyState
+                illustration={<SleepingDogIllustration />}
+                headline="No appointments yet"
+                subcopy="Your first client is out there"
+                primaryCta={{
+                  label: 'Schedule Appointment',
+                  onClick: () => {
+                    setShowBookModal(true);
+                    trackEmptyStateCta('schedule', 'Schedule Appointment');
+                  },
+                }}
+              />
             ) : (
               <div className="space-y-3">
                 {appointments
@@ -420,8 +434,8 @@ function SchedulePageInner() {
                           <span className="font-semibold text-stone-900">{service.name}</span>
                         </div>
                         <div className="flex justify-between text-xs text-stone-500">
-                          <span>{formatDuration(service.baseDuration)}</span>
-                          <span>{formatPrice(service.basePrice)}</span>
+                          <span>{service.duration} min</span>
+                          <span>${service.price}</span>
                         </div>
                       </button>
                     ))}
@@ -498,13 +512,5 @@ function SchedulePageInner() {
         </div>
       )}
     </div>
-  );
-}
-
-export default function SchedulePage() {
-  return (
-    <Suspense fallback={<div className="min-h-screen bg-stone-50 flex items-center justify-center"><div className="text-stone-500">Loading...</div></div>}>
-      <SchedulePageInner />
-    </Suspense>
   );
 }

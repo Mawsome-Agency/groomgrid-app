@@ -4,7 +4,9 @@ import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { ArrowLeft, Plus, Mail, Phone, MapPin, Edit2, Calendar, Scissors } from 'lucide-react';
-import { trackPageView } from '@/lib/ga4';
+import { trackPageView, trackEmptyStateCta } from '@/lib/ga4';
+import { EmptyState } from '@/components/ui/EmptyState';
+import { PawPrintsIllustration } from '@/components/illustrations/PawPrintsIllustration';
 
 interface Client {
   id: string;
@@ -170,7 +172,18 @@ export default function ClientDetailPage() {
           </div>
 
           {client.pets.length === 0 ? (
-            <p className="text-stone-500 text-center py-8">No pets added yet</p>
+            <EmptyState
+              illustration={<PawPrintsIllustration />}
+              headline="No pets added yet"
+              subcopy="Add your first pet"
+              primaryCta={{
+                label: 'Add Pet',
+                onClick: () => {
+                  setShowAddPetModal(true);
+                  trackEmptyStateCta('client_detail', 'Add Pet');
+                },
+              }}
+            />
           ) : (
             <div className="space-y-3">
               {client.pets.map((pet) => (

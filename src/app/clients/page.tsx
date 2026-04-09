@@ -4,7 +4,9 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { Plus, Mail, Phone, Calendar, ChevronRight, Search } from 'lucide-react';
-import { trackPageView } from '@/lib/ga4';
+import { trackPageView, trackEmptyStateCta } from '@/lib/ga4';
+import { EmptyState } from '@/components/ui/EmptyState';
+import { PawPrintsIllustration } from '@/components/illustrations/PawPrintsIllustration';
 
 interface Client {
   id: string;
@@ -138,19 +140,24 @@ export default function ClientsPage() {
 
         {/* Client List */}
         {filteredClients.length === 0 ? (
-          <div className="text-center py-12 bg-white rounded-2xl shadow-sm">
-            <p className="text-stone-600 mb-4">
-              {searchTerm ? 'No clients found' : 'No clients yet'}
-            </p>
-            {!searchTerm && (
-              <button
-                onClick={() => setShowAddModal(true)}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
-              >
-                <Plus className="w-5 h-5" /> Add Your First Client
-              </button>
-            )}
-          </div>
+          searchTerm ? (
+            <div className="text-center py-12 bg-white rounded-2xl shadow-sm">
+              <p className="text-stone-600">No clients found</p>
+            </div>
+          ) : (
+            <EmptyState
+              illustration={<PawPrintsIllustration />}
+              headline="No clients yet"
+              subcopy="Add your first client"
+              primaryCta={{
+                label: 'Add Client',
+                onClick: () => {
+                  setShowAddModal(true);
+                  trackEmptyStateCta('clients', 'Add Client');
+                },
+              }}
+            />
+          )
         ) : (
           <div className="space-y-3">
             {filteredClients.map((client) => (
