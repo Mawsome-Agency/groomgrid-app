@@ -3,10 +3,10 @@ import { NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
 import prisma from '@/lib/prisma';
 import {
-  trackSubscriptionCreatedServer,
   trackSubscriptionUpdatedServer,
   trackSubscriptionCancelledServer,
 } from '@/lib/ga4-server';
+import { triggerPaymentCompletionHandler } from '@/lib/payment-completion';
 
 export async function POST(req: Request) {
   const body = await req.text();
@@ -26,53 +26,38 @@ export async function POST(req: Request) {
       case 'checkout.session.completed': {
         const session = event.data.object;
         const userId = session.metadata?.userId;
-        // planType lives on the checkout session metadata — capture it here
-        // since subscription.metadata may not have it at subscription.created time
-        const planType = session.metadata?.planType;
+
+        // Extract paymentId - use session.id if payment_intent is null (setup mode)
+        const paymentId = session.payment_intent ?? session.id;
 
         if (userId) {
-          await prisma.profile.update({
-            where: { userId },
+          // Create PAYMENT_CONFIRMED event to signal webhook received
+          await prisma.paymentEvent.create({
             data: {
-              stripeCustomerId: typeof session.customer === 'string' ? session.customer : undefined,
-              stripeSubscriptionId: typeof session.subscription === 'string' ? session.subscription : undefined,
-              // Update planType here while we have reliable session metadata
-              ...(planType ? { planType } : {}),
+              paymentId,
+              eventType: 'PAYMENT_CONFIRMED',
+              payload: {
+                userId,
+                sessionId: session.id,
+              },
             },
           });
+
+          // Trigger payment completion handler
+          // This is idempotent - will check for COMPLETION_PROCESSED first
+          await triggerPaymentCompletionHandler(session);
         }
         break;
       }
 
       case 'customer.subscription.created': {
+        // Subscription creation is now handled by triggerPaymentCompletionHandler
+        // This handler is kept for logging/debugging purposes only
         const subscription = event.data.object;
-        // userId may be on subscription metadata (set via subscription_data.metadata)
         const userId = subscription.metadata?.userId;
 
         if (userId) {
-          // planType should already be updated from checkout.session.completed,
-          // but fall back to subscription metadata if present
-          const planType = subscription.metadata?.planType;
-
-          await prisma.profile.update({
-            where: { userId },
-            data: {
-              subscriptionStatus:
-                subscription.status === 'active'
-                  ? 'active'
-                  : subscription.status === 'trialing'
-                    ? 'trial'
-                    : 'past_due',
-              ...(planType ? { planType } : {}),
-            },
-          });
-
-          await trackSubscriptionCreatedServer(
-            userId,
-            subscription.id,
-            planType ?? 'unknown',
-            subscription.status
-          );
+          console.log(`[Webhook] subscription.created for user ${userId}: ${subscription.status}`);
         }
         break;
       }
