@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { signIn } from 'next-auth/react';
 import { AlertCircle, ArrowRight, Lock, Building, Mail } from 'lucide-react';
 import { trackSignupStarted, trackAccountCreated } from '@/lib/ga4';
+import ProgressIndicator from '@/components/funnel/ProgressIndicator';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -82,6 +83,11 @@ export default function SignupPage() {
           <Link href="/" className="inline-block mb-4">
             <span className="text-2xl font-bold text-green-600">GroomGrid</span>
           </Link>
+          <ProgressIndicator
+            currentStep={1}
+            totalSteps={4}
+            stepLabels={['Account Info', 'Business Details', 'Plan Selection', 'Payment']}
+          />
           <h1 className="text-3xl font-bold text-stone-900 mb-2">Create Account</h1>
           <p className="text-stone-600">Start your 14-day free trial</p>
         </div>
