@@ -11,6 +11,7 @@ model User {
   email         String   @unique
   passwordHash  String?  @map("password_hash")
   businessName  String?  @map("business_name")
+  timezone      String   @default("America/New_York")
   emailVerified Boolean  @default(false) @map("email_verified")
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @updatedAt @map("updated_at")
@@ -61,6 +62,7 @@ model Client {
   pets Pet[]
   appointments Appointment[]
 
+  @@unique([userId, email])
   @@map("clients")
 }
 
