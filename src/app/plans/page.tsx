@@ -7,6 +7,7 @@ import { Plan } from '@/types';
 import PlanCard from '@/components/funnel/PlanCard';
 import Testimonial from '@/components/funnel/Testimonial';
 import ValueProp from '@/components/funnel/ValueProp';
+import ProgressIndicator from '@/components/funnel/ProgressIndicator';
 import { trackPageView, trackPlanSelected } from '@/lib/ga4';
 
 const PLANS: Plan[] = [
@@ -146,6 +147,14 @@ export default function PlansPage() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 py-12">
+        {/* Progress Indicator - shows user is on step 3 of 4 */}
+        <div className="mb-8">
+          <ProgressIndicator
+            currentStep={3}
+            totalSteps={4}
+            stepLabels={['Account Info', 'Business Details', 'Plan Selection', 'Payment']}
+          />
+        </div>
         {/* Hero Section */}
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold text-stone-900 mb-4">Choose Your Plan</h2>
