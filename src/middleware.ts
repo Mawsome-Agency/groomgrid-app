@@ -2,7 +2,7 @@ import { getToken } from 'next-auth/jwt'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-const protectedRoutes = ['/dashboard', '/onboarding', '/admin']
+const protectedRoutes = ['/dashboard', '/onboarding', '/admin', '/welcome']
 const authRoutes = ['/login', '/signup']
 
 export async function middleware(request: NextRequest) {
