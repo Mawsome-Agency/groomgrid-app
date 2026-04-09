@@ -9,6 +9,11 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata: Metadata = {
   title: 'GroomGrid - Pet Grooming Business Management',
   description: 'AI-powered pet grooming business management platform',
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 5, // Allows user zooming (accessibility)
+  },
 };
 
 export default function RootLayout({
@@ -35,7 +40,7 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         {/* Skip navigation - WCAG 2.4.1 */}
-        <a href="#main-content" className="skip-link">
+        <a href="#main-content" className="sr-only focus:not-sr-only fixed left-4 top-4 z-[9999] px-4 py-2 bg-green-600 text-white font-semibold rounded-lg transition-transform focus:translate-y-0 translate-y-[-100%]">
           Skip to main content
         </a>
         {/* Global live region for screen reader announcements */}

@@ -149,7 +149,7 @@ export default function DashboardPage() {
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="p-2 text-stone-600"
           >
-            {mobileMenuOpen ? <X /> : <Menu />}
+            {mobileMenuOpen ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
           </button>
         </div>
       </header>
@@ -158,22 +158,22 @@ export default function DashboardPage() {
       {mobileMenuOpen && (
         <div className="lg:hidden bg-white border-b border-stone-200 px-4 py-4 space-y-3">
           <a href="/dashboard" className="flex items-center gap-2 text-stone-900 font-medium">
-            <Calendar className="w-5 h-5" /> Today
+            <Calendar className="w-5 h-5" aria-hidden="true" /> Today
           </a>
           <a href="/schedule" className="flex items-center gap-2 text-stone-600">
-            <Calendar className="w-5 h-5" /> Schedule
+            <Calendar className="w-5 h-5" aria-hidden="true" /> Schedule
           </a>
           <a href="/clients" className="flex items-center gap-2 text-stone-600">
-            <Users className="w-5 h-5" /> Clients
+            <Users className="w-5 h-5" aria-hidden="true" /> Clients
           </a>
           <a href="/settings" className="flex items-center gap-2 text-stone-600">
-            <Settings className="w-5 h-5" /> Settings
+            <Settings className="w-5 h-5" aria-hidden="true" /> Settings
           </a>
           <button
             onClick={handleSignOut}
             className="flex items-center gap-2 text-red-600 w-full"
           >
-            <LogOut className="w-5 h-5" /> Sign Out
+            <LogOut className="w-5 h-5" aria-hidden="true" /> Sign Out
           </button>
         </div>
       )}
@@ -187,16 +187,16 @@ export default function DashboardPage() {
 
               <nav className="space-y-2">
                 <a href="/dashboard" className="flex items-center gap-3 px-4 py-3 rounded-xl bg-green-50 text-green-700 font-medium">
-                  <Calendar className="w-5 h-5" /> Today
+                  <Calendar className="w-5 h-5" aria-hidden="true" /> Today
                 </a>
                 <a href="/schedule" className="flex items-center gap-3 px-4 py-3 rounded-xl text-stone-600 hover:bg-stone-50 transition-colors">
-                  <Calendar className="w-5 h-5" /> Schedule
+                  <Calendar className="w-5 h-5" aria-hidden="true" /> Schedule
                 </a>
                 <a href="/clients" className="flex items-center gap-3 px-4 py-3 rounded-xl text-stone-600 hover:bg-stone-50 transition-colors">
-                  <Users className="w-5 h-5" /> Clients
+                  <Users className="w-5 h-5" aria-hidden="true" /> Clients
                 </a>
                 <a href="/settings" className="flex items-center gap-3 px-4 py-3 rounded-xl text-stone-600 hover:bg-stone-50 transition-colors">
-                  <Settings className="w-5 h-5" /> Settings
+                  <Settings className="w-5 h-5" aria-hidden="true" /> Settings
                 </a>
               </nav>
 
@@ -205,7 +205,7 @@ export default function DashboardPage() {
                   onClick={handleSignOut}
                   className="flex items-center gap-2 text-red-600 hover:text-red-700 text-sm"
                 >
-                  <LogOut className="w-4 h-4" /> Sign Out
+                  <LogOut className="w-4 h-4" aria-hidden="true" /> Sign Out
                 </button>
               </div>
             </div>
@@ -238,7 +238,7 @@ export default function DashboardPage() {
               <div className="bg-white rounded-2xl shadow-sm p-6">
                 <div className="flex items-center gap-3 mb-2">
                   <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
-                    <Calendar className="w-5 h-5 text-green-600" />
+                    <Calendar className="w-5 h-5 text-green-600" aria-hidden="true" />
                   </div>
                   <span className="text-sm text-stone-500">Today</span>
                 </div>
@@ -249,7 +249,7 @@ export default function DashboardPage() {
               <div className="bg-white rounded-2xl shadow-sm p-6">
                 <div className="flex items-center gap-3 mb-2">
                   <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
-                    <Users className="w-5 h-5 text-green-600" />
+                    <Users className="w-5 h-5 text-green-600" aria-hidden="true" />
                   </div>
                   <span className="text-sm text-stone-500">Clients</span>
                 </div>
@@ -260,7 +260,7 @@ export default function DashboardPage() {
               <div className="bg-white rounded-2xl shadow-sm p-6">
                 <div className="flex items-center gap-3 mb-2">
                   <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
-                    <DollarSign className="w-5 h-5 text-green-600" />
+                    <DollarSign className="w-5 h-5 text-green-600" aria-hidden="true" />
                   </div>
                   <span className="text-sm text-stone-500">Revenue</span>
                 </div>
@@ -324,7 +324,7 @@ export default function DashboardPage() {
                               className="p-2 text-green-600 hover:bg-green-100 rounded-lg transition-colors"
                               title="Mark as complete"
                             >
-                              <Calendar className="w-5 h-5" />
+                              <Calendar className="w-5 h-5" aria-hidden="true" />
                             </button>
                           )}
                         </div>
@@ -339,7 +339,7 @@ export default function DashboardPage() {
               onClick={() => router.push('/schedule')}
               className="fixed bottom-6 right-6 lg:hidden w-14 h-14 rounded-full bg-green-500 text-white shadow-lg hover:bg-green-600 transition-colors flex items-center justify-center"
             >
-              <Plus className="w-6 h-6" />
+              <Plus className="w-6 h-6" aria-hidden="true" />
             </button>
 
             {/* Welcome Card (shown only if no data) */}

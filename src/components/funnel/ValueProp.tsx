@@ -23,24 +23,24 @@ function ValuePropItem({ icon, title, description }: ValuePropItemProps) {
 export default function ValueProp() {
   const valueProps = [
     {
-      icon: <CheckCircle2 className="w-6 h-6 text-green-600" />,
-      title: "2-tap booking",
+      icon: <CheckCircle2 className="w-6 h-6 text-green-600" aria-hidden="true" />,
+      title: "Quick booking",
       description: "Book appointments in seconds with our mobile-first design",
     },
     {
-      icon: <CheckCircle2 className="w-6 h-6 text-green-600" />,
-      title: "Automated reminders",
-      description: "Reduce no-shows with SMS and email reminders",
+      icon: <CheckCircle2 className="w-6 h-6 text-green-600" aria-hidden="true" />,
+      title: "Remind clients automatically",
+      description: "Reduce no-shows by 40% with SMS and email reminders",
     },
     {
-      icon: <CheckCircle2 className="w-6 h-6 text-green-600" />,
+      icon: <CheckCircle2 className="w-6 h-6 text-green-600" aria-hidden="true" />,
       title: "Client management",
       description: "Store pet profiles, grooming notes, and payment history",
     },
     {
-      icon: <CheckCircle2 className="w-6 h-6 text-green-600" />,
-      title: "Revenue tracking",
-      description: "See earnings at a glance with real-time analytics",
+      icon: <CheckCircle2 className="w-6 h-6 text-green-600" aria-hidden="true" />,
+      title: "See your earnings at a glance",
+      description: "Track revenue with simple, clear analytics",
     },
   ];
 

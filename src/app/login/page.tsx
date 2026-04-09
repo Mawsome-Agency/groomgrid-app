@@ -59,7 +59,7 @@ function LoginForm() {
 
         {/* Error Alert */}
         {error && (
-          <div role="alert" aria-live="assertive" className="flex items-start gap-2 p-3 rounded-lg bg-red-50 text-red-700 text-sm mb-6">
+          <div role="alert" aria-live="assertive" id="login-error" className="flex items-start gap-2 p-3 rounded-lg bg-red-50 text-red-700 text-sm mb-6">
             <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" aria-hidden="true" />
             <span>{error}</span>
           </div>
@@ -81,6 +81,7 @@ function LoginForm() {
                 placeholder="you@example.com"
                 required
                 autoComplete="email"
+                aria-describedby={error ? 'login-error' : undefined}
                 className="w-full pl-10 pr-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
               />
             </div>
@@ -106,6 +107,7 @@ function LoginForm() {
                 placeholder="Your password"
                 required
                 autoComplete="current-password"
+                aria-describedby={error ? 'login-error' : undefined}
                 className="w-full pl-10 pr-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
               />
             </div>
@@ -123,7 +125,7 @@ function LoginForm() {
               </>
             ) : (
               <>
-                Sign In <ArrowRight className="w-5 h-5" />
+                Sign In <ArrowRight className="w-5 h-5" aria-hidden="true" />
               </>
             )}
           </button>

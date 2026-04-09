@@ -10,7 +10,7 @@ interface TestimonialProps {
 export default function Testimonial({ name, business, quote, avatar }: TestimonialProps) {
   return (
     <div className="bg-stone-50 rounded-2xl p-6">
-      <Quote className="w-8 h-8 text-green-500 mb-4" />
+      <Quote className="w-8 h-8 text-green-500 mb-4" aria-hidden="true" />
       <p className="text-stone-700 mb-4 italic">"{quote}"</p>
       <div>
         <p className="font-semibold text-stone-900">{name}</p>
