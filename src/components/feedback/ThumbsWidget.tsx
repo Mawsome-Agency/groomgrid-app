@@ -42,20 +42,26 @@ export function ThumbsWidget({ page }: ThumbsWidgetProps) {
 
   if (voted) {
     return (
-      <div className="flex items-center gap-1.5 text-sm text-stone-500">
+      <div
+        role="status"
+        aria-live="polite"
+        className="flex items-center gap-1.5 text-sm text-stone-500"
+      >
         <span>Thanks!</span>
       </div>
     )
   }
 
   return (
-    <div className="flex items-center gap-2">
-      <span className="text-sm text-stone-500">Was this helpful?</span>
+    <div className="flex items-center gap-2" role="group" aria-label="Was this page helpful?">
+      <span className="text-sm text-stone-500" id="thumbs-label">
+        Was this helpful?
+      </span>
       <button
         onClick={() => handleVote(1)}
         disabled={submitting}
         className="flex h-7 w-7 items-center justify-center rounded-md border border-stone-200 text-base transition-colors hover:border-green-500 hover:bg-green-50 disabled:cursor-not-allowed disabled:opacity-50"
-        aria-label="Thumbs up"
+        aria-label="Yes, this was helpful"
       >
         👍
       </button>
@@ -63,7 +69,7 @@ export function ThumbsWidget({ page }: ThumbsWidgetProps) {
         onClick={() => handleVote(-1)}
         disabled={submitting}
         className="flex h-7 w-7 items-center justify-center rounded-md border border-stone-200 text-base transition-colors hover:border-red-300 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
-        aria-label="Thumbs down"
+        aria-label="No, this was not helpful"
       >
         👎
       </button>

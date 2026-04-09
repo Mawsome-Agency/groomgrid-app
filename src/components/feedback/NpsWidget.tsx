@@ -9,7 +9,6 @@ function shouldShowNps(): boolean {
   if (typeof window === 'undefined') return false
   const dismissed = localStorage.getItem(NPS_STORAGE_KEY)
   if (dismissed) return false
-  // Check if user signed up more than 7 days ago
   const signupStr = localStorage.getItem('gg_signup_date')
   if (!signupStr) return false
   const signupDate = new Date(signupStr)
@@ -74,36 +73,47 @@ export function NpsWidget() {
   if (!visible) return null
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 w-80 rounded-xl border border-stone-200 bg-white shadow-lg">
+    <div
+      role="region"
+      aria-label="Feedback survey"
+      aria-live="polite"
+      className="fixed bottom-6 right-6 z-50 w-80 rounded-xl border border-stone-200 bg-white shadow-lg"
+    >
       <div className="flex items-start justify-between p-4 pb-2">
-        <p className="text-sm font-semibold text-stone-800">
+        <p id="nps-heading" className="text-sm font-semibold text-stone-800">
           {submitted ? 'Thanks for your feedback! 🐾' : 'Quick question'}
         </p>
         <button
           onClick={dismiss}
           className="ml-2 flex-shrink-0 text-stone-400 hover:text-stone-600"
-          aria-label="Dismiss"
+          aria-label="Dismiss feedback survey"
         >
           ✕
         </button>
       </div>
 
       {submitted ? (
-        <div className="px-4 pb-4 text-sm text-stone-500">
+        <div className="px-4 pb-4 text-sm text-stone-500" role="status">
           Your feedback helps us build a better GroomGrid.
         </div>
       ) : (
         <>
           <div className="px-4 pb-3">
-            <p className="text-sm text-stone-600">
+            <p id="nps-question" className="text-sm text-stone-600">
               How likely are you to recommend GroomGrid to another groomer?
             </p>
           </div>
-          <div className="flex flex-wrap gap-1.5 px-4 pb-3">
+          <div
+            role="group"
+            aria-labelledby="nps-question"
+            className="flex flex-wrap gap-1.5 px-4 pb-3"
+          >
             {Array.from({ length: 11 }, (_, i) => (
               <button
                 key={i}
                 onClick={() => setSelected(i)}
+                aria-pressed={selected === i}
+                aria-label={`Score ${i} out of 10`}
                 className={`h-8 w-8 rounded-md border text-xs font-semibold transition-colors ${
                   selected === i
                     ? scoreColor(i)
@@ -114,14 +124,21 @@ export function NpsWidget() {
               </button>
             ))}
           </div>
-          <div className="flex justify-between px-4 pb-2 text-[11px] text-stone-400">
+          <div
+            className="flex justify-between px-4 pb-2 text-[11px] text-stone-400"
+            aria-hidden="true"
+          >
             <span>Not likely</span>
             <span>Very likely</span>
           </div>
 
           {selected !== null && (
             <div className="px-4 pb-3">
+              <label htmlFor="nps-comment" className="sr-only">
+                Additional comments (optional)
+              </label>
               <textarea
+                id="nps-comment"
                 className="w-full resize-none rounded-lg border border-stone-200 px-3 py-2 text-sm text-stone-800 placeholder-stone-400 focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
                 rows={2}
                 placeholder="Any thoughts? (optional)"
@@ -135,6 +152,7 @@ export function NpsWidget() {
             <button
               onClick={handleSubmit}
               disabled={selected === null || submitting}
+              aria-busy={submitting}
               className="flex-1 rounded-lg bg-green-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-green-600 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {submitting ? 'Sending...' : 'Submit'}

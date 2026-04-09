@@ -34,7 +34,23 @@ export default function RootLayout({
         </Script>
       </head>
       <body className={inter.className}>
-        <SessionProvider>{children}</SessionProvider>
+        {/* Skip navigation - WCAG 2.4.1 */}
+        <a href="#main-content" className="skip-link">
+          Skip to main content
+        </a>
+        {/* Global live region for screen reader announcements */}
+        <div
+          id="sr-announcer"
+          aria-live="polite"
+          aria-atomic="true"
+          className="sr-only"
+          role="status"
+        />
+        <SessionProvider>
+          <main id="main-content">
+            {children}
+          </main>
+        </SessionProvider>
       </body>
     </html>
   );

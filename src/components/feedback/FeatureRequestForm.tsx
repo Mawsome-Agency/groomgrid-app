@@ -58,7 +58,11 @@ export function FeatureRequestForm() {
 
   if (submitted) {
     return (
-      <div className="rounded-xl border border-green-200 bg-green-50 p-6 text-center">
+      <div
+        role="status"
+        aria-live="polite"
+        className="rounded-xl border border-green-200 bg-green-50 p-6 text-center"
+      >
         <p className="text-lg font-semibold text-stone-800">
           Thanks! We review every request 🐾
         </p>
@@ -76,44 +80,72 @@ export function FeatureRequestForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4" noValidate aria-label="Feature request form">
       <div>
-        <label className="mb-1.5 block text-sm font-medium text-stone-700">
-          Feature title <span className="text-red-500">*</span>
+        <label
+          htmlFor="feature-title"
+          className="mb-1.5 block text-sm font-medium text-stone-700"
+        >
+          Feature title{' '}
+          <span className="text-red-500" aria-hidden="true">*</span>
+          <span className="sr-only">(required)</span>
         </label>
         <input
+          id="feature-title"
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
+          required
+          aria-required="true"
+          aria-invalid={errors.title ? 'true' : 'false'}
+          aria-describedby={errors.title ? 'feature-title-error' : undefined}
           className="w-full rounded-lg border border-stone-200 px-3 py-2.5 text-sm text-stone-800 placeholder-stone-400 focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
           placeholder="e.g. Recurring appointment scheduler"
         />
         {errors.title && (
-          <p className="mt-1 text-xs text-red-500">{errors.title}</p>
+          <p id="feature-title-error" role="alert" className="mt-1 text-xs text-red-500">
+            {errors.title}
+          </p>
         )}
       </div>
 
       <div>
-        <label className="mb-1.5 block text-sm font-medium text-stone-700">
-          Description <span className="text-red-500">*</span>
+        <label
+          htmlFor="feature-description"
+          className="mb-1.5 block text-sm font-medium text-stone-700"
+        >
+          Description{' '}
+          <span className="text-red-500" aria-hidden="true">*</span>
+          <span className="sr-only">(required)</span>
         </label>
         <textarea
+          id="feature-description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           rows={4}
+          required
+          aria-required="true"
+          aria-invalid={errors.description ? 'true' : 'false'}
+          aria-describedby={errors.description ? 'feature-description-error' : undefined}
           className="w-full resize-none rounded-lg border border-stone-200 px-3 py-2.5 text-sm text-stone-800 placeholder-stone-400 focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
           placeholder="Describe what you need and why it would help your business."
         />
         {errors.description && (
-          <p className="mt-1 text-xs text-red-500">{errors.description}</p>
+          <p id="feature-description-error" role="alert" className="mt-1 text-xs text-red-500">
+            {errors.description}
+          </p>
         )}
       </div>
 
       <div>
-        <label className="mb-1.5 block text-sm font-medium text-stone-700">
+        <label
+          htmlFor="feature-priority"
+          className="mb-1.5 block text-sm font-medium text-stone-700"
+        >
           Priority
         </label>
         <select
+          id="feature-priority"
           value={priority}
           onChange={(e) => setPriority(e.target.value as Priority)}
           className="w-full rounded-lg border border-stone-200 px-3 py-2.5 text-sm text-stone-800 focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
@@ -129,6 +161,7 @@ export function FeatureRequestForm() {
       <button
         type="submit"
         disabled={submitting}
+        aria-busy={submitting}
         className="w-full rounded-lg bg-green-500 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-green-600 disabled:cursor-not-allowed disabled:opacity-50"
       >
         {submitting ? 'Submitting...' : 'Submit Request'}
