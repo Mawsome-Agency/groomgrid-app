@@ -1,0 +1,110 @@
+/**
+ * Accessibility enhancements
+ * Focus styles, reduced motion, and screen reader utilities
+ */
+
+/* Screen reader only class - visually hidden but available to screen readers */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Visible when focused (for skip links, etc.) */
+.sr-only-focusable:focus {
+  position: fixed;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 9999;
+  padding: 0.5rem 1rem;
+  background-color: #22c55e;
+  color: white;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  outline: none;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* High contrast focus ring for keyboard navigation */
+*:focus-visible {
+  outline: 2px solid #22c55e;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Skip default focus ring if element has custom focus styles */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #22c55e;
+  outline-offset: 2px;
+}
+
+/* Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Ensure text meets WCAG AA contrast requirements */
+.text-stone-400 {
+  color: #a8a29e; /* Lighter stone color for better contrast */
+}
+
+.text-stone-500 {
+  color: #78716c; /* Better contrast for text */
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .text-stone-400,
+  .text-stone-500 {
+    color: #44403c;
+  }
+  
+  button,
+  a {
+    border: 2px solid currentColor;
+  }
+}
+
+/* Improved link indicators */
+a:not([class]) {
+  color: #22c55e;
+  text-decoration: underline;
+}
+
+a:not([class]):hover {
+  color: #16a34a;
+  text-decoration: underline;
+}
+
+/* Skip link visible on focus */
+.skip-to-content {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: #22c55e;
+  color: white;
+  padding: 8px;
+  z-index: 100;
+  transition: top 0.3s;
+}
+
+.skip-to-content:focus {
+  top: 0;
+}
