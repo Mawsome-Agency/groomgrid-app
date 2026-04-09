@@ -3,13 +3,24 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/next-auth-options';
 import { createCheckoutSession } from '@/lib/stripe';
 import prisma from '@/lib/prisma';
+import { trackApiTimingServer } from '@/lib/ga4-server';
 
 // Note: trackPlanSelected is intentionally fired client-side (plans/page.tsx)
 // before this API call. window.gtag is unavailable in server routes.
 
 export async function POST(req: NextRequest) {
+  const startTime = Date.now()
+
+  let body: any
   try {
-    const { userId, planType, customerEmail } = await req.json();
+    body = await req.json()
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
+  }
+
+  const { userId, planType, customerEmail } = body
+
+  try {
 
     if (!userId || !planType) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -30,6 +41,20 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ url: session.url });
   } catch (error: any) {
     console.error('Checkout error:', error);
+    const durationMs = Date.now() - startTime
+    if (userId) {
+      await trackApiTimingServer(userId, '/api/checkout', durationMs, false, error.message || 'unknown_error')
+    }
     return NextResponse.json({ error: error.message || 'Failed to create checkout session' }, { status: 500 });
+  } finally {
+    // Track timing for successful requests
+    try {
+      if (userId) {
+        const durationMs = Date.now() - startTime
+        await trackApiTimingServer(userId, '/api/checkout', durationMs, true)
+      }
+    } catch {
+      // Ignore timing errors
+    }
   }
 }

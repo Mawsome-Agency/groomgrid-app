@@ -7,7 +7,8 @@ import { Plan } from '@/types';
 import PlanCard from '@/components/funnel/PlanCard';
 import Testimonial from '@/components/funnel/Testimonial';
 import ValueProp from '@/components/funnel/ValueProp';
-import { trackPageView, trackPlanSelected } from '@/lib/ga4';
+import { trackPageView, trackPlanSelected, trackFunnelExit } from '@/lib/ga4';
+import { useApiTiming } from '@/hooks/use-funnel-timing';
 
 const PLANS: Plan[] = [
   {
@@ -74,8 +75,22 @@ const TESTIMONIALS = [
 export default function PlansPage() {
   const router = useRouter();
   const { data: session, status } = useSession();
+  const { startTiming: startCheckoutTiming, endTiming: endCheckoutTiming } = useApiTiming('/api/checkout');
+
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
   const [loading, setLoading] = useState(false);
+
+  // Track exit when user leaves page without selecting a plan
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (!selectedPlan && !loading) {
+        trackFunnelExit('plans', 'page_exit', 'user_navigated_away');
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [selectedPlan, loading]);
 
   useEffect(() => {
     trackPageView('/plans', 'Plan Selection');
@@ -96,6 +111,9 @@ export default function PlansPage() {
     // Fire client-side GA4 event before redirect — window.gtag is available here
     trackPlanSelected(plan.type, plan.price);
 
+    // Start timing for checkout API call
+    startCheckoutTiming();
+
     try {
       const response = await fetch('/api/checkout', {
         method: 'POST',
@@ -110,12 +128,16 @@ export default function PlansPage() {
       const data = await response.json();
 
       if (data.url) {
+        // Track API timing success
+        endCheckoutTiming(true);
         window.location.href = data.url;
       } else {
         throw new Error(data.error || 'Failed to create checkout');
       }
     } catch (err: any) {
       console.error('Checkout error:', err);
+      // Track API timing with error
+      endCheckoutTiming(false, err.message || 'unknown_error');
       alert(err.message || 'Failed to proceed to checkout');
       setLoading(false);
       setSelectedPlan(null);

@@ -177,3 +177,53 @@ export async function trackSubscriptionStartedServer(
     userId
   );
 }
+
+// ── Funnel Analysis Tracking (Server-Side) ─────────────────────────────────────
+
+/**
+ * Track API timing on server side
+ */
+export async function trackApiTimingServer(
+  userId: string,
+  apiEndpoint: string,
+  durationMs: number,
+  success: boolean,
+  errorType?: string
+): Promise<void> {
+  await trackServerEvent(
+    userId,
+    {
+      name: 'api_timing',
+      params: {
+        api_endpoint: apiEndpoint,
+        duration_ms: durationMs,
+        success,
+        error_type: errorType || '',
+      },
+    },
+    userId
+  );
+}
+
+/**
+ * Track payment failure on server side (from webhook)
+ */
+export async function trackPaymentFailureServer(
+  userId: string,
+  errorType: string,
+  declineCode?: string,
+  errorMessage?: string
+): Promise<void> {
+  await trackServerEvent(
+    userId,
+    {
+      name: 'payment_failure',
+      params: {
+        error_type: errorType,
+        decline_code: declineCode || '',
+        error_message: errorMessage || '',
+      },
+    },
+    userId
+  );
+}

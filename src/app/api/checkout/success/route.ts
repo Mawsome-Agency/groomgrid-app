@@ -3,9 +3,11 @@ import { NextRequest, NextResponse } from 'next/server';
 export const dynamic = 'force-dynamic';
 import { getCheckoutSession } from '@/lib/stripe';
 import prisma from '@/lib/prisma';
-import { trackCheckoutCompletedServer, trackSubscriptionStartedServer } from '@/lib/ga4-server';
+import { trackCheckoutCompletedServer, trackSubscriptionStartedServer, trackApiTimingServer } from '@/lib/ga4-server';
 
 export async function GET(req: NextRequest) {
+  const startTime = Date.now()
+
   try {
     const { searchParams } = new URL(req.url);
     const session_id = searchParams.get('session_id');
@@ -47,6 +49,8 @@ export async function GET(req: NextRequest) {
       0
     );
 
+    const durationMs = Date.now() - startTime
+    await trackApiTimingServer(userId, '/api/checkout/success', durationMs, true)
     return NextResponse.redirect(new URL(`/onboarding?session_id=${session_id}`, req.url));
   } catch (error: any) {
     console.error('Checkout success error:', error);

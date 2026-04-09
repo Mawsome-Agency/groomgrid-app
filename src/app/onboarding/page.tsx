@@ -8,7 +8,8 @@ import Step1AddClient from '@/components/onboarding/Step1AddClient';
 import Step2Appointment from '@/components/onboarding/Step2Appointment';
 import Step3BusinessHours, { BusinessHoursForm } from '@/components/onboarding/Step3BusinessHours';
 import CompletionScreen from '@/components/onboarding/CompletionScreen';
-import { trackOnboardingStep, trackOnboardingSkipped, trackPageView } from '@/lib/ga4';
+import { trackOnboardingStep, trackOnboardingSkipped, trackPageView, trackStepDuration, getSessionId } from '@/lib/ga4';
+import { useFunnelTiming } from '@/hooks/use-funnel-timing';
 
 // Days in the order the business-hours API expects (index 0 = Sunday)
 const DAYS_API_ORDER = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'] as const;
@@ -16,6 +17,12 @@ const DAYS_API_ORDER = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 
 export default function OnboardingPage() {
   const router = useRouter();
   const { data: session, status } = useSession();
+  const { recordStepCompletion } = useFunnelTiming({
+    stepName: 'onboarding',
+    stepNumber: 1,
+    enabled: true,
+  });
+
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(true);
   const [stepLoading, setStepLoading] = useState(false);
@@ -137,6 +144,8 @@ export default function OnboardingPage() {
       setClientData({ ...client, id: savedClient.id, petId: savedPetId });
       await updateProfileStep(1);
       trackOnboardingStep(1);
+      // Track step completion timing
+      recordStepCompletion();
       setStep(2);
     } catch (err) {
       console.error('Step 1 failed:', err);
@@ -178,6 +187,8 @@ export default function OnboardingPage() {
 
       await updateProfileStep(2);
       trackOnboardingStep(2);
+      // Track step completion timing
+      recordStepCompletion();
       setStep(3);
     } catch (err) {
       console.error('Step 2 failed:', err);
@@ -213,6 +224,8 @@ export default function OnboardingPage() {
       // Mark onboarding complete
       await updateProfileStep(3, true);
       trackOnboardingStep(3);
+      // Track step completion timing
+      recordStepCompletion();
       setStep(4);
     } catch (err) {
       console.error('Step 3 failed:', err);

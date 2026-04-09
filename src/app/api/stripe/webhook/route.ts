@@ -6,6 +6,7 @@ import {
   trackSubscriptionCreatedServer,
   trackSubscriptionUpdatedServer,
   trackSubscriptionCancelledServer,
+  trackPaymentFailureServer,
 } from '@/lib/ga4-server';
 
 export async function POST(req: Request) {
@@ -76,6 +77,39 @@ export async function POST(req: Request) {
 
           // Track subscription status changes (upgrades, downgrades, renewals)
           await trackSubscriptionUpdatedServer(userId, subscription.id, subscription.status);
+        }
+        break;
+      }
+
+      case 'invoice.payment_failed': {
+        const invoice = event.data.object;
+        const userId = invoice.metadata?.userId;
+
+        if (userId) {
+          // Extract error details from the payment intent
+          let errorType = 'unknown';
+          let declineCode: string | undefined;
+          let errorMessage: string | undefined;
+
+          if (invoice.payment_intent) {
+            try {
+              const paymentIntent = await stripe.paymentIntents.retrieve(
+                typeof invoice.payment_intent === 'string'
+                  ? invoice.payment_intent
+                  : (invoice.payment_intent as any).id
+              );
+              if (paymentIntent.last_payment_error) {
+                errorType = paymentIntent.last_payment_error.type || 'unknown';
+                declineCode = (paymentIntent.last_payment_error as any).decline_code;
+                errorMessage = paymentIntent.last_payment_error.message;
+              }
+            } catch (err) {
+              console.error('Failed to retrieve payment intent:', err);
+            }
+          }
+
+          // Track payment failure via GA4
+          await trackPaymentFailureServer(userId, errorType, declineCode, errorMessage);
         }
         break;
       }
