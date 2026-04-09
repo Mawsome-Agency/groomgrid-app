@@ -37,6 +37,7 @@ model Profile {
   trialEndsAt          DateTime? @map("trial_ends_at")
   onboardingCompleted  Boolean   @default(false) @map("onboarding_completed")
   onboardingStep       Int       @default(0) @map("onboarding_step")
+  welcomeShown         Boolean   @default(false) @map("welcome_shown")
   stripeCustomerId     String?   @map("stripe_customer_id")
   stripeSubscriptionId String?   @map("stripe_subscription_id")
   createdAt            DateTime  @default(now()) @map("created_at")

@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
     where: { userId: session.user.id },
   })
 
-  return NextResponse.json({ profile })
+  return NextResponse.json(profile)
 }
 
 export async function PATCH(req: NextRequest) {
@@ -24,11 +24,12 @@ export async function PATCH(req: NextRequest) {
 
   try {
     const body = await req.json()
-    const { onboardingStep, onboardingCompleted, ...rest } = body
+    const { onboardingStep, onboardingCompleted, welcomeShown, ...rest } = body
 
     const data: Record<string, unknown> = {}
     if (onboardingStep !== undefined) data.onboardingStep = onboardingStep
     if (onboardingCompleted !== undefined) data.onboardingCompleted = onboardingCompleted
+    if (welcomeShown !== undefined) data.welcomeShown = welcomeShown
     if (rest.businessName !== undefined) data.businessName = rest.businessName
     if (rest.phone !== undefined) data.phone = rest.phone
 
@@ -37,7 +38,7 @@ export async function PATCH(req: NextRequest) {
       data,
     })
 
-    return NextResponse.json({ profile })
+    return NextResponse.json(profile)
   } catch (error) {
     console.error('Profile update error:', error)
     return NextResponse.json({ error: 'Failed to update profile' }, { status: 500 })

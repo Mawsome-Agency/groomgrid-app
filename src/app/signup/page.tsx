@@ -69,7 +69,7 @@ export default function SignupPage() {
         return;
       }
 
-      router.push('/plans');
+      router.push('/welcome');
     } catch (err: any) {
       trackSignupError(err.message || 'network_error', 'catch_block');
       setError(err.message || 'Failed to create account');

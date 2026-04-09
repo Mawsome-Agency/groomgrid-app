@@ -108,6 +108,15 @@ export function trackPageView(pagePath: string, pageTitle: string) {
     page_title: pageTitle,
   });
 }
+
+export function trackWelcomeViewed(userId: string, businessName: string) {
+  trackEvent('welcome_viewed', {
+    user_id: userId,
+    business_name: businessName,
+    timestamp: new Date().toISOString(),
+  });
+}
+
 export function trackSignupError(error: string, context: string) {
   trackEvent('signup_error', {
     error,

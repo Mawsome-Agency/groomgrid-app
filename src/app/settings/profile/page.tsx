@@ -42,13 +42,12 @@ export default function ProfileSettingsPage() {
 
   const fetchProfile = async () => {
     try {
-      const res = await fetch(`/api/profile?userId=${session?.user?.id}`);
+      const res = await fetch('/api/profile');
       if (res.ok) {
         const data = await res.json();
-        const p = data.profile;
         const loaded = {
-          businessName: p?.business_name || p?.businessName || '',
-          phone: p?.phone || '',
+          businessName: data?.business_name || data?.businessName || '',
+          phone: data?.phone || '',
         };
         setForm(loaded);
         setOriginal(loaded);
