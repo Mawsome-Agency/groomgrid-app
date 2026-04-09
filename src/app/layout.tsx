@@ -9,6 +9,11 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata: Metadata = {
   title: 'GroomGrid - Pet Grooming Business Management',
   description: 'AI-powered pet grooming business management platform',
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 5, // Allows user zooming (accessibility)
+  },
 };
 
 export default function RootLayout({
