@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
 import prisma from '@/lib/prisma'
+import { enrollUserInDrip } from '@/lib/email/enroll-drip'
 
 export async function POST(req: NextRequest) {
   try {
@@ -37,6 +38,13 @@ export async function POST(req: NextRequest) {
         },
       },
     })
+
+    // Auto-enroll new user in the welcome drip sequence (non-fatal)
+    try {
+      await enrollUserInDrip(user.id, user.email)
+    } catch (dripError) {
+      console.error('Drip enrollment failed (non-fatal):', dripError)
+    }
 
     return NextResponse.json({ success: true, userId: user.id })
   } catch (error) {

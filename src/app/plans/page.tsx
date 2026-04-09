@@ -87,7 +87,7 @@ export default function PlansPage() {
     }
   }, [status]);
 
-  const handleSelectPlan = async (plan: Plan) => {
+  const handleSelectPlan = (plan: Plan) => {
     if (!session?.user?.id) return;
 
     setSelectedPlan(plan);
@@ -96,30 +96,8 @@ export default function PlansPage() {
     // Fire client-side GA4 event before redirect — window.gtag is available here
     trackPlanSelected(plan.type, plan.price);
 
-    try {
-      const response = await fetch('/api/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId: session.user.id,
-          planType: plan.type,
-          customerEmail: session.user.email,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        throw new Error(data.error || 'Failed to create checkout');
-      }
-    } catch (err: any) {
-      console.error('Checkout error:', err);
-      alert(err.message || 'Failed to proceed to checkout');
-      setLoading(false);
-      setSelectedPlan(null);
-    }
+    // Redirect to payment review page for transparent pre-checkout summary
+    router.push(`/payment-review?plan=${plan.type}`);
   };
 
   if (status === 'loading' || !session) {

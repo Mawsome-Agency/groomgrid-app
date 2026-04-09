@@ -71,6 +71,8 @@ function p(text: string, muted = false): string {
 
 function step0(userName: string, appUrl: string): EmailContent {
   const firstName = userName.split(' ')[0]
+  const onboardingUrl = `${appUrl}/onboarding`
+  const docsUrl = `${appUrl}/docs`
 
   const html = emailWrapper(`
     ${h1(`Welcome to GroomGrid, ${firstName}! 🐾`)}
@@ -101,9 +103,9 @@ function step0(userName: string, appUrl: string): EmailContent {
       </tr>
     </table>
     ${p(`It only takes a few minutes and you'll never go back to spreadsheets.`)}
-    ${ctaButton('Set Up My Account', appUrl)}
+    ${ctaButton('Complete My Setup', onboardingUrl)}
     <br /><br />
-    ${p(`Questions? Just reply to this email — we're real people and we read everything.`, true)}
+    ${p(`Need help? <a href="${docsUrl}" style="color:${BRAND.primary};">Browse the getting-started guide</a> or reply to this email — we're real people and we read everything.`, true)}
   `)
 
   const text = `Welcome to GroomGrid, ${firstName}!
@@ -113,7 +115,8 @@ Here's how to get started:
 2. Add your first client — store pet details and notes.
 3. Book your first appointment — schedule and send reminders.
 
-Get started: ${appUrl}
+Complete your setup: ${onboardingUrl}
+Getting-started guide: ${docsUrl}
 
 Questions? Reply to this email.`
 

@@ -9,6 +9,7 @@ export interface CreateCheckoutSessionParams {
   planType: 'solo' | 'salon' | 'enterprise';
   customerEmail: string;
   businessName: string;
+  signupSource?: string;
 }
 
 const PRICE_IDS = {
@@ -22,9 +23,10 @@ export async function createCheckoutSession({
   planType,
   customerEmail,
   businessName,
+  signupSource = 'unknown',
 }: CreateCheckoutSessionParams) {
   const priceId = PRICE_IDS[planType];
-  
+
   const session = await stripe.checkout.sessions.create({
     customer_email: customerEmail,
     mode: 'subscription',
@@ -35,15 +37,22 @@ export async function createCheckoutSession({
         quantity: 1,
       },
     ],
+    metadata: {
+      userId,
+      planType,
+      businessName,
+      signupSource,
+    },
     subscription_data: {
       trial_period_days: 14,
       metadata: {
         userId,
         planType,
         businessName,
+        signupSource,
       },
     },
-    success_url: `${process.env.NEXT_PUBLIC_APP_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+    success_url: `${process.env.NEXT_PUBLIC_APP_URL}/api/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/plans`,
     allow_promotion_codes: true,
     billing_address_collection: 'required',

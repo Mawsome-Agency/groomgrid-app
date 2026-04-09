@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import ProgressIndicator from '@/components/funnel/ProgressIndicator';
 import Step1AddClient from '@/components/onboarding/Step1AddClient';
@@ -15,6 +15,8 @@ const DAYS_API_ORDER = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 
 
 export default function OnboardingPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const fromPayment = searchParams.get('from') === 'payment-success';
   const { data: session, status } = useSession();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -257,6 +259,13 @@ export default function OnboardingPage() {
         )}
 
         <div className="bg-white rounded-2xl shadow-xl p-8">
+          {/* Payment success welcome banner */}
+          {fromPayment && step === 1 && (
+            <div className="mb-6 px-4 py-3 rounded-xl bg-green-50 border border-green-200 text-sm text-green-800">
+              <strong>Your 14-day free trial is active!</strong> Let&apos;s get your account set up so you&apos;re ready for your first appointment.
+            </div>
+          )}
+
           {/* Step-level error banner */}
           {stepError && (
             <div className="mb-4 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-sm text-red-700">

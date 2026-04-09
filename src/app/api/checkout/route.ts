@@ -25,6 +25,7 @@ export async function POST(req: NextRequest) {
       planType: planType as 'solo' | 'salon' | 'enterprise',
       customerEmail: customerEmail || `${userId}@groomgrid.app`,
       businessName: profile.businessName,
+      signupSource: 'plans_page',
     });
 
     return NextResponse.json({ url: session.url });
