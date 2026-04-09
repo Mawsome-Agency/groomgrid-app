@@ -1,11 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { signIn } from 'next-auth/react';
-import { AlertCircle, ArrowRight, Lock, Building, Mail } from 'lucide-react';
+import { AlertCircle, ArrowRight, Lock, Building, Mail, Check, X } from 'lucide-react';
 import { trackSignupStarted, trackAccountCreated } from '@/lib/ga4';
+import { validateEmail, validatePassword, validateBusinessName } from '@/lib/validators';
+
+type FieldState = 'untouched' | 'touched' | 'valid' | 'invalid' | 'pending-validation';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -17,14 +20,94 @@ export default function SignupPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  // Field-level validation states
+  const [fieldStates, setFieldStates] = useState<{
+    email: FieldState;
+    password: FieldState;
+    businessName: FieldState;
+  }>({
+    email: 'untouched',
+    password: 'untouched',
+    businessName: 'untouched',
+  });
+
+  const [fieldErrors, setFieldErrors] = useState<{
+    email?: string;
+    password?: string;
+    businessName?: string;
+  }>({});
+
   useEffect(() => {
     if (formData.businessName) {
       trackSignupStarted(formData.businessName);
     }
   }, [formData.businessName]);
 
+  // Async email validation (checks if email exists)
+  const validateEmailAvailability = useCallback(async (email: string) => {
+    try {
+      const res = await fetch(\`/api/auth/validate-email?email=\${encodeURIComponent(email)}\`);
+      const data = await res.json();
+
+      if (!data.isValid) {
+        return { isValid: false, error: data.error || 'Email is not available' };
+      }
+
+      return { isValid: true };
+    } catch {
+      return { isValid: true }; // On API error, allow validation to proceed
+    }
+  }, []);
+
+  // Blur handlers for each field
+  const handleBlur = useCallback(async (field: 'email' | 'password' | 'businessName') => {
+    setFieldStates(prev => ({ ...prev, [field]: 'touched' }));
+
+    const value = formData[field];
+    let validationResult;
+
+    switch (field) {
+      case 'email':
+        // Async validation for email
+        setFieldStates(prev => ({ ...prev, email: 'pending-validation' }));
+        validationResult = await validateEmailAvailability(value);
+        break;
+      case 'password':
+        validationResult = validatePassword(value);
+        break;
+      case 'businessName':
+        validationResult = validateBusinessName(value);
+        break;
+    }
+
+    if (validationResult.isValid) {
+      setFieldStates(prev => ({ ...prev, [field]: 'valid' }));
+      setFieldErrors(prev => ({ ...prev, [field]: undefined }));
+    } else {
+      setFieldStates(prev => ({ ...prev, [field]: 'invalid' }));
+      setFieldErrors(prev => ({ ...prev, [field]: validationResult.error }));
+    }
+  }, [formData, validateEmailAvailability]);
+
+  const handleFieldChange = (field: 'email' | 'password' | 'businessName', value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+
+    // Clear error state while typing if field was invalid
+    if (fieldStates[field] === 'invalid') {
+      setFieldStates(prev => ({ ...prev, [field]: 'touched' }));
+      setFieldErrors(prev => ({ ...prev, [field]: undefined }));
+    }
+  };
+
+  const isFormValid = (): boolean => {
+    return fieldStates.email === 'valid' &&
+           fieldStates.password === 'valid' &&
+           fieldStates.businessName === 'valid';
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     setError('');
     setLoading(true);
 
@@ -94,6 +177,7 @@ export default function SignupPage() {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Business Name Field */}
           <div>
             <label className="block text-sm font-medium text-stone-700 mb-1">Business Name</label>
             <div className="relative">
@@ -101,14 +185,31 @@ export default function SignupPage() {
               <input
                 type="text"
                 value={formData.businessName}
-                onChange={(e) => setFormData({ ...formData, businessName: e.target.value })}
+                onChange={(e) => handleFieldChange('businessName', e.target.value)}
+                onBlur={() => handleBlur('businessName')}
                 placeholder="e.g., Paws on Wheels"
                 required
-                className="w-full pl-10 pr-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
+                className={\`w-full pl-10 pr-10 py-3 rounded-xl border outline-none transition-all \${
+                  fieldStates.businessName === 'valid'
+                    ? 'border-green-500 focus:ring-green-500'
+                    : fieldStates.businessName === 'invalid'
+                    ? 'border-red-500 focus:ring-red-500'
+                    : 'border-stone-200 focus:ring-green-500 focus:border-transparent'
+                }\`}
               />
+              {fieldStates.businessName === 'valid' && (
+                <Check className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-green-500" />
+              )}
+              {fieldStates.businessName === 'invalid' && (
+                <X className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-red-500" />
+              )}
             </div>
+            {fieldErrors.businessName && (
+              <p className="mt-1 text-xs text-red-500">{fieldErrors.businessName}</p>
+            )}
           </div>
 
+          {/* Email Field */}
           <div>
             <label className="block text-sm font-medium text-stone-700 mb-1">Email Address</label>
             <div className="relative">
@@ -116,15 +217,39 @@ export default function SignupPage() {
               <input
                 type="email"
                 value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                onChange={(e) => handleFieldChange('email', e.target.value)}
+                onBlur={() => handleBlur('email')}
                 placeholder="you@example.com"
                 required
                 autoComplete="email"
-                className="w-full pl-10 pr-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
+                className={\`w-full pl-10 pr-10 py-3 rounded-xl border outline-none transition-all \${
+                  fieldStates.email === 'valid'
+                    ? 'border-green-500 focus:ring-green-500'
+                    : fieldStates.email === 'invalid'
+                    ? 'border-red-500 focus:ring-red-500'
+                    : fieldStates.email === 'pending-validation'
+                    ? 'border-amber-400'
+                    : 'border-stone-200 focus:ring-green-500 focus:border-transparent'
+                }\`}
               />
+              {fieldStates.email === 'valid' && (
+                <Check className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-green-500" />
+              )}
+              {fieldStates.email === 'invalid' && (
+                <X className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-red-500" />
+              )}
+              {fieldStates.email === 'pending-validation' && (
+                <div className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5">
+                  <div className="w-5 h-5 border-2 border-amber-400 border-t-transparent rounded-full animate-spin" />
+                </div>
+              )}
             </div>
+            {fieldErrors.email && (
+              <p className="mt-1 text-xs text-red-500">{fieldErrors.email}</p>
+            )}
           </div>
 
+          {/* Password Field */}
           <div>
             <label className="block text-sm font-medium text-stone-700 mb-1">Password</label>
             <div className="relative">
@@ -132,19 +257,35 @@ export default function SignupPage() {
               <input
                 type="password"
                 value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                onChange={(e) => handleFieldChange('password', e.target.value)}
+                onBlur={() => handleBlur('password')}
                 placeholder="Min. 8 characters"
                 required
                 minLength={8}
                 autoComplete="new-password"
-                className="w-full pl-10 pr-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
+                className={\`w-full pl-10 pr-10 py-3 rounded-xl border outline-none transition-all \${
+                  fieldStates.password === 'valid'
+                    ? 'border-green-500 focus:ring-green-500'
+                    : fieldStates.password === 'invalid'
+                    ? 'border-red-500 focus:ring-red-500'
+                    : 'border-stone-200 focus:ring-green-500 focus:border-transparent'
+                }\`}
               />
+              {fieldStates.password === 'valid' && (
+                <Check className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-green-500" />
+              )}
+              {fieldStates.password === 'invalid' && (
+                <X className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-red-500" />
+              )}
             </div>
+            {fieldErrors.password && (
+              <p className="mt-1 text-xs text-red-500">{fieldErrors.password}</p>
+            )}
           </div>
 
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || !isFormValid()}
             className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-green-500 text-white font-semibold hover:bg-green-600 disabled:bg-stone-300 disabled:cursor-not-allowed transition-colors"
           >
             {loading ? (
