@@ -9,6 +9,7 @@ export interface CreateCheckoutSessionParams {
   planType: 'solo' | 'salon' | 'enterprise';
   customerEmail: string;
   businessName: string;
+  planData?: { name: string; price: number };
 }
 
 const PRICE_IDS = {
@@ -22,9 +23,10 @@ export async function createCheckoutSession({
   planType,
   customerEmail,
   businessName,
+  planData,
 }: CreateCheckoutSessionParams) {
   const priceId = PRICE_IDS[planType];
-  
+
   const session = await stripe.checkout.sessions.create({
     customer_email: customerEmail,
     mode: 'subscription',
@@ -41,6 +43,9 @@ export async function createCheckoutSession({
         userId,
         planType,
         businessName,
+        planName: planData?.name || planType,
+        planPrice: planData?.price?.toString() || '0',
+        isTrial: 'true',
       },
     },
     success_url: `${process.env.NEXT_PUBLIC_APP_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
@@ -52,7 +57,7 @@ export async function createCheckoutSession({
       name: 'auto',
     },
   });
-  
+
   return session;
 }
 

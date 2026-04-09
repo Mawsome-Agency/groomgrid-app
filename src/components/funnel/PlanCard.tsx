@@ -1,5 +1,6 @@
 import { Check, Star } from 'lucide-react';
 import { Plan } from '@/types';
+import NoHiddenFeesSeal from '@/components/trust/NoHiddenFeesSeal';
 
 interface PlanCardProps {
   plan: Plan;
@@ -55,6 +56,9 @@ export default function PlanCard({ plan, selected, onSelect }: PlanCardProps) {
       >
         {selected ? 'Selected' : 'Choose Plan'}
       </button>
+
+      {/* Trust Signal: No Hidden Fees */}
+      <NoHiddenFeesSeal className="justify-center" />
     </div>
   );
 }

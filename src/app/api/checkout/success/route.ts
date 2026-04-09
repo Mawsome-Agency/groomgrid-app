@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
     const session_id = searchParams.get('session_id');
 
     if (!session_id) {
-      return NextResponse.redirect(new URL('/plans', req.url));
+      return NextResponse.json({ error: 'Missing session_id' }, { status: 400 });
     }
 
     const session = await getCheckoutSession(session_id);
@@ -41,11 +41,15 @@ export async function GET(req: NextRequest) {
 
     console.log(`[CheckoutSuccess] Created PAYMENT_INITIATED event for payment ${paymentId}`);
 
-    // Redirect to onboarding immediately - no profile update here
-    // Payment will be confirmed via webhook and processed atomically
-    return NextResponse.redirect(new URL('/onboarding', req.url));
+    // Return session data for success page billing summary
+    // Note: After we modify the checkout route to include plan details, this will have more metadata
+    return NextResponse.json({
+      session_id: session.id,
+      metadata: session.metadata,
+      trial_end_days_left: session.subscription?.trial_end ? Math.max(0, Math.ceil((new Date(session.subscription.trial_end).getTime() - Date.now()) / (1000 * 60 * 60 * 24))) : 0,
+    });
   } catch (error: any) {
     console.error('Checkout success error:', error);
-    return NextResponse.redirect(new URL('/plans', req.url));
+    return NextResponse.json({ error: 'Failed to fetch session' }, { status: 500 });
   }
 }

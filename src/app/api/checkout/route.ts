@@ -5,6 +5,13 @@ import { createCheckoutSession, getStripeErrorMessage } from '@/lib/stripe';
 import prisma from '@/lib/prisma';
 import { trackPaymentInitiatedServer } from '@/lib/ga4-server';
 
+// Plan data for metadata
+const PLAN_DATA = {
+  solo: { name: 'Solo', price: 2900 },
+  salon: { name: 'Salon', price: 7900 },
+  enterprise: { name: 'Enterprise', price: 14900 },
+} as const;
+
 // Note: trackPlanSelected is intentionally fired client-side (plans/page.tsx)
 // before this API call. window.gtag is unavailable in server routes.
 
@@ -38,6 +45,7 @@ export async function POST(req: NextRequest) {
       planType: planType as 'solo' | 'salon' | 'enterprise',
       customerEmail: customerEmail || `${userId}@groomgrid.app`,
       businessName: profile.businessName,
+      planData: PLAN_DATA[planType], // Pass plan data for metadata
     });
 
     // Track payment initiated event

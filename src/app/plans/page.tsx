@@ -7,7 +7,9 @@ import { Plan } from '@/types';
 import PlanCard from '@/components/funnel/PlanCard';
 import Testimonial from '@/components/funnel/Testimonial';
 import ValueProp from '@/components/funnel/ValueProp';
-import { trackPageView, trackPlanSelected } from '@/lib/ga4';
+import TrustSignals from '@/components/trust/TrustSignals';
+import { BillingSummaryData } from '@/components/trust/BillingSummary';
+import { trackPageView, trackPlanSelected, trackBillingSummaryViewed } from '@/lib/ga4';
 
 const PLANS: Plan[] = [
   {
@@ -79,6 +81,20 @@ export default function PlansPage() {
   const [loading, setLoading] = useState(false);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
 
+  // Get billing summary data for selected plan
+  const getBillingData = (): BillingSummaryData | null => {
+    if (!selectedPlan) return null;
+
+    return {
+      planName: selectedPlan.name,
+      todayAmount: 0, // Trial is free
+      recurringAmount: selectedPlan.price * 100, // Convert to cents
+      currency: "$",
+      isTrial: true,
+      trialDays: 14,
+    };
+  };
+
   useEffect(() => {
     trackPageView('/plans', 'Plan Selection');
     
@@ -121,6 +137,9 @@ export default function PlansPage() {
 
     // Fire client-side GA4 event before redirect — window.gtag is available here
     trackPlanSelected(plan.type, plan.price);
+
+    // Track billing summary viewed
+    trackBillingSummaryViewed(plan.name, plan.price * 100, true);
 
     try {
       const response = await fetch('/api/checkout', {
@@ -213,8 +232,18 @@ export default function PlansPage() {
         )}
 
         {/* Value Props */}
-        <div className="mb-12">
+        <div className="mb-8">
           <ValueProp />
+        </div>
+
+        {/* Trust Signals */}
+        <div className="mb-8">
+          <TrustSignals
+            showBillingSummary={!!selectedPlan}
+            billingData={getBillingData() || undefined}
+            location="plans"
+            compact={true}
+          />
         </div>
 
         {/* Plan Cards */}
