@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
     // Actual profile update happens when webhook confirms payment
     await prisma.paymentEvent.create({
       data: {
-        paymentId,
+        paymentId: session.payment_intent as string,
         eventType: 'PAYMENT_INITIATED',
         payload: {
           userId,

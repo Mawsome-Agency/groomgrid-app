@@ -326,7 +326,7 @@ export async function POST(
     const endTime = new Date(startTime.getTime() + durationMinutes * 60 * 1000);
 
     // C1: Transaction with conflict check — race condition protection
-    const result = await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx: any) => {
       // Check for conflicts within the transaction
       const conflicts = await tx.appointment.findMany({
         where: {

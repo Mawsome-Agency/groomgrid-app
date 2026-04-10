@@ -58,12 +58,12 @@ export async function POST(req: NextRequest) {
 
   // Process all reminders concurrently (allSettled so one failure doesn't block others)
   const [results24h, resultsDayOf] = await Promise.all([
-    Promise.allSettled(upcoming24h.map(({ id }) => process24hReminder(id))),
-    Promise.allSettled(upcomingDayOf.map(({ id }) => processDayOfReminder(id))),
+    Promise.allSettled(upcoming24h.map(({ id }: any) => process24hReminder(id))),
+    Promise.allSettled(upcomingDayOf.map(({ id }: any) => processDayOfReminder(id))),
   ])
 
   const allResults = [
-    ...results24h.map((r, i) => {
+    ...results24h.map((r: any, i: number) => {
       if (r.status === 'fulfilled') return r.value
       console.error(`[reminder-check] Unexpected error for 24h reminder ${upcoming24h[i].id}:`, r.reason)
       return {
@@ -74,7 +74,7 @@ export async function POST(req: NextRequest) {
         error: r.reason?.message ?? 'Unexpected error',
       }
     }),
-    ...resultsDayOf.map((r, i) => {
+    ...resultsDayOf.map((r: any, i: number) => {
       if (r.status === 'fulfilled') return r.value
       console.error(`[reminder-check] Unexpected error for day-of reminder ${upcomingDayOf[i].id}:`, r.reason)
       return {

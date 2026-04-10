@@ -36,7 +36,7 @@ export async function POST(req: Request) {
           // Create PAYMENT_CONFIRMED event to signal webhook received
           await prisma.paymentEvent.create({
             data: {
-              paymentId,
+              paymentId: (session as any).payment_intent ?? (session as any).id,
               eventType: 'PAYMENT_CONFIRMED',
               payload: {
                 userId,
@@ -47,7 +47,7 @@ export async function POST(req: Request) {
 
           // Trigger payment completion handler
           // This is idempotent - will check for COMPLETION_PROCESSED first
-          await triggerPaymentCompletionHandler(session);
+          await triggerPaymentCompletionHandler(session as any);
         }
         break;
       }
@@ -149,7 +149,7 @@ export async function POST(req: Request) {
             await trackPaymentFailedServer(
               profile.userId,
               invoice.id,
-              invoice.last_payment_error?.message || 'unknown'
+              (invoice as any).last_payment_error?.message || 'unknown'
             );
           }
         }

@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-export default function CheckoutSuccessPage() {
+function CheckoutSuccessContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const sessionId = searchParams.get('session_id');
@@ -64,5 +64,13 @@ export default function CheckoutSuccessPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function CheckoutSuccessPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gradient-to-br from-green-50 to-stone-50 flex items-center justify-center">Loading...</div>}>
+      <CheckoutSuccessContent />
+    </Suspense>
   );
 }
