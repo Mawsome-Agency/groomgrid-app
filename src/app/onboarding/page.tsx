@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import ProgressIndicator from '@/components/funnel/ProgressIndicator';
@@ -8,7 +8,7 @@ import Step1AddClient from '@/components/onboarding/Step1AddClient';
 import Step2Appointment from '@/components/onboarding/Step2Appointment';
 import Step3BusinessHours, { BusinessHoursForm } from '@/components/onboarding/Step3BusinessHours';
 import CompletionScreen from '@/components/onboarding/CompletionScreen';
-import { trackOnboardingStep, trackOnboardingSkipped, trackPageView } from '@/lib/ga4';
+import { trackOnboardingStep, trackOnboardingSkipped, trackPageView, trackOnboardingCompleted } from '@/lib/ga4';
 
 // Days in the order the business-hours API expects (index 0 = Sunday)
 const DAYS_API_ORDER = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'] as const;
@@ -20,6 +20,9 @@ export default function OnboardingPage() {
   const [loading, setLoading] = useState(true);
   const [stepLoading, setStepLoading] = useState(false);
   const [stepError, setStepError] = useState<string | null>(null);
+
+  // Ref to track onboarding event fired state - prevents duplicate fires from React strict mode
+  const onboardingEventFired = useRef(false);
 
   // State for onboarding data — includes API-returned ids after Step 1
   const [clientData, setClientData] = useState<{
@@ -37,6 +40,15 @@ export default function OnboardingPage() {
   useEffect(() => {
     trackPageView('/onboarding', 'Onboarding');
   }, []);
+
+  // Track onboarding completion when step transitions to 4 (completion screen)
+  // Uses ref guard to prevent duplicate fires from React strict mode
+  useEffect(() => {
+    if (step === 4 && !onboardingEventFired.current && session?.user?.id) {
+      trackOnboardingCompleted(session.user.id);
+      onboardingEventFired.current = true;
+    }
+  }, [step, session]);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -224,7 +236,14 @@ export default function OnboardingPage() {
 
   const handleSkip = async () => {
     if (!session?.user?.id) return;
-    trackOnboardingSkipped();
+
+    // Guard: only fire skip event if onboarding completed hasn't been fired
+    // Ensures onboarding_completed and onboarding_skipped are mutually exclusive
+    if (!onboardingEventFired.current) {
+      trackOnboardingSkipped();
+      onboardingEventFired.current = true;
+    }
+
     await fetch('/api/profile', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
 import { Calendar, Users, DollarSign, Plus, LogOut, Settings, Menu, X } from 'lucide-react';
-import { trackPageView } from '@/lib/ga4';
+import { trackPageView, trackDashboardFirstView } from '@/lib/ga4';
 
 interface Appointment {
   id: string;
@@ -42,6 +42,8 @@ export default function DashboardPage() {
     }
 
     if (status === 'authenticated' && session?.user?.id) {
+      // Track dashboard first view - uses localStorage to prevent re-fires
+      trackDashboardFirstView(session.user.id);
       fetchDashboardData();
     }
   }, [status, session]);
