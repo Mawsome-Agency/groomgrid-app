@@ -108,38 +108,28 @@ export function getStripeErrorMessage(error: any): { type: string; message: stri
     const stripeError = error as Stripe.StripeRawError;
     
     switch (stripeError.type) {
-      case 'StripeCardError':
+      case 'card_error':
         const cardError = stripeError as Stripe.StripeRawError & { code?: string };
         return {
           type: mapStripeErrorToErrorType(cardError.code),
           message: cardError.message || 'Payment failed',
           declineCode: cardError.code,
         };
-      
-      case 'StripeRateLimitError':
+      case 'rate_limit_error':
         return {
           type: 'generic',
           message: 'Too many requests. Please try again later.',
         };
-      
-      case 'StripeInvalidRequestError':
+      case 'invalid_request_error':
         return {
           type: 'generic',
           message: 'Invalid request. Please check your input.',
         };
-      
-      case 'StripeAPIError':
+      case 'api_error':
         return {
           type: 'generic',
           message: 'Payment processing error. Please try again.',
         };
-      
-      case 'StripeConnectionError':
-        return {
-          type: 'generic',
-          message: 'Network error. Please check your connection.',
-        };
-      
       default:
         return {
           type: 'generic',
