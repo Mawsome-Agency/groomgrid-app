@@ -180,3 +180,22 @@ export function trackBillingSummaryViewed(planName: string, amount: number, isTr
 export function trackFaqOpened(faqType: string) {
   trackEvent('faq_opened', { faq_type: faqType, timestamp: new Date().toISOString() });
 }
+
+export function trackABTestAssigned(testName: string, variant: 'A' | 'B', userId?: string) {
+  trackEvent('ab_test_assigned', {
+    test_name: testName,
+    variant,
+    user_id: userId,
+    timestamp: new Date().toISOString(),
+  });
+}
+
+export function trackABTestConverted(testName: string, variant: 'A' | 'B', event: string, userId?: string) {
+  trackEvent('ab_test_converted', {
+    test_name: testName,
+    variant,
+    conversion_event: event,
+    user_id: userId,
+    timestamp: new Date().toISOString(),
+  });
+}
