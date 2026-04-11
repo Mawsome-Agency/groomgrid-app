@@ -9,7 +9,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useABTest } from './ABTestProvider';
-import { getOrCreateAssignment, type Variant } from '@/lib/ab-test';
+import { trackAssignment, type Variant } from '@/lib/ab-test-client';
 import { trackABTestAssigned } from '@/lib/ga4';
 
 interface ABTestVariantProps<T = any> {
@@ -35,10 +35,9 @@ export function ABTestVariant<T = any>({
   // Track assignment on first render (for authenticated users)
   useEffect(() => {
     if (userId && !hasTracked) {
-      getOrCreateAssignment(test, userId).then((assignment) => {
-        if (assignment) {
-          trackABTestAssigned(test, assignment.variant, userId);
-        }
+      const currentVariant = variant || 'A';
+      trackAssignment(test, currentVariant, userId).then(() => {
+        trackABTestAssigned(test, currentVariant, userId);
       });
       setHasTracked(true);
     }

@@ -7,8 +7,8 @@
  * Wraps the entire application in layout.tsx
  */
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { getVariant, getOrCreateAssignment, type Variant, trackConversion } from '@/lib/ab-test';
+import React, { createContext, useContext } from 'react';
+import { getVariant, trackAssignment, type Variant } from '@/lib/ab-test-client';
 import { trackABTestAssigned, trackABTestConverted } from '@/lib/ga4';
 
 interface ABTestContextValue {
@@ -25,39 +25,39 @@ interface ABTestProviderProps {
 }
 
 export function ABTestProvider({ children, userId }: ABTestProviderProps) {
-  const [trackedTests, setTrackedTests] = useState<Set<string>>(new Set());
-
-  // Get variant for a test name
+  // Get variant for a test name (pure hash, no DB)
   const getVariantWrapper = (testName: string): Variant => {
     return getVariant(testName, userId);
   };
 
-  // Track conversion for a test
+  // Track conversion via API route (server-side via fetch)
   const trackConversionWrapper = async (
     testName: string,
     event: string,
     metadata?: Record<string, any>
   ): Promise<void> => {
-    // Track in local database
-    await trackConversion(testName, userId || 'anonymous', event, metadata);
+    try {
+      await fetch('/api/ab-test/conversion', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ testName, event, userId, metadata }),
+      });
+    } catch {
+      // Non-critical
+    }
 
     // Track in GA4
     const variant = getVariant(testName, userId);
     trackABTestConverted(testName, variant, event, userId);
   };
 
-  // Track assignment when user first sees a test (idempotent)
-  useEffect(() => {
-    if (userId && trackedTests.size > 0) {
-      trackedTests.forEach(async (testName) => {
-        const assignment = await getOrCreateAssignment(testName, userId);
-        if (assignment) {
-          trackABTestAssigned(testName, assignment.variant, userId);
-        }
-      });
-      setTrackedTests(new Set());
-    }
-  }, [userId, trackedTests]);
+  // Record assignment via API when userId is known (fire-and-forget)
+  const recordAssignment = async (testName: string): Promise<void> => {
+    if (!userId) return;
+    const variant = getVariant(testName, userId);
+    await trackAssignment(testName, variant, userId);
+    trackABTestAssigned(testName, variant, userId);
+  };
 
   const value: ABTestContextValue = {
     getVariant: getVariantWrapper,
