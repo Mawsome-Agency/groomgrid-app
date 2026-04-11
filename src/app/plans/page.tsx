@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
 import { Plan } from '@/types';
 import PlanCard from '@/components/funnel/PlanCard';
@@ -62,24 +62,32 @@ const TESTIMONIALS = [
   {
     name: 'Sarah Mitchell',
     business: 'Paws on Wheels',
-    quote: 'GroomGrid cut my booking time in half. I can focus on the dogs, not the paperwork.',
+    quote: 'GroomGrid cut my booking time in half. I can focus on dogs, not paperwork.',
   },
   {
     name: 'James Rodriguez',
     business: 'Fur Perfect Salon',
-    quote: 'My team loves the mobile app. We can check schedules from anywhere and no-shows dropped 40%.',
+    quote: 'My team loves mobile app. We can check schedules from anywhere and no-shows dropped 40%.',
   },
 ];
 
 export default function PlansPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { data: session, status } = useSession();
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
   const [loading, setLoading] = useState(false);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
 
   useEffect(() => {
     trackPageView('/plans', 'Plan Selection');
-  }, []);
+    
+    // Check for previously selected plan from URL
+    const planParam = searchParams.get('selected');
+    if (planParam && PLANS.find(p => p.id === planParam)) {
+      setSelectedPlan(PLANS.find(p => p.id === planParam) || null);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -109,6 +117,7 @@ export default function PlansPage() {
 
     setSelectedPlan(plan);
     setLoading(true);
+    setCheckoutError(null);
 
     // Fire client-side GA4 event before redirect — window.gtag is available here
     trackPlanSelected(plan.type, plan.price);
@@ -126,6 +135,17 @@ export default function PlansPage() {
 
       const data = await response.json();
 
+      if (!response.ok) {
+        // Handle API errors with redirect to error page
+        const errorType = data.errorType || 'generic';
+        const declineCode = data.declineCode || '';
+        
+        router.push(`/checkout/error?error_type=${errorType}&decline_code=${declineCode}`);
+        setLoading(false);
+        setSelectedPlan(null);
+        return;
+      }
+
       if (data.url) {
         window.location.href = data.url;
       } else {
@@ -133,7 +153,7 @@ export default function PlansPage() {
       }
     } catch (err: any) {
       console.error('Checkout error:', err);
-      alert(err.message || 'Failed to proceed to checkout');
+      setCheckoutError(err.message || 'Failed to proceed to checkout');
       setLoading(false);
       setSelectedPlan(null);
     }
@@ -168,6 +188,29 @@ export default function PlansPage() {
           <h2 className="text-4xl font-bold text-stone-900 mb-4">Choose Your Plan</h2>
           <p className="text-xl text-stone-600">All plans include a 14-day free trial</p>
         </div>
+
+        {/* Checkout Error Alert */}
+        {checkoutError && (
+          <div 
+            className="bg-amber-50 border-2 border-amber-200 rounded-2xl p-6 mb-8"
+            role="alert"
+            aria-live="polite"
+          >
+            <div className="flex items-start gap-3">
+              <span className="text-2xl" aria-hidden="true">⚠️</span>
+              <div>
+                <h3 className="text-lg font-semibold text-amber-900 mb-2">Payment Trouble</h3>
+                <p className="text-amber-800 mb-4">{checkoutError}</p>
+                <button
+                  onClick={() => router.push('/checkout/error?error_type=generic')}
+                  className="text-amber-700 hover:text-amber-900 font-medium underline"
+                >
+                  View detailed error and recovery options
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Value Props */}
         <div className="mb-12">

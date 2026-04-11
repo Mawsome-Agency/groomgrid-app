@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/next-auth-options';
-import { createCheckoutSession } from '@/lib/stripe';
+import { createCheckoutSession, getStripeErrorMessage } from '@/lib/stripe';
 import prisma from '@/lib/prisma';
 import { trackPaymentInitiatedServer } from '@/lib/ga4-server';
 
@@ -13,12 +13,24 @@ export async function POST(req: NextRequest) {
     const { userId, planType, customerEmail } = await req.json();
 
     if (!userId || !planType) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+      return NextResponse.json(
+        { 
+          error: 'Missing required fields',
+          errorType: 'generic',
+        }, 
+        { status: 400 }
+      );
     }
 
     const profile = await prisma.profile.findUnique({ where: { userId } });
     if (!profile) {
-      return NextResponse.json({ error: 'Profile not found' }, { status: 404 });
+      return NextResponse.json(
+        { 
+          error: 'Profile not found',
+          errorType: 'generic',
+        }, 
+        { status: 404 }
+      );
     }
 
     const session = await createCheckoutSession({
@@ -34,6 +46,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ url: session.url, sessionId: session.id });
   } catch (error: any) {
     console.error('Checkout error:', error);
-    return NextResponse.json({ error: error.message || 'Failed to create checkout session' }, { status: 500 });
+    
+    // Extract structured error information
+    const errorDetails = getStripeErrorMessage(error);
+    
+    return NextResponse.json(
+      { 
+        error: errorDetails.message,
+        errorType: errorDetails.type,
+        declineCode: errorDetails.declineCode,
+      }, 
+      { status: 500 }
+    );
   }
 }

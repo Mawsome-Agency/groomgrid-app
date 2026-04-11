@@ -8,8 +8,22 @@ function CheckoutSuccessContent() {
   const searchParams = useSearchParams();
   const sessionId = searchParams.get('session_id');
   const [countdown, setCountdown] = useState(5);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
+
+    // Validate session exists before proceeding
+    if (!sessionId) {
+      console.error('Checkout success page called without session_id');
+      router.push('/plans');
+      return;
+    }
+  }, [sessionId, router]);
+
+  useEffect(() => {
+    if (!mounted) return;
+
     if (countdown <= 0) {
       router.push(`/onboarding${sessionId ? `?session_id=${sessionId}` : ''}`);
       return;
@@ -20,7 +34,15 @@ function CheckoutSuccessContent() {
     }, 1000);
 
     return () => clearTimeout(timer);
-  }, [countdown, router, sessionId]);
+  }, [countdown, mounted, router, sessionId]);
+
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-stone-50 flex items-center justify-center px-4">
+        <div className="text-center">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-stone-50 flex items-center justify-center px-4">
