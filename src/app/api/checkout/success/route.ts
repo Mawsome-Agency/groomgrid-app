@@ -46,7 +46,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       session_id: session.id,
       metadata: session.metadata,
-      trial_end_days_left: session.subscription?.trial_end ? Math.max(0, Math.ceil((new Date(session.subscription.trial_end).getTime() - Date.now()) / (1000 * 60 * 60 * 24))) : 0,
+      trial_end_days_left: (() => { const sub = typeof session.subscription === 'object' ? session.subscription as { trial_end?: number | null } : null; return (sub?.trial_end) ? Math.max(0, Math.ceil((sub.trial_end * 1000 - Date.now()) / (1000 * 60 * 60 * 24))) : 0; })(),
     });
   } catch (error: any) {
     console.error('Checkout success error:', error);
