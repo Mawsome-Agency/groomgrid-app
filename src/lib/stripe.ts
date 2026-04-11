@@ -105,7 +105,7 @@ export function getStripeErrorMessage(error: any): { type: string; message: stri
 
   // Handle Stripe API errors
   if (error.type) {
-    const stripeError = error as Stripe.StripeError;
+    const stripeError = error as Stripe.StripeRawError;
     
     switch (stripeError.type) {
       case 'StripeCardError':
