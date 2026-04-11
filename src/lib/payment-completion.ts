@@ -1,3 +1,4 @@
+import Stripe from 'stripe';
 /**
  * Payment Completion Handler — Coordinates payment state updates
  *
@@ -81,7 +82,7 @@ export async function triggerPaymentCompletionHandler(
 
   try {
     // Single transaction: update profile and create completion event
-    await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx: any) => {
       // Update profile with all payment-related fields atomically
       await tx.profile.update({
         where: { userId },
