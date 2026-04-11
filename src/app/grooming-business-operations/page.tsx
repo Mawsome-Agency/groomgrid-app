@@ -485,7 +485,7 @@ export default function GroomingBusinessOperationsPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
-                href="/grooming-software/scheduling-software/"
+                href="/plans"
                 className="px-8 py-4 rounded-xl bg-white text-green-700 font-bold text-lg hover:bg-green-50 transition-colors shadow-md"
               >
                 See GroomGrid Scheduling →
