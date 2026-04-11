@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
 import { Plan } from '@/types';
@@ -73,7 +73,7 @@ const TESTIMONIALS = [
   },
 ];
 
-export default function PlansPage() {
+function PlansPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { data: session, status } = useSession();
@@ -298,3 +298,18 @@ export default function PlansPage() {
     </div>
   );
 }
+
+// Wrap component in Suspense for useSearchParams
+function PlansPageWrapper() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-stone-50 flex items-center justify-center">
+        <div className="text-center">Loading...</div>
+      </div>
+    }>
+      <PlansPage />
+    </Suspense>
+  );
+}
+
+export default PlansPageWrapper;

@@ -3,6 +3,7 @@ import '@testing-library/jest-dom'
 // Mock environment variables
 process.env.NEXT_PUBLIC_APP_URL = 'http://localhost:3000'
 process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID = 'G-TEST123'
+process.env.GA4_API_SECRET = 'test-secret'
 process.env.STRIPE_SECRET_KEY = 'sk_test_test123'
 process.env.STRIPE_WEBHOOK_SECRET = 'whsec_test123'
 process.env.STRIPE_PRICE_SOLO = 'price_solo'
@@ -40,3 +41,10 @@ global.ResizeObserver = class ResizeObserver {
   observe() {}
   unobserve() {}
 }
+
+// Mock window.gtag for GA4 tests
+// Reset before each test so prior initGA4() calls don't pollute the mock state
+beforeEach(() => {
+  window.gtag = jest.fn()
+  window.dataLayer = []
+})

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { AlertCircle, RefreshCw, Mail, ArrowLeft } from 'lucide-react';
 
@@ -82,7 +82,7 @@ const ERROR_CONFIG: Record<ErrorType, ErrorConfig> = {
   },
 };
 
-export default function CheckoutErrorPage() {
+function CheckoutErrorPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [errorType, setErrorType] = useState<ErrorType>('generic');
@@ -249,3 +249,18 @@ export default function CheckoutErrorPage() {
     </div>
   );
 }
+
+// Wrap component in Suspense for useSearchParams
+function CheckoutErrorPageWrapper() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-stone-50 flex items-center justify-center">
+        <div className="text-stone-500">Loading...</div>
+      </div>
+    }>
+      <CheckoutErrorPage />
+    </Suspense>
+  );
+}
+
+export default CheckoutErrorPageWrapper;

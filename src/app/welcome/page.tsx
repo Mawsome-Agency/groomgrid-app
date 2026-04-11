@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { CheckCircle2, ArrowRight, Calendar, Bell, Users, Sparkles } from 'lucide-react';
 import { trackWelcomeViewed } from '@/lib/ga4';
 
-export default function WelcomePage() {
+function WelcomePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { data: session, status } = useSession();
@@ -223,3 +223,18 @@ export default function WelcomePage() {
     </div>
   );
 }
+
+// Wrap component in Suspense for useSearchParams
+function WelcomePageWrapper() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-stone-50 flex items-center justify-center">
+        <div className="text-center">Loading...</div>
+      </div>
+    }>
+      <WelcomePage />
+    </Suspense>
+  );
+}
+
+export default WelcomePageWrapper;

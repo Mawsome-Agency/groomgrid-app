@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ArrowLeft, CheckCircle, Calendar } from 'lucide-react';
 
-export default function CheckoutCancelPage() {
+function CheckoutCancelPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [mounted, setMounted] = useState(false);
@@ -127,3 +127,18 @@ export default function CheckoutCancelPage() {
     </div>
   );
 }
+
+// Wrap component in Suspense for useSearchParams
+function CheckoutCancelPageWrapper() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-stone-50 flex items-center justify-center">
+        <div className="text-stone-500">Loading...</div>
+      </div>
+    }>
+      <CheckoutCancelPage />
+    </Suspense>
+  );
+}
+
+export default CheckoutCancelPageWrapper;
