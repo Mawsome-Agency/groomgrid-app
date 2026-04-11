@@ -109,7 +109,7 @@ export function getStripeErrorMessage(error: any): { type: string; message: stri
     
     switch (stripeError.type) {
       case 'StripeCardError':
-        const cardError = stripeError as Stripe.StripeCardError;
+        const cardError = stripeError as Stripe.StripeRawError & { code?: string };
         return {
           type: mapStripeErrorToErrorType(cardError.code),
           message: cardError.message || 'Payment failed',
