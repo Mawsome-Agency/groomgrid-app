@@ -22,18 +22,18 @@ interface BillingSummaryProps {
 
 export default function BillingSummary({ data, className, compact = false }: BillingSummaryProps) {
   const [hasViewed, setHasViewed] = useState(false);
-  const { trackEvent } = useAnalytics();
+  const { track } = useAnalytics();
 
   useEffect(() => {
     if (!hasViewed) {
       setHasViewed(true);
-      trackEvent("billing_summary_viewed", {
+      track("billing_summary_viewed", {
         plan_name: data.planName,
         amount: data.recurringAmount,
         is_trial: data.isTrial,
       });
     }
-  }, [data, trackEvent, hasViewed]);
+  }, [data, track, hasViewed]);
 
   const formatAmount = (cents: number) => {
     return `${data.currency}${Math.round(cents / 100)}`;

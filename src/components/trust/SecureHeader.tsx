@@ -5,10 +5,10 @@ import { cn } from "@/lib/utils";
 import { useAnalytics } from "@/hooks/use-analytics";
 
 export default function SecureHeader({ className }: { className?: string }) {
-  const { trackEvent } = useAnalytics();
+  const { track } = useAnalytics();
 
   const handleClick = () => {
-    trackEvent("trust_badge_interacted", { badge_type: "secure_header", location: "plans" });
+    track("trust_badge_interacted", { badge_type: "secure_header", location: "plans" });
   };
 
   return (

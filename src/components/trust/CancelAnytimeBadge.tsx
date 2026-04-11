@@ -12,7 +12,7 @@ interface CancelAnytimeBadgeProps {
 
 export default function CancelAnytimeBadge({ className, size = "md" }: CancelAnytimeBadgeProps) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const { trackEvent } = useAnalytics();
+  const { track } = useAnalytics();
 
   const sizeClasses = {
     sm: "text-sm",
@@ -22,7 +22,7 @@ export default function CancelAnytimeBadge({ className, size = "md" }: CancelAny
 
   const handleToggle = () => {
     setIsExpanded((prev) => !prev);
-    trackEvent("faq_opened", { faq_type: "cancel_anytime" });
+    track("faq_opened", { faq_type: "cancel_anytime" });
   };
 
   return (

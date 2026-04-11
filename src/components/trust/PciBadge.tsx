@@ -6,10 +6,10 @@ import Tooltip from "@/components/ui/Tooltip";
 import { useAnalytics } from "@/hooks/use-analytics";
 
 export default function PciBadge({ className, location = "plans" }: { className?: string; location?: "plans" | "success" | "billing" }) {
-  const { trackEvent } = useAnalytics();
+  const { track } = useAnalytics();
 
   const handleClick = () => {
-    trackEvent("trust_badge_interacted", { badge_type: "pci", location });
+    track("trust_badge_interacted", { badge_type: "pci", location });
   };
 
   return (
