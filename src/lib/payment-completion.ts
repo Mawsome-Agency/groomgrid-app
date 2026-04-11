@@ -1,4 +1,3 @@
-import Stripe from 'stripe';
 /**
  * Payment Completion Handler — Coordinates payment state updates
  *
