@@ -36,3 +36,8 @@ next-env.d.ts
 /src/generated/prisma
 
 CORTEX_PLAN.md
+
+# Playwright E2E
+e2e/.auth/user.json
+playwright-report/
+test-results/
