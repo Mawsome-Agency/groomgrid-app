@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import Script from 'next/script';
 import { SessionProvider } from '@/components/SessionProvider';
+import { ABTestProvider } from '@/components/ab-test';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -34,7 +35,9 @@ export default function RootLayout({
         </Script>
       </head>
       <body className={inter.className}>
-        <SessionProvider>{children}</SessionProvider>
+        <SessionProvider>
+          <ABTestProvider>{children}</ABTestProvider>
+        </SessionProvider>
       </body>
     </html>
   );

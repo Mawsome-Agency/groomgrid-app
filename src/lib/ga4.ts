@@ -124,3 +124,41 @@ export function trackSignupError(error: string, context: string) {
     timestamp: new Date().toISOString(),
   });
 }
+
+// Payment page view event - tracks when user reaches checkout success page
+export function trackPaymentPageView(context: string, planType?: string) {
+  trackEvent('payment_page_view', {
+    context,
+    plan_type: planType || 'unknown',
+    timestamp: new Date().toISOString(),
+  });
+}
+
+// Onboarding completed event - one-time event when user finishes onboarding
+// Use useRef in component to prevent duplicate fires from React strict mode
+export function trackOnboardingCompleted(userId: string) {
+  trackEvent('onboarding_completed', {
+    user_id: userId,
+    timestamp: new Date().toISOString(),
+  });
+}
+
+// Dashboard first view event - one-time event when user first sees dashboard
+// Uses localStorage to prevent re-fires (key is userId-prefixed)
+export function trackDashboardFirstView(userId: string) {
+  const storageKey = `dashboard_first_view_seen_${userId}`;
+  const alreadySeen = typeof window !== 'undefined'
+    ? localStorage.getItem(storageKey)
+    : false;
+
+  if (!alreadySeen) {
+    trackEvent('dashboard_first_view', {
+      user_id: userId,
+      timestamp: new Date().toISOString(),
+    });
+
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(storageKey, 'true');
+    }
+  }
+}

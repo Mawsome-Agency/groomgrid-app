@@ -179,3 +179,51 @@ model PaymentEvent {
   @@unique([paymentId, eventType])
   @@map("payment_events")
 }
+
+// A/B Testing Framework
+model ABTest {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  variantA    Json     @default("{}")
+  variantB    Json     @default("{}")
+  splitRatio  Int      @default(50) // percentage for variantA
+  active      Boolean  @default(true)
+  startedAt   DateTime @default(now()) @map("started_at")
+  endedAt     DateTime? @map("ended_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  assignments ABTestAssignment[]
+  conversions ABTestConversion[]
+  @@map("ab_tests")
+}
+
+model ABTestAssignment {
+  id          String   @id @default(cuid())
+  testId      String   @map("test_id")
+  userId      String?  @map("user_id")
+  sessionId   String?  @map("session_id") // for anonymous users
+  variant     String   // "A" or "B"
+  createdAt   DateTime @default(now()) @map("created_at")
+  test        ABTest   @relation(fields: [testId], references: [id], onDelete: Cascade)
+  conversions ABTestConversion[]
+  @@unique([testId, userId])
+  @@unique([testId, sessionId])
+  @@index([testId, variant])
+  @@map("ab_test_assignments")
+}
+
+model ABTestConversion {
+  id           String   @id @default(cuid())
+  testId       String   @map("test_id")
+  assignmentId String   @map("assignment_id")
+  userId       String?  @map("user_id")
+  sessionId    String?  @map("session_id")
+  event        String   // "signup", "payment", "book_appointment", "cta_click", etc.
+  metadata     Json?
+  createdAt    DateTime @default(now()) @map("created_at")
+  test         ABTest           @relation(fields: [testId], references: [id], onDelete: Cascade)
+  assignment   ABTestAssignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  @@index([testId, event])
+  @@map("ab_test_conversions")
+}

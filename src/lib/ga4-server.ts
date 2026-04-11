@@ -232,3 +232,41 @@ export async function trackPaymentFailedServer(
     userId
   );
 }
+
+export async function trackABTestAssignedServer(
+  userId: string,
+  testName: string,
+  variant: 'A' | 'B'
+): Promise<void> {
+  await trackServerEvent(
+    userId,
+    {
+      name: 'ab_test_assigned',
+      params: {
+        test_name: testName,
+        variant,
+      },
+    },
+    userId
+  );
+}
+
+export async function trackABTestConvertedServer(
+  userId: string,
+  testName: string,
+  variant: 'A' | 'B',
+  event: string
+): Promise<void> {
+  await trackServerEvent(
+    userId,
+    {
+      name: 'ab_test_converted',
+      params: {
+        test_name: testName,
+        variant,
+        event,
+      },
+    },
+    userId
+  );
+}
