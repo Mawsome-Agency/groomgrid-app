@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { trackConversion } from '@/lib/ab-test';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { authOptions } from '@/lib/next-auth-options';
 
 export async function POST(request: NextRequest) {
   try {
