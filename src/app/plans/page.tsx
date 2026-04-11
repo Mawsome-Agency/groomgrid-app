@@ -84,8 +84,25 @@ export default function PlansPage() {
   useEffect(() => {
     if (status === 'unauthenticated') {
       router.push('/login');
+      return;
     }
-  }, [status]);
+
+    // Check if welcome screen has been shown
+    if (status === 'authenticated' && session?.user?.id) {
+      fetch('/api/profile')
+        .then((res) => res.json())
+        .then((data) => {
+          // If welcome hasn't been shown and user hasn't selected a plan yet, redirect to welcome
+          if (!data.welcomeShown && !data.stripeSubscriptionId) {
+            router.replace('/welcome');
+          }
+        })
+        .catch((err) => {
+          console.error('Failed to check welcome status:', err);
+          // Don't block the page if check fails
+        });
+    }
+  }, [status, session, router]);
 
   const handleSelectPlan = async (plan: Plan) => {
     if (!session?.user?.id) return;
