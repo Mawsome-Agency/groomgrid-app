@@ -30,7 +30,12 @@ export async function POST(req: Request) {
         const userId = session.metadata?.userId;
 
         // Extract paymentId - use session.id if payment_intent is null (setup mode)
-        const paymentId = session.payment_intent ?? session.id;
+        // payment_intent can be a string ID or an expanded PaymentIntent object; normalize to string
+        const rawPaymentIntent = session.payment_intent;
+        const paymentId: string =
+          typeof rawPaymentIntent === 'string'
+            ? rawPaymentIntent
+            : rawPaymentIntent?.id ?? session.id;
 
         if (userId) {
           // Create PAYMENT_CONFIRMED event to signal webhook received
@@ -47,7 +52,11 @@ export async function POST(req: Request) {
 
           // Trigger payment completion handler
           // This is idempotent - will check for COMPLETION_PROCESSED first
-          await triggerPaymentCompletionHandler(session as any);
+          // Cast metadata to strip the `null` case — metadata is checked above via userId guard
+          await triggerPaymentCompletionHandler({
+            ...session,
+            metadata: session.metadata ?? undefined,
+          });
         }
         break;
       }
@@ -146,10 +155,15 @@ export async function POST(req: Request) {
             });
 
             // Track payment failure in GA4
+            // last_payment_error is not in Stripe types but present at runtime; access safely
+            const invoiceAny = invoice as unknown as Record<string, unknown>;
+            const lastPaymentErrorMessage =
+              (invoiceAny.last_payment_error as { message?: string } | undefined)?.message ||
+              'unknown';
             await trackPaymentFailedServer(
               profile.userId,
               invoice.id,
-              (invoice as any).last_payment_error?.message || 'unknown'
+              lastPaymentErrorMessage
             );
           }
         }

@@ -13,6 +13,7 @@ import Stripe from 'stripe';
  * 5. GA4 events fire after transaction (idempotent)
  */
 
+import Stripe from 'stripe';
 import prisma from '@/lib/prisma';
 import { trackCheckoutCompletedServer, trackSubscriptionStartedServer } from '@/lib/ga4-server';
 
