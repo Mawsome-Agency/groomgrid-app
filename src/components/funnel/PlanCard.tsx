@@ -1,24 +1,39 @@
 import { Check, Star } from 'lucide-react';
 import { Plan } from '@/types';
 import NoHiddenFeesSeal from '@/components/trust/NoHiddenFeesSeal';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import { cn } from '@/lib/utils';
 
 interface PlanCardProps {
   plan: Plan;
   selected: boolean;
   onSelect: (plan: Plan) => void;
+  isLoading?: boolean;
+  isDimmed?: boolean;
+  hasError?: boolean;
 }
 
-export default function PlanCard({ plan, selected, onSelect }: PlanCardProps) {
+export default function PlanCard({ plan, selected, onSelect, isLoading, isDimmed, hasError }: PlanCardProps) {
   return (
     <div
-      onClick={() => onSelect(plan)}
+      onClick={() => !isLoading && onSelect(plan)}
       className={cn(
         "relative p-6 rounded-2xl border-2 cursor-pointer transition-all hover:shadow-lg",
         selected
           ? "border-green-500 bg-green-50"
-          : "border-stone-200 bg-white hover:border-green-300"
+          : "border-stone-200 bg-white hover:border-green-300",
+        isDimmed && "opacity-60",
+        isLoading && "pointer-events-none",
+        hasError && "animate-shake"
       )}
     >
+      {/* Loading overlay */}
+      {isLoading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-white/70 rounded-2xl z-10">
+          <LoadingSpinner size="lg" />
+        </div>
+      )}
+
       {plan.popular && (
         <div className="absolute -top-3 left-1/2 -translate-x-1/2">
           <span className="inline-flex items-center gap-1 px-3 py-1 bg-green-500 text-white text-xs font-semibold rounded-full">
@@ -27,7 +42,7 @@ export default function PlanCard({ plan, selected, onSelect }: PlanCardProps) {
           </span>
         </div>
       )}
-      
+
       <div className="text-center mb-4">
         <h3 className="text-xl font-bold text-stone-900 mb-1">{plan.name}</h3>
         <div className="flex items-baseline justify-center gap-1">
@@ -36,7 +51,7 @@ export default function PlanCard({ plan, selected, onSelect }: PlanCardProps) {
         </div>
         <p className="text-xs text-green-600 mt-2">14-day free trial</p>
       </div>
-      
+
       <ul className="space-y-3 mb-6">
         {plan.features.map((feature, index) => (
           <li key={index} className="flex items-start gap-2">
@@ -45,7 +60,7 @@ export default function PlanCard({ plan, selected, onSelect }: PlanCardProps) {
           </li>
         ))}
       </ul>
-      
+
       <button
         className={cn(
           "w-full py-3 rounded-xl font-semibold transition-all",
@@ -61,8 +76,4 @@ export default function PlanCard({ plan, selected, onSelect }: PlanCardProps) {
       <NoHiddenFeesSeal className="justify-center" />
     </div>
   );
-}
-
-function cn(...classes: string[]) {
-  return classes.filter(Boolean).join(' ');
 }
