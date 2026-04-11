@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
 import { Plan } from '@/types';
@@ -8,6 +8,7 @@ import PlanCard from '@/components/funnel/PlanCard';
 import Testimonial from '@/components/funnel/Testimonial';
 import ValueProp from '@/components/funnel/ValueProp';
 import TrustSignals from '@/components/trust/TrustSignals';
+import StickyPlanBar from '@/components/funnel/StickyPlanBar';
 import { BillingSummaryData } from '@/components/trust/BillingSummary';
 import { trackPageView, trackPlanSelected, trackBillingSummaryViewed } from '@/lib/ga4';
 
@@ -73,13 +74,40 @@ const TESTIMONIALS = [
   },
 ];
 
-export default function PlansPage() {
+function PlansSkeleton() {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-stone-50">
+      <div className="max-w-7xl mx-auto px-4 py-12">
+        <div className="h-8 w-48 bg-stone-200 rounded animate-pulse mx-auto mb-4" />
+        <div className="h-5 w-64 bg-stone-200 rounded animate-pulse mx-auto mb-12" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="bg-white rounded-2xl border-2 border-stone-200 p-6 animate-pulse">
+              <div className="h-6 w-24 bg-stone-200 rounded mx-auto mb-4" />
+              <div className="h-10 w-20 bg-stone-200 rounded mx-auto mb-2" />
+              <div className="h-4 w-32 bg-stone-200 rounded mx-auto mb-6" />
+              <div className="space-y-3">
+                {[0, 1, 2, 3].map((j) => (
+                  <div key={j} className="h-4 bg-stone-200 rounded" />
+                ))}
+              </div>
+              <div className="h-12 bg-stone-200 rounded-xl mt-6" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function PlansPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { data: session, status } = useSession();
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
-  const [loading, setLoading] = useState(false);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
+  const isCheckoutInFlight = useRef<boolean>(false);
+  const planGridRef = useRef<HTMLDivElement>(null);
 
   // Get billing summary data for selected plan
   const getBillingData = (): BillingSummaryData | null => {
@@ -97,7 +125,7 @@ export default function PlansPage() {
 
   useEffect(() => {
     trackPageView('/plans', 'Plan Selection');
-    
+
     // Check for previously selected plan from URL
     const planParam = searchParams.get('selected');
     if (planParam && PLANS.find(p => p.id === planParam)) {
@@ -130,10 +158,11 @@ export default function PlansPage() {
 
   const handleSelectPlan = async (plan: Plan) => {
     if (!session?.user?.id) return;
+    if (isCheckoutInFlight.current) return;
 
     setSelectedPlan(plan);
-    setLoading(true);
     setCheckoutError(null);
+    isCheckoutInFlight.current = true;
 
     // Fire client-side GA4 event before redirect — window.gtag is available here
     trackPlanSelected(plan.type, plan.price);
@@ -158,14 +187,15 @@ export default function PlansPage() {
         // Handle API errors with redirect to error page
         const errorType = data.errorType || 'generic';
         const declineCode = data.declineCode || '';
-        
+
+        isCheckoutInFlight.current = false;
         router.push(`/checkout/error?error_type=${errorType}&decline_code=${declineCode}`);
-        setLoading(false);
         setSelectedPlan(null);
         return;
       }
 
       if (data.url) {
+        isCheckoutInFlight.current = false;
         window.location.href = data.url;
       } else {
         throw new Error(data.error || 'Failed to create checkout');
@@ -173,7 +203,7 @@ export default function PlansPage() {
     } catch (err: any) {
       console.error('Checkout error:', err);
       setCheckoutError(err.message || 'Failed to proceed to checkout');
-      setLoading(false);
+      isCheckoutInFlight.current = false;
       setSelectedPlan(null);
     }
   };
@@ -210,7 +240,7 @@ export default function PlansPage() {
 
         {/* Checkout Error Alert */}
         {checkoutError && (
-          <div 
+          <div
             className="bg-amber-50 border-2 border-amber-200 rounded-2xl p-6 mb-8"
             role="alert"
             aria-live="polite"
@@ -231,9 +261,22 @@ export default function PlansPage() {
           </div>
         )}
 
-        {/* Value Props */}
-        <div className="mb-8">
-          <ValueProp />
+        {/* Mobile layout: Plan Cards → Trust Signals → Value Props → Testimonials → FAQ */}
+        {/* Desktop layout: Value Props → Trust Signals → Plan Cards → Testimonials → FAQ */}
+
+        {/* Plan Cards — shown first on mobile, after ValueProp on desktop */}
+        <div ref={planGridRef} className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 order-first md:order-none">
+          {PLANS.map((plan) => (
+            <PlanCard
+              key={plan.id}
+              plan={plan}
+              selected={selectedPlan?.id === plan.id}
+              onSelect={() => handleSelectPlan(plan)}
+              isLoading={selectedPlan?.id === plan.id && isCheckoutInFlight.current}
+              isDimmed={isCheckoutInFlight.current && selectedPlan?.id !== plan.id}
+              hasError={!!checkoutError && selectedPlan?.id === plan.id}
+            />
+          ))}
         </div>
 
         {/* Trust Signals */}
@@ -246,16 +289,14 @@ export default function PlansPage() {
           />
         </div>
 
-        {/* Plan Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          {PLANS.map((plan) => (
-            <PlanCard
-              key={plan.id}
-              plan={plan}
-              selected={selectedPlan?.id === plan.id}
-              onSelect={() => handleSelectPlan(plan)}
-            />
-          ))}
+        {/* Value Props — hidden on mobile (shown above plan cards on desktop via flex order) */}
+        <div className="hidden md:block mb-8">
+          <ValueProp />
+        </div>
+
+        {/* Value Props — shown below Trust Signals on mobile only */}
+        <div className="md:hidden mb-8">
+          <ValueProp />
         </div>
 
         {/* Testimonials */}
@@ -295,6 +336,21 @@ export default function PlansPage() {
           </div>
         </div>
       </main>
+
+      {/* Sticky Plan Bar (mobile only) */}
+      <StickyPlanBar
+        selectedPlan={selectedPlan}
+        onSelectPlan={handleSelectPlan}
+        planGridRef={planGridRef}
+      />
     </div>
+  );
+}
+
+export default function PlansPage() {
+  return (
+    <Suspense fallback={<PlansSkeleton />}>
+      <PlansPageInner />
+    </Suspense>
   );
 }

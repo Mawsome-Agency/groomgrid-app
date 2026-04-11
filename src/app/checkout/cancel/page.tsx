@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ArrowLeft, CheckCircle, Calendar } from 'lucide-react';
 
-export default function CheckoutCancelPage() {
+function CheckoutCancelPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [mounted, setMounted] = useState(false);
@@ -30,11 +30,7 @@ export default function CheckoutCancelPage() {
   };
 
   if (!mounted) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-stone-50 flex items-center justify-center">
-        <div className="text-stone-500">Loading...</div>
-      </div>
-    );
+    return <div className="min-h-screen bg-gray-50" />;
   }
 
   return (
@@ -125,5 +121,13 @@ export default function CheckoutCancelPage() {
         </div>
       </main>
     </div>
+  );
+}
+
+export default function CheckoutCancelPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-50" />}>
+      <CheckoutCancelPageInner />
+    </Suspense>
   );
 }
