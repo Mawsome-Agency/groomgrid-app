@@ -162,3 +162,21 @@ export function trackDashboardFirstView(userId: string) {
     }
   }
 }
+
+// Trust signal tracking events
+export function trackTrustBadgeInteracted(badgeType: 'pci' | 'cancel_anytime' | 'secure_header', location: 'plans' | 'success' | 'billing') {
+  trackEvent('trust_badge_interacted', { badge_type: badgeType, location, timestamp: new Date().toISOString() });
+}
+
+export function trackBillingSummaryViewed(planName: string, amount: number, isTrial: boolean) {
+  trackEvent('billing_summary_viewed', {
+    plan_name: planName,
+    amount,
+    is_trial: isTrial,
+    timestamp: new Date().toISOString()
+  });
+}
+
+export function trackFaqOpened(faqType: string) {
+  trackEvent('faq_opened', { faq_type: faqType, timestamp: new Date().toISOString() });
+}
