@@ -70,4 +70,84 @@ export async function createCustomerPortalSession(customerId: string) {
   return session;
 }
 
+/**
+ * Maps Stripe decline codes to GroomGrid error types for the error page
+ */
+export function mapStripeErrorToErrorType(declineCode?: string): 'declined' | 'insufficient' | 'expired' | 'generic' {
+  if (!declineCode) return 'generic';
+
+  switch (declineCode) {
+    case 'insufficient_funds':
+      return 'insufficient';
+    case 'expired_card':
+      return 'expired';
+    case 'card_declined':
+    case 'generic_decline':
+    case 'processing_error':
+      return 'declined';
+    default:
+      return 'generic';
+  }
+}
+
+/**
+ * Extracts error details from a Stripe error for client-side display
+ */
+export function getStripeErrorMessage(error: any): { type: string; message: string; declineCode?: string } {
+  if (!error) {
+    return { type: 'generic', message: 'An unknown error occurred' };
+  }
+
+  // Handle Stripe API errors
+  if (error.type) {
+    const stripeError = error as Stripe.StripeError;
+
+    switch (stripeError.type) {
+      case 'StripeCardError':
+        const cardError = stripeError as Stripe.StripeCardError;
+        return {
+          type: mapStripeErrorToErrorType(cardError.code),
+          message: cardError.message || 'Payment failed',
+          declineCode: cardError.code,
+        };
+
+      case 'StripeRateLimitError':
+        return {
+          type: 'generic',
+          message: 'Too many requests. Please try again later.',
+        };
+
+      case 'StripeInvalidRequestError':
+        return {
+          type: 'generic',
+          message: 'Invalid request. Please check your input.',
+        };
+
+      case 'StripeAPIError':
+        return {
+          type: 'generic',
+          message: 'Payment processing error. Please try again.',
+        };
+
+      case 'StripeConnectionError':
+        return {
+          type: 'generic',
+          message: 'Network error. Please check your connection.',
+        };
+
+      default:
+        return {
+          type: 'generic',
+          message: stripeError.message || 'An error occurred',
+        };
+    }
+  }
+
+  // Handle generic errors
+  return {
+    type: 'generic',
+    message: error.message || 'An error occurred',
+  };
+}
+
 export { stripe };

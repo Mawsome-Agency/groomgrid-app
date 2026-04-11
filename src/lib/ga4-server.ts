@@ -12,8 +12,8 @@
  * If GA4_API_SECRET is not set, events are logged to console (no-op in prod).
  */
 
-const MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID;
-const API_SECRET = process.env.GA4_API_SECRET;
+function getMeasurementId() { return process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID; }
+function getApiSecret() { return process.env.GA4_API_SECRET; }
 const MP_ENDPOINT = 'https://www.google-analytics.com/mp/collect';
 
 interface GA4ServerEvent {
@@ -31,6 +31,9 @@ export async function trackServerEvent(
   events: GA4ServerEvent | GA4ServerEvent[],
   userId?: string
 ): Promise<void> {
+  const MEASUREMENT_ID = getMeasurementId();
+  const API_SECRET = getApiSecret();
+
   if (!MEASUREMENT_ID) {
     console.warn('[GA4 Server] NEXT_PUBLIC_GA4_MEASUREMENT_ID not set — skipping event');
     return;

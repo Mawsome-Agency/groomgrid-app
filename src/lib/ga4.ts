@@ -6,25 +6,30 @@ declare global {
   }
 }
 
-const GA4_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID;
+function getGA4MeasurementId() {
+  return process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID;
+}
 
 // Initialize GA4
 export function initGA4() {
+  const GA4_MEASUREMENT_ID = getGA4MeasurementId();
   if (!GA4_MEASUREMENT_ID) return;
 
   window.dataLayer = window.dataLayer || [];
-  
-  window.gtag = function gtag() {
-    window.dataLayer?.push(arguments);
-  };
-  
+
+  if (!window.gtag) {
+    window.gtag = function gtag() {
+      window.dataLayer?.push(arguments);
+    };
+  }
+
   window.gtag('js', new Date());
   window.gtag('config', GA4_MEASUREMENT_ID);
 }
 
 // Track event
 export function trackEvent(eventName: string, params: Record<string, any> = {}) {
-  if (typeof window !== 'undefined' && window.gtag && GA4_MEASUREMENT_ID) {
+  if (typeof window !== 'undefined' && window.gtag && getGA4MeasurementId()) {
     window.gtag('event', eventName, params);
   }
 }
