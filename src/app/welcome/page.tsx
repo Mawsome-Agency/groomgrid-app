@@ -1,12 +1,39 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { CheckCircle2, ArrowRight, Calendar, Bell, Users, Sparkles } from 'lucide-react';
 import { trackWelcomeViewed } from '@/lib/ga4';
 
-export default function WelcomePage() {
+function WelcomeSkeleton() {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-stone-50 flex items-center justify-center">
+      <div className="w-full max-w-3xl px-4">
+        <div className="bg-white rounded-2xl p-8 animate-pulse mb-6">
+          <div className="w-20 h-20 bg-stone-200 rounded-full mx-auto mb-6" />
+          <div className="h-8 bg-stone-200 rounded w-3/4 mx-auto mb-4" />
+          <div className="h-5 bg-stone-200 rounded w-1/2 mx-auto" />
+        </div>
+        <div className="bg-white rounded-2xl p-8 animate-pulse mb-6">
+          <div className="h-6 bg-stone-200 rounded w-1/3 mb-6" />
+          <div className="grid grid-cols-3 gap-6">
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="text-center">
+                <div className="w-14 h-14 bg-stone-200 rounded-xl mx-auto mb-4" />
+                <div className="h-4 bg-stone-200 rounded mb-2" />
+                <div className="h-3 bg-stone-200 rounded w-3/4 mx-auto" />
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="h-14 bg-stone-200 rounded-xl w-48 mx-auto animate-pulse" />
+      </div>
+    </div>
+  );
+}
+
+function WelcomePageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { data: session, status } = useSession();
@@ -112,14 +139,7 @@ export default function WelcomePage() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-stone-50 flex items-center justify-center" role="status" aria-live="polite">
-        <div className="text-center">
-          <div className="w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" aria-hidden="true" />
-          <p className="text-stone-600">Loading...</p>
-        </div>
-      </div>
-    );
+    return <WelcomeSkeleton />;
   }
 
   return (
@@ -221,5 +241,13 @@ export default function WelcomePage() {
         </div>
       </main>
     </div>
+  );
+}
+
+export default function WelcomePage() {
+  return (
+    <Suspense fallback={<WelcomeSkeleton />}>
+      <WelcomePageInner />
+    </Suspense>
   );
 }
