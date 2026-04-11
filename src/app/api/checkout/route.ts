@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
       planType: planType as 'solo' | 'salon' | 'enterprise',
       customerEmail: customerEmail || `${userId}@groomgrid.app`,
       businessName: profile.businessName,
-      planData: PLAN_DATA[planType], // Pass plan data for metadata
+      planData: PLAN_DATA[planType as keyof typeof PLAN_DATA], // Pass plan data for metadata
     });
 
     // Track payment initiated event
