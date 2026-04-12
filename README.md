@@ -136,3 +136,5 @@ The app is deployed to Vercel. Connect the GitHub repository and configure envir
 ### License
 
 Copyright © 2026 GroomGrid. All rights reserved.
+
+<!-- Cortex test marker: 2026-04-12 pipeline hardening - expanded round-robin to 7 providers per tier validated -->
