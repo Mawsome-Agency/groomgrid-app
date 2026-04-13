@@ -26,12 +26,20 @@ export default function HomePage() {
       {/* ── Nav ── */}
       <nav className="flex items-center justify-between px-6 py-4 max-w-5xl mx-auto border-b border-stone-100">
         <span className="text-xl font-bold text-green-600">GroomGrid 🐾</span>
-        <CtaLink
-          href={SIGNUP_URL}
-          className="px-4 py-2 rounded-lg bg-green-500 text-white text-sm font-semibold hover:bg-green-600 transition-colors"
-        >
-          Start Free Trial
-        </CtaLink>
+        <div className="flex items-center gap-4">
+          <Link
+            href="/blog"
+            className="text-stone-600 hover:text-green-600 text-sm font-medium transition-colors"
+          >
+            Blog
+          </Link>
+          <CtaLink
+            href={SIGNUP_URL}
+            className="px-4 py-2 rounded-lg bg-green-500 text-white text-sm font-semibold hover:bg-green-600 transition-colors"
+          >
+            Start Free Trial
+          </CtaLink>
+        </div>
       </nav>
 
       {/* ── Hero ── */}
@@ -239,8 +247,11 @@ export default function HomePage() {
 
       {/* ── Footer ── */}
       <footer className="px-6 py-8 text-center text-stone-400 text-sm border-t border-stone-100">
-        <p>
-          © 2026 GroomGrid ·{' '}
+        <p className="mb-2">
+          <Link href="/blog" className="hover:text-stone-600 transition-colors">
+            Blog
+          </Link>
+          {' · '}
           <a
             href="mailto:hello@getgroomgrid.com"
             className="hover:text-stone-600 transition-colors"
@@ -248,6 +259,7 @@ export default function HomePage() {
             hello@getgroomgrid.com
           </a>
         </p>
+        <p>© 2026 GroomGrid</p>
       </footer>
     </div>
   );
