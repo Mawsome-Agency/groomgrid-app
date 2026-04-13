@@ -84,13 +84,16 @@ export async function trackServerEvent(
 // ── Typed helpers ────────────────────────────────────────────────────────────
 
 export async function trackCheckoutCompletedServer(
+  clientId: string,
   userId: string,
   sessionId: string,
   planType: string,
   trialStarted: boolean
 ): Promise<void> {
+  // Use the provided clientId if available; fall back to userId for client_id
+  const effectiveClientId = clientId || userId;
   await trackServerEvent(
-    userId, // use userId as client_id; GA4 will dedupe on user_id
+    effectiveClientId,
     {
       name: 'checkout_completed',
       params: {
@@ -104,13 +107,15 @@ export async function trackCheckoutCompletedServer(
 }
 
 export async function trackSubscriptionCreatedServer(
+  clientId: string,
   userId: string,
   subscriptionId: string,
   planType: string,
   status: string
 ): Promise<void> {
+  const effectiveClientId = clientId || userId;
   await trackServerEvent(
-    userId,
+    effectiveClientId,
     {
       name: 'subscription_created',
       params: {

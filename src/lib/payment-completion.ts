@@ -25,6 +25,7 @@ export interface CompletionPayload {
   stripeCustomerId?: string;
   stripeSubscriptionId?: string;
   subscriptionStatus?: string;
+  clientId?: string;
 }
 
 /**
@@ -56,7 +57,7 @@ export async function triggerPaymentCompletionHandler(
     id: string;
     customer: string | Stripe.Customer | Stripe.DeletedCustomer | null;
     subscription: string | Stripe.Subscription | null;
-    metadata?: { userId?: string; planType?: string };
+    metadata?: { userId?: string; planType?: string; clientId?: string };
   }
 ): Promise<void> {
   // Extract paymentId - use session.id if payment_intent is null
@@ -75,6 +76,7 @@ export async function triggerPaymentCompletionHandler(
   }
 
   const planType = session.metadata?.planType ?? 'unknown';
+  const clientId = session.metadata?.clientId;
 
   // Extract Stripe IDs with type guards
   const stripeCustomerId = typeof session.customer === 'string' ? session.customer : undefined;
@@ -116,8 +118,8 @@ export async function triggerPaymentCompletionHandler(
 
     // Fire GA4 events AFTER transaction succeeds
     // Order matters for funnel tracking
-    await trackCheckoutCompletedServer(userId, session.id, planType, true);
-    
+    await trackCheckoutCompletedServer(clientId || userId, userId, session.id, planType, true);
+
     if (stripeSubscriptionId) {
       await trackSubscriptionStartedServer(
         userId,

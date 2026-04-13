@@ -25,12 +25,6 @@ export default function SignupPage() {
 
   const { errors, validateField, clearFieldError } = useFormValidation();
 
-  useEffect(() => {
-    if (formData.businessName) {
-      trackSignupStarted(formData.businessName);
-    }
-  }, [formData.businessName]);
-
   const handleFieldChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     // Clear error when value changes
@@ -61,6 +55,9 @@ export default function SignupPage() {
     e.preventDefault();
     setError('');
     setLoading(true);
+
+    // Track signup started event
+    trackSignupStarted(formData.businessName);
 
     try {
       const res = await fetch('/api/auth/signup', {

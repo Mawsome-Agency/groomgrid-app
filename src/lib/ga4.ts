@@ -199,3 +199,26 @@ export function trackABTestConverted(testName: string, variant: 'A' | 'B', event
     timestamp: new Date().toISOString(),
   });
 }
+
+// Get GA4 Client ID from cookie
+export function getGA4ClientId(): string | null {
+  if (typeof window === 'undefined') return null;
+  
+  const gaCookie = document.cookie
+    .split('; ')
+    .find((row) => row.startsWith('_ga='));
+    
+  if (!gaCookie) return null;
+  
+  // _ga cookie format: _ga=GA1.2.1234567890.1234567890
+  // We want the client ID: 1234567890.1234567890
+  const gaParts = gaCookie.split('=');
+  if (gaParts.length !== 2) return null;
+  
+  const gaValue = gaParts[1];
+  const clientIdParts = gaValue.split('.');
+  if (clientIdParts.length < 4) return null;
+  
+  // Return the last two parts joined by a period (client ID)
+  return `${clientIdParts[2]}.${clientIdParts[3]}`;
+}

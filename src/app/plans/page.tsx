@@ -10,7 +10,7 @@ import ValueProp from '@/components/funnel/ValueProp';
 import TrustSignals from '@/components/trust/TrustSignals';
 import StickyPlanBar from '@/components/funnel/StickyPlanBar';
 import { BillingSummaryData } from '@/components/trust/BillingSummary';
-import { trackPageView, trackPlanSelected, trackBillingSummaryViewed } from '@/lib/ga4';
+import { trackPageView, trackPlanSelected, trackBillingSummaryViewed, getGA4ClientId } from '@/lib/ga4';
 
 const PLANS: Plan[] = [
   {
@@ -178,6 +178,7 @@ function PlansPageInner() {
           userId: session.user.id,
           planType: plan.type,
           customerEmail: session.user.email,
+          clientId: getGA4ClientId(),
         }),
       });
 

@@ -17,14 +17,14 @@ const PLAN_DATA = {
 
 export async function POST(req: NextRequest) {
   try {
-    const { userId, planType, customerEmail } = await req.json();
+    const { userId, planType, customerEmail, clientId } = await req.json();
 
     if (!userId || !planType) {
       return NextResponse.json(
-        { 
+        {
           error: 'Missing required fields',
           errorType: 'generic',
-        }, 
+        },
         { status: 400 }
       );
     }
@@ -46,6 +46,7 @@ export async function POST(req: NextRequest) {
       customerEmail: customerEmail || `${userId}@groomgrid.app`,
       businessName: profile.businessName,
       planData: PLAN_DATA[planType as keyof typeof PLAN_DATA], // Pass plan data for metadata
+      clientId,
     });
 
     // Track payment initiated event
