@@ -73,7 +73,7 @@ function findDuplicates(missions) {
     if (!byTitle[title]) byTitle[title] = [];
     byTitle[title].push(m);
   });
-  
+
   return Object.entries(byTitle)
     .filter(([_, items]) => items.length > 1)
     .map(([title, items]) => ({
@@ -87,14 +87,21 @@ function findNonCritical(missions) {
     const status = (m.status || '').toUpperCase();
     const priority = (m.priority || '').toUpperCase();
     const rockTitle = m.rock?.title || m.rockTitle || '';
-    
+
     const isPending = status === 'PENDING' || status === 'TODO';
     const isNotHigh = priority !== 'HIGH';
     const notLinkedToActiveRock = !ACTIVE_ROCKS.some(r => rockTitle.includes(r));
-    
+
     return isPending && isNotHigh && notLinkedToActiveRock;
   });
 }
+
+module.exports = {
+  findDuplicates,
+  findNonCritical,
+  findCompletedTweaks,
+  ACTIVE_ROCKS
+};
 
 function findCompletedTweaks(missions) {
   return missions.filter(m => {
@@ -102,6 +109,16 @@ function findCompletedTweaks(missions) {
     const type = (m.type || '').toUpperCase();
     return status === 'COMPLETED' && (type === 'TWEAK' || type === 'BUGFIX');
   });
+}
+
+// Export functions for testing
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    findDuplicates,
+    findNonCritical,
+    findCompletedTweaks,
+    ACTIVE_ROCKS
+  };
 }
 
 async function main() {
