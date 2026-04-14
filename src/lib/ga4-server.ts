@@ -161,6 +161,7 @@ export async function trackSubscriptionCancelledServer(
 }
 
 export async function trackSubscriptionStartedServer(
+  clientId: string,
   userId: string,
   subscriptionId: string,
   planType: string,
@@ -168,7 +169,7 @@ export async function trackSubscriptionStartedServer(
   price: number
 ): Promise<void> {
   await trackServerEvent(
-    userId,
+    clientId || userId,
     {
       name: 'subscription_started',
       params: {
