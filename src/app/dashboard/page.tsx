@@ -3,8 +3,9 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
-import { Calendar, Users, DollarSign, Plus, LogOut, Settings, Menu, X } from 'lucide-react';
+import { Calendar, Users, DollarSign, Plus, LogOut, Settings, Menu, X, AlertCircle, RefreshCw } from 'lucide-react';
 import { trackPageView } from '@/lib/ga4';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 interface Appointment {
   id: string;
@@ -21,6 +22,14 @@ interface Client {
   _count: { appointments: number };
 }
 
+interface DashboardError {
+  type: 'network' | 'timeout' | 'server' | 'parse' | 'unknown';
+  message: string;
+  retryable: boolean;
+}
+
+const FETCH_TIMEOUT = 15000; // 15 seconds
+
 export default function DashboardPage() {
   const router = useRouter();
   const { data: session, status } = useSession();
@@ -30,6 +39,8 @@ export default function DashboardPage() {
   const [weekRevenue, setWeekRevenue] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<DashboardError | null>(null);
+  const [isRetrying, setIsRetrying] = useState(false);
 
   useEffect(() => {
     trackPageView('/dashboard', 'Dashboard');
@@ -46,60 +57,134 @@ export default function DashboardPage() {
     }
   }, [status, session]);
 
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = async (signal?: AbortSignal) => {
+    setLoading(true);
+    setError(null);
+
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT);
+
+      // Combine the passed signal with our timeout signal
+      const combinedSignal = signal ?
+        AbortSignal.any([signal, controller.signal]) :
+        controller.signal;
+
       const [profileRes, appointmentsRes, clientsRes] = await Promise.all([
-        fetch(`/api/profile?userId=${session?.user?.id}`),
-        fetch('/api/clients'),
-        fetch('/api/appointments'),
+        fetch(`/api/profile?userId=${session?.user?.id}`, { signal: combinedSignal }),
+        fetch('/api/clients', { signal: combinedSignal }),
+        fetch('/api/appointments', { signal: combinedSignal }),
       ]);
 
-      if (profileRes.ok) {
-        const data = await profileRes.json();
-        setProfile(data.profile);
+      clearTimeout(timeoutId);
+
+      // Check for HTTP errors
+      const errors: string[] = [];
+
+      if (!profileRes.ok) {
+        errors.push(`Profile: ${profileRes.status}`);
+      }
+      if (!clientsRes.ok) {
+        errors.push(`Clients: ${clientsRes.status}`);
+      }
+      if (!appointmentsRes.ok) {
+        errors.push(`Appointments: ${appointmentsRes.status}`);
       }
 
-      if (clientsRes.ok) {
-        const data = await clientsRes.json();
-        setClientCount(data.clients.length);
+      if (errors.length > 0) {
+        throw new Error(`Server errors: ${errors.join(', ')}`);
       }
 
-      if (appointmentsRes.ok) {
-        const data = await appointmentsRes.json();
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const endOfToday = new Date(today);
-        endOfToday.setHours(23, 59, 59, 999);
+      // Parse responses
+      let profileData, clientsData, appointmentsData;
 
-        const todayApps = data.appointments.filter((appt: Appointment) => {
-          const apptTime = new Date(appt.startTime);
-          return apptTime >= today && apptTime <= endOfToday;
-        });
-        setTodayAppointments(todayApps);
-
-        // Calculate revenue for the last 7 days (completed appointments only)
-        const weekAgo = new Date();
-        weekAgo.setDate(weekAgo.getDate() - 7);
-        const weekApps = data.appointments.filter((appt: Appointment) => {
-          const apptTime = new Date(appt.startTime);
-          return apptTime >= weekAgo && appt.status === 'completed';
-        });
-        const revenue = weekApps.reduce((sum: number, appt: Appointment) => {
-          const servicePrices: Record<string, number> = {
-            'Full Groom': 65,
-            'Bath + Brush': 40,
-            'Nail Trim': 20,
-            'Teeth Brushing': 15,
-          };
-          return sum + (servicePrices[appt.service] || 0);
-        }, 0);
-        setWeekRevenue(revenue);
+      try {
+        profileData = await profileRes.json();
+        clientsData = await clientsRes.json();
+        appointmentsData = await appointmentsRes.json();
+      } catch (parseErr) {
+        console.error('Failed to parse API responses:', parseErr);
+        throw new Error('Unable to process server response');
       }
-    } catch (err) {
+
+      // Set state with parsed data
+      setProfile(profileData.profile);
+      setClientCount(clientsData.clients.length);
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const endOfToday = new Date(today);
+      endOfToday.setHours(23, 59, 59, 999);
+
+      const todayApps = appointmentsData.appointments.filter((appt: Appointment) => {
+        const apptTime = new Date(appt.startTime);
+        return apptTime >= today && apptTime <= endOfToday;
+      });
+      setTodayAppointments(todayApps);
+
+      // Calculate revenue for the last 7 days (completed appointments only)
+      const weekAgo = new Date();
+      weekAgo.setDate(weekAgo.getDate() - 7);
+      const weekApps = appointmentsData.appointments.filter((appt: Appointment) => {
+        const apptTime = new Date(appt.startTime);
+        return apptTime >= weekAgo && appt.status === 'completed';
+      });
+      const revenue = weekApps.reduce((sum: number, appt: Appointment) => {
+        const servicePrices: Record<string, number> = {
+          'Full Groom': 65,
+          'Bath + Brush': 40,
+          'Nail Trim': 20,
+          'Teeth Brushing': 15,
+        };
+        return sum + (servicePrices[appt.service] || 0);
+      }, 0);
+      setWeekRevenue(revenue);
+
+    } catch (err: any) {
       console.error('Failed to fetch dashboard data:', err);
+
+      // Determine error type and user-friendly message
+      let errorType: DashboardError['type'] = 'unknown';
+      let errorMessage = 'Unable to load your dashboard';
+      let retryable = true;
+
+      if (err.name === 'AbortError') {
+        errorType = 'timeout';
+        errorMessage = 'Request timed out. Please check your connection and try again.';
+      } else if (err.message?.includes('Failed to fetch') || err.message?.includes('NetworkError')) {
+        errorType = 'network';
+        errorMessage = 'Network connection issue. Please check your internet connection.';
+      } else if (err.message?.includes('Server errors')) {
+        errorType = 'server';
+        errorMessage = 'Server is temporarily unavailable. Please try again later.';
+      } else if (err.message?.includes('parse') || err.message?.includes('JSON')) {
+        errorType = 'parse';
+        errorMessage = 'Unable to process data. Please try again.';
+        retryable = false;
+      }
+
+      setError({
+        type: errorType,
+        message: errorMessage,
+        retryable,
+      });
+
+      // Log to Sentry if available (non-blocking)
+      if (typeof window !== 'undefined' && (window as any).Sentry) {
+        (window as any).Sentry.captureException(err, {
+          tags: { component: 'dashboard', errorType },
+          extra: { userId: session?.user?.id },
+        });
+      }
     } finally {
       setLoading(false);
+      setIsRetrying(false);
     }
+  };
+
+  const handleRetry = () => {
+    setIsRetrying(true);
+    fetchDashboardData();
   };
 
   const handleSignOut = async () => {
@@ -122,7 +207,52 @@ export default function DashboardPage() {
   if (status === 'loading' || loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-stone-50 flex items-center justify-center">
-        <div className="text-center">Loading...</div>
+        <div className="text-center">
+          <LoadingSpinner size="lg" />
+          <p className="mt-4 text-stone-600">Loading your dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state if there's an error
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-stone-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md w-full">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
+              <AlertCircle className="w-6 h-6 text-red-600" />
+            </div>
+            <h2 className="text-xl font-semibold text-stone-900">Unable to Load Dashboard</h2>
+          </div>
+          <p className="text-stone-600 mb-6">{error.message}</p>
+          {error.retryable && (
+            <button
+              onClick={handleRetry}
+              disabled={isRetrying}
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isRetrying ? (
+                <>
+                  <LoadingSpinner size="sm" />
+                  Retrying...
+                </>
+              ) : (
+                <>
+                  <RefreshCw className="w-4 h-4" />
+                  Try Again
+                </>
+              )}
+            </button>
+          )}
+          <button
+            onClick={() => router.push('/')}
+            className="w-full mt-3 px-4 py-3 text-stone-600 hover:text-stone-900 transition-colors"
+          >
+            Return to Home
+          </button>
+        </div>
       </div>
     );
   }
