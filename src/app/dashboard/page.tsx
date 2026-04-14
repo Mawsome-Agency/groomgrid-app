@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
 import { Calendar, Users, DollarSign, Plus, LogOut, Settings, Menu, X } from 'lucide-react';
 import { trackPageView } from '@/lib/ga4';
+import PaymentProcessingBanner from '@/components/PaymentProcessingBanner';
 
 interface Appointment {
   id: string;
@@ -211,6 +212,9 @@ export default function DashboardPage() {
 
           {/* Main Content */}
           <main className="lg:col-span-3 space-y-6">
+            {/* Payment Processing Banner */}
+            <PaymentProcessingBanner />
+
             {/* Trial Banner */}
             {isTrial && (
               <div className="bg-green-500 text-white rounded-2xl p-6">

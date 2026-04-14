@@ -181,6 +181,24 @@ model PaymentEvent {
   @@map("payment_events")
 }
 
+model PaymentLockout {
+  id              String   @id @default(cuid())
+  userId          String   @map("user_id")
+  paymentId       String   @map("payment_id")
+  status          String   @default("processing") // processing, completed, failed
+  sessionId       String   @map("session_id")
+  errorMessage    String?  @map("error_message")
+  retryCount      Int      @default(0) @map("retry_count")
+  lastRetryAt     DateTime? @map("last_retry_at")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, paymentId])
+  @@map("payment_lockouts")
+}
+
 // A/B Testing Framework
 model ABTest {
   id          String   @id @default(cuid())
