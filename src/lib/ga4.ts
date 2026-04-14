@@ -222,3 +222,86 @@ export function getGA4ClientId(): string | null {
   // Return the last two parts joined by a period (client ID)
   return `${clientIdParts[2]}.${clientIdParts[3]}`;
 }
+
+// ============================================================================
+// BOFU (Bottom of Funnel) Comparison Page Analytics
+// ============================================================================
+
+/**
+ * Track when a user views a BOFU comparison page
+ * @param pageType - Type of BOFU page (e.g., 'mobile-grooming-business', 'grooming-business-operations')
+ * @param referrer - Where the user came from (if available)
+ */
+export function trackBofuPageViewed(pageType: string, referrer?: string) {
+  trackEvent('bofu_page_viewed', {
+    page_type: pageType,
+    referrer: referrer || 'direct',
+    timestamp: new Date().toISOString(),
+  });
+}
+
+/**
+ * Track scroll depth milestones on BOFU pages
+ * @param pageType - Type of BOFU page
+ * @param depthPercentage - Scroll depth reached (25, 50, 75, 100)
+ */
+export function trackBofuScrollDepth(pageType: string, depthPercentage: number) {
+  trackEvent('bofu_scroll_depth', {
+    page_type: pageType,
+    depth_percentage: depthPercentage,
+    timestamp: new Date().toISOString(),
+  });
+}
+
+/**
+ * Track when a user views a specific section on a BOFU page
+ * @param pageType - Type of BOFU page
+ * @param sectionId - ID of the section viewed
+ * @param sectionTitle - Human-readable title of the section
+ */
+export function trackBofuSectionViewed(pageType: string, sectionId: string, sectionTitle: string) {
+  trackEvent('bofu_section_viewed', {
+    page_type: pageType,
+    section_id: sectionId,
+    section_title: sectionTitle,
+    timestamp: new Date().toISOString(),
+  });
+}
+
+/**
+ * Track time spent on a BOFU page
+ * @param pageType - Type of BOFU page
+ * @param timeSpentMs - Time spent in milliseconds
+ * @param sectionsViewed - Number of sections viewed
+ */
+export function trackBofuEngagementTime(pageType: string, timeSpentMs: number, sectionsViewed: number) {
+  trackEvent('bofu_engagement_time', {
+    page_type: pageType,
+    time_spent_ms: timeSpentMs,
+    time_spent_seconds: Math.round(timeSpentMs / 1000),
+    sections_viewed: sectionsViewed,
+    timestamp: new Date().toISOString(),
+  });
+}
+
+/**
+ * Track CTA clicks on BOFU pages
+ * @param pageType - Type of BOFU page
+ * @param ctaType - Type of CTA (e.g., 'see_plans', 'start_trial', 'learn_more')
+ * @param ctaLocation - Location of CTA on page (e.g., 'hero', 'footer', 'inline')
+ * @param sectionId - Section where CTA was clicked (if applicable)
+ */
+export function trackBofuCtaClick(
+  pageType: string,
+  ctaType: string,
+  ctaLocation: string,
+  sectionId?: string
+) {
+  trackEvent('bofu_cta_click', {
+    page_type: pageType,
+    cta_type: ctaType,
+    cta_location: ctaLocation,
+    section_id: sectionId || null,
+    timestamp: new Date().toISOString(),
+  });
+}
