@@ -4,6 +4,7 @@ import './globals.css';
 import Script from 'next/script';
 import { SessionProvider } from '@/components/SessionProvider';
 import { ABTestProvider } from '@/components/ab-test';
+import SessionExpirationDetector from '@/components/session-expiration/SessionExpirationDetector';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -36,7 +37,10 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <SessionProvider>
-          <ABTestProvider>{children}</ABTestProvider>
+          <ABTestProvider>
+            {children}
+            <SessionExpirationDetector />
+          </ABTestProvider>
         </SessionProvider>
       </body>
     </html>
