@@ -9,6 +9,7 @@ import {
   trackPaymentFailedServer,
 } from '@/lib/ga4-server';
 import { triggerPaymentCompletionHandler } from '@/lib/payment-completion';
+import { updatePaymentLockoutStatus } from '@/lib/payment-lockout';
 
 export async function POST(req: Request) {
   const body = await req.text();
@@ -38,25 +39,57 @@ export async function POST(req: Request) {
             : rawPaymentIntent?.id ?? session.id;
 
         if (userId) {
-          // Create PAYMENT_CONFIRMED event to signal webhook received
-          await prisma.paymentEvent.create({
-            data: {
-              paymentId: (session as any).payment_intent ?? (session as any).id,
-              eventType: 'PAYMENT_CONFIRMED',
-              payload: {
-                userId,
-                sessionId: session.id,
+          try {
+            // Create PAYMENT_CONFIRMED event to signal webhook received
+            await prisma.paymentEvent.create({
+              data: {
+                paymentId: (session as any).payment_intent ?? (session as any).id,
+                eventType: 'PAYMENT_CONFIRMED',
+                payload: {
+                  userId,
+                  sessionId: session.id,
+                },
               },
-            },
-          });
+            });
 
-          // Trigger payment completion handler
-          // This is idempotent - will check for COMPLETION_PROCESSED first
-          // Cast metadata to strip the `null` case — metadata is checked above via userId guard
-          await triggerPaymentCompletionHandler({
-            ...session,
-            metadata: session.metadata ?? undefined,
-          });
+            // Trigger payment completion handler
+            // This is idempotent - will check for COMPLETION_PROCESSED first
+            // Cast metadata to strip the `null` case — metadata is checked above via userId guard
+            await triggerPaymentCompletionHandler({
+              ...session,
+              metadata: session.metadata ?? undefined,
+            });
+
+            // Update payment lockout status to completed
+            const paymentId = (session as any).payment_intent ?? (session as any).id;
+            const lockout = await prisma.paymentLockout.findFirst({
+              where: {
+                userId,
+                paymentId: paymentId as string,
+              },
+            });
+
+            if (lockout) {
+              await updatePaymentLockoutStatus(lockout.id, 'completed');
+            }
+          } catch (handlerError: any) {
+            console.error('Payment completion handler error:', handlerError);
+
+            // Update payment lockout status to failed
+            const paymentId = (session as any).payment_intent ?? (session as any).id;
+            const lockout = await prisma.paymentLockout.findFirst({
+              where: {
+                userId,
+                paymentId: paymentId as string,
+              },
+            });
+
+            if (lockout) {
+              await updatePaymentLockoutStatus(lockout.id, 'failed', handlerError.message);
+            }
+
+            throw handlerError;
+          }
         }
         break;
       }
