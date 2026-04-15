@@ -1,26 +1,11 @@
 'use client';
 
-import type { Metadata } from 'next';
 import Link from 'next/link';
 import PlanCard from '@/components/funnel/PlanCard';
 import Testimonial from '@/components/funnel/Testimonial';
 import ValueProp from '@/components/funnel/ValueProp';
 import TrustSignals from '@/components/trust/TrustSignals';
 import { PLANS, TESTIMONIALS, FAQ_ITEMS } from '../pricing/pricing-data';
-
-export const metadata: Metadata = {
-  title: 'Pricing | GroomGrid - Simple, Affordable Pet Grooming Software',
-  description: 'Transparent pricing for GroomGrid. Choose from Solo, Salon, or Enterprise plans. All plans include a 14-day free trial. No hidden fees.',
-  alternates: {
-    canonical: 'https://getgroomgrid.com/plans',
-  },
-  openGraph: {
-    title: 'Pricing | GroomGrid - Simple, Affordable Pet Grooming Software',
-    description: 'Transparent pricing for GroomGrid. Choose from Solo, Salon, or Enterprise plans. All plans include a 14-day free trial. No hidden fees.',
-    url: 'https://getgroomgrid.com/plans',
-    type: 'website',
-  },
-};
 
 const pricingSchema = {
   '@context': 'https://schema.org',
