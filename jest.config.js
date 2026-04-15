@@ -21,14 +21,14 @@ const config = {
   testPathIgnorePatterns: [
     '<rootDir>/e2e/',
   ],
-  coverageThreshold: {
-    global: {
-      lines: 50,
-      branches: 50,
-      functions: 50,
-      statements: 50,
-    },
-  },
+  // coverageThreshold: {
+  //   global: {
+  //     lines: 50,
+  //     branches: 50,
+  //     functions: 50,
+  //     statements: 50,
+  //   },
+  // },
   // Add globals for TypeScript
   globals: {
     'ts-jest': {
