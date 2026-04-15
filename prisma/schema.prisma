@@ -24,8 +24,6 @@ model User {
   appointments    Appointment[]
   businessHours   BusinessHours[]
   paymentLockouts PaymentLockout[]
-
-  paymentLockouts PaymentLockout[]
   @@map("users")
 }
 
