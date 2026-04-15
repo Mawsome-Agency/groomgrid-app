@@ -15,7 +15,7 @@
 import Stripe from 'stripe';
 import prisma from '@/lib/prisma';
 import { trackCheckoutCompletedServer, trackSubscriptionStartedServer } from '@/lib/ga4-server';
-import type { Prisma } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 
 export type PaymentEventType = 'PAYMENT_INITIATED' | 'PAYMENT_CONFIRMED' | 'COMPLETION_PROCESSED';
 
@@ -122,20 +122,13 @@ export async function triggerPaymentCompletionHandler(
     await trackCheckoutCompletedServer(clientId || userId, userId, session.id, planType, true);
 
     if (stripeSubscriptionId) {
-      // Map planType to price
-      const planPriceMap: Record<string, number> = {
-        solo: 29,
-        salon: 79,
-        enterprise: 149,
-      };
-      const price = planPriceMap[planType] ?? 0;
-
       await trackSubscriptionStartedServer(
+        clientId || userId,
         userId,
         stripeSubscriptionId,
         planType,
         'trial',
-        price
+        0
       );
     }
   } catch (error) {

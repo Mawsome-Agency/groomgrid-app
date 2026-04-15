@@ -26,6 +26,12 @@ const config = {
       statements: 80,
     },
   },
+  // Add globals for TypeScript
+  globals: {
+    'ts-jest': {
+      tsconfig: 'tsconfig.test.json',
+    },
+  },
 };
 
 module.exports = config;

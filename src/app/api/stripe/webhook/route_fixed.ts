@@ -9,34 +9,16 @@ import {
   trackPaymentFailedServer,
 } from '@/lib/ga4-server';
 import { triggerPaymentCompletionHandler } from '@/lib/payment-completion';
-import { updatePaymentLockoutStatus } from '@/lib/payment-lockout';
-import { checkRateLimit } from '@/lib/rate-limit';
-import { requireEnvVar } from '@/lib/validation';
+import Stripe from 'stripe';
 
 export async function POST(req: Request) {
-  // Validate required environment variables
-  const webhookSecret = requireEnvVar('STRIPE_WEBHOOK_SECRET');
-
-  // Rate limiting: prevent webhook spam
-  // Use IP address as key, allow 100 requests per minute
-  const ip = headers().get('x-forwarded-for') || headers().get('x-real-ip') || 'unknown';
-  const rateLimitResult = checkRateLimit(`webhook:${ip}`, 100, 60 * 1000);
-
-  if (!rateLimitResult.allowed) {
-    console.warn(`[Webhook] Rate limited for IP ${ip}: ${rateLimitResult.retryAfter}s until reset`);
-    return NextResponse.json(
-      { error: 'Too many requests', retryAfter: rateLimitResult.retryAfter },
-      { status: 429 }
-    );
-  }
-
   const body = await req.text();
   const signature = headers().get('stripe-signature')!;
 
-  let event;
+  let event: Stripe.Event;
 
   try {
-    event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+    event = stripe.webhooks.constructEvent(body, signature, process.env.STRIPE_WEBHOOK_SECRET!);
   } catch (error: unknown) {
     console.error('Webhook signature verification failed:', error);
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
@@ -45,7 +27,7 @@ export async function POST(req: Request) {
   try {
     switch (event.type) {
       case 'checkout.session.completed': {
-        const session = event.data.object;
+        const session = event.data.object as Stripe.Checkout.Session;
         const userId = session.metadata?.userId;
 
         // Extract paymentId - use session.id if payment_intent is null (setup mode)
@@ -57,56 +39,25 @@ export async function POST(req: Request) {
             : rawPaymentIntent?.id ?? session.id;
 
         if (userId) {
-          try {
-            // Create PAYMENT_CONFIRMED event to signal webhook received
-            await prisma.paymentEvent.create({
-              data: {
-                paymentId,
-                eventType: 'PAYMENT_CONFIRMED',
-                payload: {
-                  userId,
-                  sessionId: session.id,
-                },
-              },
-            });
-
-            // Trigger payment completion handler
-            // This is idempotent - will check for COMPLETION_PROCESSED first
-            // Cast metadata to strip the `null` case — metadata is checked above via userId guard
-            await triggerPaymentCompletionHandler({
-              ...session,
-              metadata: session.metadata ?? undefined,
-            });
-
-            // Update payment lockout status to completed
-            const lockout = await prisma.paymentLockout.findFirst({
-              where: {
+          // Create PAYMENT_CONFIRMED event to signal webhook received
+          await prisma.paymentEvent.create({
+            data: {
+              paymentId,
+              eventType: 'PAYMENT_CONFIRMED',
+              payload: {
                 userId,
-                paymentId,
+                sessionId: session.id,
               },
-            });
+            },
+          });
 
-            if (lockout) {
-              await updatePaymentLockoutStatus(lockout.id, 'completed');
-            }
-          } catch (handlerError: unknown) {
-            console.error('Payment completion handler error:', handlerError);
-
-            // Update payment lockout status to failed
-            const lockout = await prisma.paymentLockout.findFirst({
-              where: {
-                userId,
-                paymentId,
-              },
-            });
-
-            if (lockout) {
-              const errorMessage = handlerError instanceof Error ? handlerError.message : 'Unknown error';
-              await updatePaymentLockoutStatus(lockout.id, 'failed', errorMessage);
-            }
-
-            throw handlerError;
-          }
+          // Trigger payment completion handler
+          // This is idempotent - will check for COMPLETION_PROCESSED first
+          // Cast metadata to strip the `null` case — metadata is checked above via userId guard
+          await triggerPaymentCompletionHandler({
+            ...session,
+            metadata: session.metadata ?? undefined,
+          });
         }
         break;
       }
@@ -114,7 +65,7 @@ export async function POST(req: Request) {
       case 'customer.subscription.created': {
         // Subscription creation is now handled by triggerPaymentCompletionHandler
         // This handler is kept for logging/debugging purposes only
-        const subscription = event.data.object;
+        const subscription = event.data.object as Stripe.Subscription;
         const userId = subscription.metadata?.userId;
 
         if (userId) {
@@ -124,7 +75,7 @@ export async function POST(req: Request) {
       }
 
       case 'customer.subscription.updated': {
-        const subscription = event.data.object;
+        const subscription = event.data.object as Stripe.Subscription;
         const userId = subscription.metadata?.userId;
 
         if (userId) {
@@ -149,7 +100,7 @@ export async function POST(req: Request) {
       }
 
       case 'customer.subscription.deleted': {
-        const subscription = event.data.object;
+        const subscription = event.data.object as Stripe.Subscription;
         const userId = subscription.metadata?.userId;
 
         if (userId) {
@@ -164,7 +115,7 @@ export async function POST(req: Request) {
       }
 
       case 'invoice.payment_succeeded': {
-        const invoice = event.data.object;
+        const invoice = event.data.object as Stripe.Invoice;
         const customerId = typeof invoice.customer === 'string' ? invoice.customer : null;
 
         if (customerId) {
@@ -190,7 +141,7 @@ export async function POST(req: Request) {
       }
 
       case 'invoice.payment_failed': {
-        const invoice = event.data.object;
+        const invoice = event.data.object as Stripe.Invoice;
         const customerId = typeof invoice.customer === 'string' ? invoice.customer : null;
 
         if (customerId) {

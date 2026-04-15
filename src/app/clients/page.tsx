@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { Plus, Mail, Phone, Calendar, ChevronRight, Search } from 'lucide-react';
+import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import { trackPageView } from '@/lib/ga4';
 
 interface Client {
@@ -30,7 +30,7 @@ export default function ClientsPage() {
   const [filteredClients, setFilteredClients] = useState<Client[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const { isOnline } = useOnlineStatus();
 
   useEffect(() => {
     trackPageView('/clients', 'Clients');
@@ -114,7 +114,8 @@ export default function ClientsPage() {
           <h1 className="text-2xl font-bold text-stone-900">Clients</h1>
           <button
             onClick={() => setShowAddModal(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+            disabled={!isOnline}
+            className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors disabled:bg-gray-400"
           >
             <Plus className="w-5 h-5" /> Add Client
           </button>

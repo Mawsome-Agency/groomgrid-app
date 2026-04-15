@@ -58,3 +58,5 @@ export interface AuthError {
   message: string;
   code?: string;
 }
+
+export type NetworkErrorType = 'offline' | 'timeout' | 'server_error' | 'unknown';
