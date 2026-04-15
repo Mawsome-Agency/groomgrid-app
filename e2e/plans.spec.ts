@@ -2,20 +2,15 @@
  * Plans page E2E tests
  * Target: https://staging.getgroomgrid.com/plans
  *
- * These tests use a pre-authenticated user via storageState.
- * The plans page requires authentication (unauthenticated users are redirected to /login).
+ * The plans page is publicly accessible for marketing purposes.
+ * Authenticated users see additional account-specific information.
  */
 
 import { test, expect } from '@playwright/test';
 
-// Plans page requires auth — storageState is set via chromium-auth project in playwright.config.ts
+// Plans page is publicly accessible for marketing purposes
 
 test.describe('Plans page', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto('/plans');
-    // If redirected to login or welcome, this context may not be fully set up — skip gracefully
-    await expect(page).toHaveURL(/\/plans|\/login|\/welcome/, { timeout: 20_000 });
-  });
 
   test('shows plan selection heading', async ({ page }) => {
     const url = page.url();

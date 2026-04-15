@@ -24,6 +24,9 @@ const requiredEnvVars: Record<string, string[]> = {
     'NEXT_PUBLIC_GA4_MEASUREMENT_ID',
     'GA4_API_SECRET',
   ],
+  spyfu: [
+    'SPYFU_API_SECRET',
+  ],
 };
 
 /**
