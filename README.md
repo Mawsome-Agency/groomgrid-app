@@ -6,6 +6,23 @@ AI-powered pet grooming business management platform.
 
 This repository contains the complete user acquisition funnel that converts visitors to paying customers.
 
+## SEO Competitor Research
+
+This feature provides insights into competitor keywords and identifies content opportunities.
+
+### Setup
+
+1. Add `SPYFU_API_SECRET` to your environment variables
+2. Visit `/admin/seo` to view the competitor research dashboard
+
+### API Endpoint
+
+```
+GET /api/seo/competitor-research
+```
+
+For more details, see [SEO_COMPETITOR_RESEARCH.md](docs/SEO_COMPETITOR_RESEARCH.md)
+
 ### Funnel Steps
 
 1. **Landing Page** → `/signup`

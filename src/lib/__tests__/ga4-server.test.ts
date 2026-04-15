@@ -26,17 +26,26 @@ describe('ga4-server.ts', () => {
     NODE_ENV: process.env.NODE_ENV,
   };
 
+  // Helper to set NODE_ENV safely (it's read-only in some environments)
+  const setNodeEnv = (value: string) => {
+    Object.defineProperty(process.env, 'NODE_ENV', {
+      value,
+      writable: true,
+      configurable: true,
+    });
+  };
+
   beforeEach(() => {
     jest.clearAllMocks();
     process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID = 'G-TEST123';
     process.env.GA4_API_SECRET = 'test-secret';
-    process.env.NODE_ENV = 'test';
+    setNodeEnv('test');
   });
 
   afterEach(() => {
     process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID = originalEnv.MEASUREMENT_ID;
     process.env.GA4_API_SECRET = originalEnv.API_SECRET;
-    process.env.NODE_ENV = originalEnv.NODE_ENV;
+    setNodeEnv(originalEnv.NODE_ENV ?? 'test');
   });
 
   describe('trackServerEvent', () => {
@@ -130,7 +139,7 @@ describe('ga4-server.ts', () => {
     });
 
     it('should return early if API_SECRET not set in development', async () => {
-      process.env.NODE_ENV = 'development';
+      setNodeEnv('development');
       delete process.env.GA4_API_SECRET;
       (global as any).fetch = jest.fn();
       const consoleWarn = jest.spyOn(console, 'warn');
@@ -146,7 +155,7 @@ describe('ga4-server.ts', () => {
     });
 
     it('should not warn in production if API_SECRET not set', async () => {
-      process.env.NODE_ENV = 'production';
+      setNodeEnv('production');
       delete process.env.GA4_API_SECRET;
       (global as any).fetch = jest.fn();
       const consoleWarn = jest.spyOn(console, 'warn');
@@ -175,7 +184,7 @@ describe('ga4-server.ts', () => {
     });
 
     it('should warn on non-ok response in development', async () => {
-      process.env.NODE_ENV = 'development';
+      setNodeEnv('development');
       (global as any).fetch = jest.fn().mockResolvedValue({
         ok: false,
         status: 400,
@@ -193,7 +202,7 @@ describe('ga4-server.ts', () => {
     });
 
     it('should not warn on non-ok response in production', async () => {
-      process.env.NODE_ENV = 'production';
+      setNodeEnv('production');
       (global as any).fetch = jest.fn().mockResolvedValue({
         ok: false,
         status: 400,
@@ -212,7 +221,7 @@ describe('ga4-server.ts', () => {
     it('should call trackServerEvent with correct params', async () => {
       (global as any).fetch = jest.fn().mockResolvedValue({ ok: true });
 
-      await trackCheckoutCompletedServer('user_123', 'sess_456', 'solo', true);
+      await trackCheckoutCompletedServer('user_123', 'user_123', 'sess_456', 'solo', true);
 
       const fetchBody = JSON.parse((fetch as jest.Mock).mock.calls[0][1].body);
       expect(fetchBody.client_id).toBe('user_123');
@@ -226,7 +235,7 @@ describe('ga4-server.ts', () => {
     it('should handle false trial_started', async () => {
       (global as any).fetch = jest.fn().mockResolvedValue({ ok: true });
 
-      await trackCheckoutCompletedServer('user_123', 'sess_456', 'enterprise', false);
+      await trackCheckoutCompletedServer('user_123', 'user_123', 'sess_456', 'enterprise', false);
 
       const fetchBody = JSON.parse((fetch as jest.Mock).mock.calls[0][1].body);
       expect(fetchBody.events[0].params.trial_started).toBe(false);
@@ -235,7 +244,7 @@ describe('ga4-server.ts', () => {
     it('should handle null session ID', async () => {
       (global as any).fetch = jest.fn().mockResolvedValue({ ok: true });
 
-      await trackCheckoutCompletedServer('user_123', null as any, 'solo', true);
+      await trackCheckoutCompletedServer('user_123', 'user_123', null as any, 'solo', true);
 
       const fetchBody = JSON.parse((fetch as jest.Mock).mock.calls[0][1].body);
       expect(fetchBody.events[0].params.session_id).toBeNull();
@@ -246,7 +255,7 @@ describe('ga4-server.ts', () => {
     it('should call trackServerEvent with correct params', async () => {
       (global as any).fetch = jest.fn().mockResolvedValue({ ok: true });
 
-      await trackSubscriptionCreatedServer('user_123', 'sub_456', 'solo', 'active');
+      await trackSubscriptionCreatedServer('user_123', 'user_123', 'sub_456', 'solo', 'active');
 
       const fetchBody = JSON.parse((fetch as jest.Mock).mock.calls[0][1].body);
       expect(fetchBody.events[0].name).toBe('subscription_created');
@@ -285,7 +294,7 @@ describe('ga4-server.ts', () => {
     it('should call trackServerEvent with correct params', async () => {
       (global as any).fetch = jest.fn().mockResolvedValue({ ok: true });
 
-      await trackSubscriptionStartedServer('user_123', 'sub_456', 'solo', 'active', 29);
+      await trackSubscriptionStartedServer('user_123', 'user_123', 'sub_456', 'solo', 'active', 29);
 
       const fetchBody = JSON.parse((fetch as jest.Mock).mock.calls[0][1].body);
       expect(fetchBody.events[0].name).toBe('subscription_started');
@@ -299,7 +308,7 @@ describe('ga4-server.ts', () => {
     it('should handle float price', async () => {
       (global as any).fetch = jest.fn().mockResolvedValue({ ok: true });
 
-      await trackSubscriptionStartedServer('user_123', 'sub_456', 'enterprise', 'active', 149.99);
+      await trackSubscriptionStartedServer('user_123', 'user_123', 'sub_456', 'enterprise', 'active', 149.99);
 
       const fetchBody = JSON.parse((fetch as jest.Mock).mock.calls[0][1].body);
       expect(fetchBody.events[0].params.price).toBe(149.99);
@@ -396,20 +405,24 @@ describe('ga4-server.ts', () => {
       (global as any).fetch = jest.fn().mockResolvedValue({ ok: true });
 
       await trackPaymentInitiatedServer('user_123', 'sess_456', 'solo');
-      expect((fetch as jest.Mock).mock.calls[0][1].events[0].name).toBe('payment_initiated');
+      const fetchBody1 = JSON.parse((fetch as jest.Mock).mock.calls[0][1].body);
+      expect(fetchBody1.events[0].name).toBe('payment_initiated');
 
       await trackPaymentSuccessServer('user_123', 'inv_456', 2999);
-      expect((fetch as jest.Mock).mock.calls[1][1].events[0].name).toBe('payment_success');
+      const fetchBody2 = JSON.parse((fetch as jest.Mock).mock.calls[1][1].body);
+      expect(fetchBody2.events[0].name).toBe('payment_success');
     });
 
     it('should track payment initiated followed by failure', async () => {
       (global as any).fetch = jest.fn().mockResolvedValue({ ok: true });
 
       await trackPaymentInitiatedServer('user_123', 'sess_456', 'solo');
-      expect((fetch as jest.Mock).mock.calls[0][1].events[0].name).toBe('payment_initiated');
+      const fetchBody1 = JSON.parse((fetch as jest.Mock).mock.calls[0][1].body);
+      expect(fetchBody1.events[0].name).toBe('payment_initiated');
 
       await trackPaymentFailedServer('user_123', 'inv_456', 'insufficient_funds');
-      expect((fetch as jest.Mock).mock.calls[1][1].events[0].name).toBe('payment_failed');
+      const fetchBody2 = JSON.parse((fetch as jest.Mock).mock.calls[1][1].body);
+      expect(fetchBody2.events[0].name).toBe('payment_failed');
     });
   });
 });
