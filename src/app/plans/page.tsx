@@ -1,6 +1,10 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+<<<<<<< HEAD
 import PlanCardWrapper from '@/components/funnel/PlanCardWrapper';
+=======
+import PlanCard from '@/components/funnel/PlanCard';
+>>>>>>> b7d603e (feat: Create public marketing pricing page)
 import Testimonial from '@/components/funnel/Testimonial';
 import ValueProp from '@/components/funnel/ValueProp';
 import TrustSignals from '@/components/trust/TrustSignals';
@@ -35,6 +39,14 @@ const pricingSchema = {
 };
 
 export default function PublicPricingPage() {
+<<<<<<< HEAD
+=======
+  const handleSelectPlan = () => {
+    // For the marketing page, we just redirect to signup
+    window.location.href = '/signup';
+  };
+
+>>>>>>> b7d603e (feat: Create public marketing pricing page)
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-stone-50">
       {/* Header */}
@@ -60,7 +72,16 @@ export default function PublicPricingPage() {
         {/* Plan Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
           {PLANS.map((plan) => (
+<<<<<<< HEAD
             <PlanCardWrapper key={plan.id} plan={plan} />
+=======
+            <PlanCard
+              key={plan.id}
+              plan={plan}
+              selected={false}
+              onSelect={handleSelectPlan}
+            />
+>>>>>>> b7d603e (feat: Create public marketing pricing page)
           ))}
         </div>
 
