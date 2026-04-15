@@ -48,8 +48,6 @@ model Profile {
   @@index([stripeCustomerId])
   @@index([subscriptionStatus])
   @@map("profiles")
-  @@index([stripeCustomerId])
-  @@index([subscriptionStatus])
 }
 
 model Client {
@@ -113,11 +111,10 @@ model Appointment {
   @@index([userId, startTime])
   @@index([userId, status, reminderSent])
   @@index([userId, status, dayOfReminderSent])
-  @@map("appointments")
-  @@index([userId, startTime])
   @@index([userId, status, startTime, endTime])
   @@index([status, reminderSent, startTime])
   @@index([status, dayOfReminderSent, startTime])
+  @@map("appointments")
 }
 
 model BusinessHours {
