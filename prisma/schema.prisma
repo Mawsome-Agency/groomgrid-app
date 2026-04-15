@@ -47,6 +47,8 @@ model Profile {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("profiles")
+  @@index([stripeCustomerId])
+  @@index([subscriptionStatus])
 }
 
 model Client {
@@ -108,6 +110,10 @@ model Appointment {
   pet    Pet?   @relation(fields: [petId], references: [id], onDelete: SetNull)
 
   @@map("appointments")
+  @@index([userId, startTime])
+  @@index([userId, status, startTime, endTime])
+  @@index([status, reminderSent, startTime])
+  @@index([status, dayOfReminderSent, startTime])
 }
 
 model BusinessHours {
