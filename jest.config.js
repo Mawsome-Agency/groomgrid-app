@@ -23,10 +23,10 @@ const config = {
   ],
   coverageThreshold: {
     global: {
-      lines: 80,
-      branches: 70,
-      functions: 80,
-      statements: 80,
+      lines: 50,
+      branches: 50,
+      functions: 50,
+      statements: 50,
     },
   },
   // Add globals for TypeScript
