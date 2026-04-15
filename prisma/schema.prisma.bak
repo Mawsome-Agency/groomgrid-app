@@ -1,0 +1,230 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  passwordHash  String?  @map("password_hash")
+  businessName  String?  @map("business_name")
+  timezone      String   @default("America/New_York")
+  emailVerified Boolean  @default(false) @map("email_verified")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  profile         Profile?
+  dripQueue       DripEmailQueue[]
+  feedback        Feedback[]
+  analyticsEvents AnalyticsEvent[]
+  clients         Client[]
+  appointments    Appointment[]
+  businessHours   BusinessHours[]
+
+  @@map("users")
+}
+
+model Profile {
+  id                   String    @id @default(cuid())
+  userId               String    @unique @map("user_id")
+  businessName         String    @map("business_name")
+  phone                String?
+  planType             String    @default("solo") @map("plan_type")
+  subscriptionStatus   String    @default("trial") @map("subscription_status")
+  trialEndsAt          DateTime? @map("trial_ends_at")
+  onboardingCompleted  Boolean   @default(false) @map("onboarding_completed")
+  onboardingStep       Int       @default(0) @map("onboarding_step")
+  welcomeShown         Boolean   @default(false) @map("welcome_shown")
+  stripeCustomerId     String?   @map("stripe_customer_id")
+  stripeSubscriptionId String?   @map("stripe_subscription_id")
+  createdAt            DateTime  @default(now()) @map("created_at")
+  updatedAt            DateTime  @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("profiles")
+}
+
+model Client {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  name      String
+  email     String?
+  phone     String?
+  address   String?
+  notes     String?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  pets Pet[]
+  appointments Appointment[]
+
+  @@unique([userId, email])
+  @@map("clients")
+}
+
+model Pet {
+  id          String   @id @default(cuid())
+  clientId    String   @map("client_id")
+  name        String
+  breed       String?
+  size        String?  // small, medium, large, giant
+  age         String?
+  specialNotes String?  @map("special_notes")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  client       Client       @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  appointments Appointment[]
+
+  @@map("pets")
+}
+
+model Appointment {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  clientId  String   @map("client_id")
+  petId     String?  @map("pet_id")
+  service   String   // Full Groom, Bath + Brush, Nail Trim, etc.
+  startTime DateTime @map("start_time")
+  endTime   DateTime @map("end_time")
+  price     Int      // in cents
+  status    String   @default("scheduled") // scheduled, completed, cancelled, no_show
+  notes     String?
+  invoiceId String?  @map("invoice_id")
+  reminderSent      Boolean @default(false) @map("reminder_sent")
+  dayOfReminderSent Boolean @default(false) @map("day_of_reminder_sent")
+  noShowCharged     Boolean @default(false) @map("no_show_charged")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  pet    Pet?   @relation(fields: [petId], references: [id], onDelete: SetNull)
+
+  @@map("appointments")
+}
+
+model BusinessHours {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  dayOfWeek Int      @map("day_of_week") // 0 = Sunday, 1 = Monday, etc.
+  openTime  String   @map("open_time")   // "08:00"
+  closeTime String   @map("close_time")  // "18:00"
+  enabled   Boolean  @default(true)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, dayOfWeek])
+  @@map("business_hours")
+}
+
+model DripEmailQueue {
+  id           String    @id @default(cuid())
+  userId       String    @map("user_id")
+  email        String
+  sequenceStep Int       @map("sequence_step")
+  scheduledAt  DateTime  @map("scheduled_at")
+  sentAt       DateTime? @map("sent_at")
+  status       String    @default("pending")
+  errorMessage String?   @map("error_message")
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("drip_email_queue")
+}
+
+model Feedback {
+  id        String   @id @default(cuid())
+  userId    String?  @map("user_id")
+  type      String
+  score     Int?
+  page      String?
+  message   String?
+  metadata  Json?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@map("feedback")
+}
+
+model AnalyticsEvent {
+  id         String   @id @default(cuid())
+  userId     String   @map("user_id")
+  eventName  String   @map("event_name")
+  properties Json?
+  sessionId  String?  @map("session_id")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("analytics_events")
+}
+
+model PaymentEvent {
+  id        String    @id @default(cuid())
+  paymentId String    @map("payment_id")
+  eventType String    @map("event_type") // PAYMENT_INITIATED, PAYMENT_CONFIRMED, COMPLETION_PROCESSED
+  payload   Json?
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  @@unique([paymentId, eventType])
+  @@map("payment_events")
+}
+
+// A/B Testing Framework
+model ABTest {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  variantA    Json     @default("{}")
+  variantB    Json     @default("{}")
+  splitRatio  Int      @default(50) // percentage for variantA
+  active      Boolean  @default(true)
+  startedAt   DateTime @default(now()) @map("started_at")
+  endedAt     DateTime? @map("ended_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  assignments ABTestAssignment[]
+  conversions ABTestConversion[]
+  @@map("ab_tests")
+}
+
+model ABTestAssignment {
+  id          String   @id @default(cuid())
+  testId      String   @map("test_id")
+  userId      String?  @map("user_id")
+  sessionId   String?  @map("session_id") // for anonymous users
+  variant     String   // "A" or "B"
+  createdAt   DateTime @default(now()) @map("created_at")
+  test        ABTest   @relation(fields: [testId], references: [id], onDelete: Cascade)
+  conversions ABTestConversion[]
+  @@unique([testId, userId])
+  @@unique([testId, sessionId])
+  @@index([testId, variant])
+  @@map("ab_test_assignments")
+}
+
+model ABTestConversion {
+  id           String   @id @default(cuid())
+  testId       String   @map("test_id")
+  assignmentId String   @map("assignment_id")
+  userId       String?  @map("user_id")
+  sessionId    String?  @map("session_id")
+  event        String   // "signup", "payment", "book_appointment", "cta_click", etc.
+  metadata     Json?
+  createdAt    DateTime @default(now()) @map("created_at")
+  test         ABTest           @relation(fields: [testId], references: [id], onDelete: Cascade)
+  assignment   ABTestAssignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  @@index([testId, event])
+  @@map("ab_test_conversions")
+}

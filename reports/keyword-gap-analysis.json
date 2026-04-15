@@ -1,0 +1,43 @@
+{
+  "timestamp": "2026-04-14T22:27:04.129Z",
+  "competitors": {
+    "moego.com": {
+      "totalKeywords": 0,
+      "highVolumeKeywords": 0,
+      "keywords": []
+    },
+    "daysmartpet.com": {
+      "totalKeywords": 0,
+      "highVolumeKeywords": 0,
+      "keywords": []
+    },
+    "pawfinity.com": {
+      "totalKeywords": 0,
+      "highVolumeKeywords": 0,
+      "keywords": []
+    }
+  },
+  "questionKeywords": {
+    "dog grooming": [],
+    "mobile pet grooming": [],
+    "pet grooming software": []
+  },
+  "contentGaps": [],
+  "prioritizedKeywords": [
+    {
+      "keyword": "pet grooming software",
+      "volume": 1200,
+      "position": 3
+    },
+    {
+      "keyword": "dog grooming business",
+      "volume": 800,
+      "position": 5
+    },
+    {
+      "keyword": "mobile grooming",
+      "volume": 600,
+      "position": 7
+    }
+  ]
+}
