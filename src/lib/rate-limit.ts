@@ -68,3 +68,24 @@ export function checkRateLimit(
   const retryAfter = Math.ceil((entry.resetAt - now) / 1000);
   return { allowed: false, remaining: 0, retryAfter };
 }
+
+/**
+ * Specialized rate limiter for load testing endpoints
+ * Allows higher limits for authenticated admin users
+ *
+ * @param key - Unique identifier (e.g., IP address or user ID)
+ * @param isAdmin - Whether the user is an admin
+ * @param ipLimit - Limit for regular IP-based requests
+ * @param adminLimit - Higher limit for admin users
+ * @param windowMs - Window duration in milliseconds
+ */
+export function checkLoadTestRateLimit(
+  key: string,
+  isAdmin: boolean = false,
+  ipLimit: number = 10,
+  adminLimit: number = 100,
+  windowMs: number = 10 * 60 * 1000, // 10 minutes
+): RateLimitResult {
+  const limit = isAdmin ? adminLimit : ipLimit;
+  return checkRateLimit(key, limit, windowMs);
+}
