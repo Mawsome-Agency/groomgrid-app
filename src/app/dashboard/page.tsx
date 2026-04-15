@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
 import { Calendar, Users, DollarSign, Plus, LogOut, Settings, Menu, X } from 'lucide-react';
 import { trackPageView } from '@/lib/ga4';
+import PaymentProcessingBanner from '@/components/PaymentProcessingBanner';
 
 interface Appointment {
   id: string;
@@ -30,6 +31,7 @@ export default function DashboardPage() {
   const [weekRevenue, setWeekRevenue] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     trackPageView('/dashboard', 'Dashboard');
@@ -48,55 +50,62 @@ export default function DashboardPage() {
 
   const fetchDashboardData = async () => {
     try {
+      setError(null); // Clear any previous errors
       const [profileRes, appointmentsRes, clientsRes] = await Promise.all([
         fetch(`/api/profile?userId=${session?.user?.id}`),
         fetch('/api/clients'),
         fetch('/api/appointments'),
       ]);
 
-      if (profileRes.ok) {
-        const data = await profileRes.json();
-        setProfile(data.profile);
+      // Check if any requests failed
+      if (!profileRes.ok || !clientsRes.ok || !appointmentsRes.ok) {
+        const errors = [];
+        if (!profileRes.ok) errors.push(`Profile API (${profileRes.status})`);
+        if (!clientsRes.ok) errors.push(`Clients API (${clientsRes.status})`);
+        if (!appointmentsRes.ok) errors.push(`Appointments API (${appointmentsRes.status})`);
+
+        setError(`Failed to load data from: ${errors.join(', ')}. Please try again.`);
+        return;
       }
 
-      if (clientsRes.ok) {
-        const data = await clientsRes.json();
-        setClientCount(data.clients.length);
-      }
+      const profileData = await profileRes.json();
+      const clientsData = await clientsRes.json();
+      const appointmentsData = await appointmentsRes.json();
 
-      if (appointmentsRes.ok) {
-        const data = await appointmentsRes.json();
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const endOfToday = new Date(today);
-        endOfToday.setHours(23, 59, 59, 999);
+      setProfile(profileData.profile);
+      setClientCount(clientsData.clients.length);
 
-        const todayApps = data.appointments.filter((appt: Appointment) => {
-          const apptTime = new Date(appt.startTime);
-          return apptTime >= today && apptTime <= endOfToday;
-        });
-        setTodayAppointments(todayApps);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const endOfToday = new Date(today);
+      endOfToday.setHours(23, 59, 59, 999);
 
-        // Calculate revenue for the last 7 days (completed appointments only)
-        const weekAgo = new Date();
-        weekAgo.setDate(weekAgo.getDate() - 7);
-        const weekApps = data.appointments.filter((appt: Appointment) => {
-          const apptTime = new Date(appt.startTime);
-          return apptTime >= weekAgo && appt.status === 'completed';
-        });
-        const revenue = weekApps.reduce((sum: number, appt: Appointment) => {
-          const servicePrices: Record<string, number> = {
-            'Full Groom': 65,
-            'Bath + Brush': 40,
-            'Nail Trim': 20,
-            'Teeth Brushing': 15,
-          };
-          return sum + (servicePrices[appt.service] || 0);
-        }, 0);
-        setWeekRevenue(revenue);
-      }
+      const todayApps = appointmentsData.appointments.filter((appt: Appointment) => {
+        const apptTime = new Date(appt.startTime);
+        return apptTime >= today && apptTime <= endOfToday;
+      });
+      setTodayAppointments(todayApps);
+
+      // Calculate revenue for the last 7 days (completed appointments only)
+      const weekAgo = new Date();
+      weekAgo.setDate(weekAgo.getDate() - 7);
+      const weekApps = appointmentsData.appointments.filter((appt: Appointment) => {
+        const apptTime = new Date(appt.startTime);
+        return apptTime >= weekAgo && appt.status === 'completed';
+      });
+      const revenue = weekApps.reduce((sum: number, appt: Appointment) => {
+        const servicePrices: Record<string, number> = {
+          'Full Groom': 65,
+          'Bath + Brush': 40,
+          'Nail Trim': 20,
+          'Teeth Brushing': 15,
+        };
+        return sum + (servicePrices[appt.service] || 0);
+      }, 0);
+      setWeekRevenue(revenue);
     } catch (err) {
       console.error('Failed to fetch dashboard data:', err);
+      setError('Failed to load dashboard data. This might be a temporary network issue. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -123,6 +132,88 @@ export default function DashboardPage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-stone-50 flex items-center justify-center">
         <div className="text-center">Loading...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-stone-50">
+        {/* Mobile Header */}
+        <header className="bg-white border-b border-stone-200 lg:hidden">
+          <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+            <div>
+              <h1 className="text-xl font-bold text-green-600">GroomGrid</h1>
+              <p className="text-xs text-stone-500">{profile?.business_name || session?.user?.name || 'My Business'}</p>
+            </div>
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="p-2 text-stone-600"
+            >
+              {mobileMenuOpen ? <X /> : <Menu />}
+            </button>
+          </div>
+        </header>
+
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            {/* Sidebar (Desktop) */}
+            <aside className="hidden lg:block">
+              <div className="bg-white rounded-2xl shadow-sm p-6 sticky top-8">
+                <h1 className="text-2xl font-bold text-green-600 mb-6">GroomGrid</h1>
+                <nav className="space-y-2">
+                  <a href="/dashboard" className="flex items-center gap-3 px-4 py-3 rounded-xl bg-green-50 text-green-700 font-medium">
+                    <Calendar className="w-5 h-5" /> Today
+                  </a>
+                  <a href="/schedule" className="flex items-center gap-3 px-4 py-3 rounded-xl text-stone-600 hover:bg-stone-50 transition-colors">
+                    <Calendar className="w-5 h-5" /> Schedule
+                  </a>
+                  <a href="/clients" className="flex items-center gap-3 px-4 py-3 rounded-xl text-stone-600 hover:bg-stone-50 transition-colors">
+                    <Users className="w-5 h-5" /> Clients
+                  </a>
+                  <a href="/settings" className="flex items-center gap-3 px-4 py-3 rounded-xl text-stone-600 hover:bg-stone-50 transition-colors">
+                    <Settings className="w-5 h-5" /> Settings
+                  </a>
+                </nav>
+                <div className="mt-8 pt-6 border-t border-stone-200">
+                  <button
+                    onClick={handleSignOut}
+                    className="flex items-center gap-2 text-red-600 hover:text-red-700 text-sm"
+                  >
+                    <LogOut className="w-4 h-4" /> Sign Out
+                  </button>
+                </div>
+              </div>
+            </aside>
+
+            {/* Main Content */}
+            <main className="lg:col-span-3">
+              <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-lg mb-6">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <svg className="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <div className="ml-3">
+                    <h3 className="text-sm font-medium text-red-800">Failed to load dashboard</h3>
+                    <div className="mt-2 text-sm text-red-700">
+                      <p>{error}</p>
+                    </div>
+                    <div className="mt-4">
+                      <button
+                        onClick={fetchDashboardData}
+                        className="bg-red-100 px-2 py-1.5 rounded-md text-sm font-medium text-red-800 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-600"
+                      >
+                        Retry Now
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </main>
+          </div>
+        </div>
       </div>
     );
   }
@@ -211,6 +302,9 @@ export default function DashboardPage() {
 
           {/* Main Content */}
           <main className="lg:col-span-3 space-y-6">
+            {/* Payment Processing Banner */}
+            <PaymentProcessingBanner />
+
             {/* Trial Banner */}
             {isTrial && (
               <div className="bg-green-500 text-white rounded-2xl p-6">

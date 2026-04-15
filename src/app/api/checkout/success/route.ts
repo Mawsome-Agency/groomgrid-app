@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 export const dynamic = 'force-dynamic';
 import { getCheckoutSession } from '@/lib/stripe';
 import prisma from '@/lib/prisma';
+import { createPaymentLockout } from '@/lib/payment-lockout';
 
 export async function GET(req: NextRequest) {
   try {
@@ -38,6 +39,9 @@ export async function GET(req: NextRequest) {
         },
       },
     });
+
+    // Create payment lockout to track payment processing state
+    await createPaymentLockout(userId, paymentId as string, session_id);
 
     console.log(`[CheckoutSuccess] Created PAYMENT_INITIATED event for payment ${paymentId}`);
 
