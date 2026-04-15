@@ -10,16 +10,34 @@ import {
 } from '@/lib/ga4-server';
 import { triggerPaymentCompletionHandler } from '@/lib/payment-completion';
 import { updatePaymentLockoutStatus } from '@/lib/payment-lockout';
+import { checkRateLimit } from '@/lib/rate-limit';
+import { requireEnvVar } from '@/lib/validation';
 
 export async function POST(req: Request) {
+  // Validate required environment variables
+  const webhookSecret = requireEnvVar('STRIPE_WEBHOOK_SECRET');
+
+  // Rate limiting: prevent webhook spam
+  // Use IP address as key, allow 100 requests per minute
+  const ip = headers().get('x-forwarded-for') || headers().get('x-real-ip') || 'unknown';
+  const rateLimitResult = checkRateLimit(`webhook:${ip}`, 100, 60 * 1000);
+
+  if (!rateLimitResult.allowed) {
+    console.warn(`[Webhook] Rate limited for IP ${ip}: ${rateLimitResult.retryAfter}s until reset`);
+    return NextResponse.json(
+      { error: 'Too many requests', retryAfter: rateLimitResult.retryAfter },
+      { status: 429 }
+    );
+  }
+
   const body = await req.text();
   const signature = headers().get('stripe-signature')!;
 
   let event;
 
   try {
-    event = stripe.webhooks.constructEvent(body, signature, process.env.STRIPE_WEBHOOK_SECRET!);
-  } catch (error: any) {
+    event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+  } catch (error: unknown) {
     console.error('Webhook signature verification failed:', error);
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
   }
@@ -43,7 +61,7 @@ export async function POST(req: Request) {
             // Create PAYMENT_CONFIRMED event to signal webhook received
             await prisma.paymentEvent.create({
               data: {
-                paymentId: (session as any).payment_intent ?? (session as any).id,
+                paymentId,
                 eventType: 'PAYMENT_CONFIRMED',
                 payload: {
                   userId,
@@ -61,31 +79,30 @@ export async function POST(req: Request) {
             });
 
             // Update payment lockout status to completed
-            const paymentId = (session as any).payment_intent ?? (session as any).id;
             const lockout = await prisma.paymentLockout.findFirst({
               where: {
                 userId,
-                paymentId: paymentId as string,
+                paymentId,
               },
             });
 
             if (lockout) {
               await updatePaymentLockoutStatus(lockout.id, 'completed');
             }
-          } catch (handlerError: any) {
+          } catch (handlerError: unknown) {
             console.error('Payment completion handler error:', handlerError);
 
             // Update payment lockout status to failed
-            const paymentId = (session as any).payment_intent ?? (session as any).id;
             const lockout = await prisma.paymentLockout.findFirst({
               where: {
                 userId,
-                paymentId: paymentId as string,
+                paymentId,
               },
             });
 
             if (lockout) {
-              await updatePaymentLockoutStatus(lockout.id, 'failed', handlerError.message);
+              const errorMessage = handlerError instanceof Error ? handlerError.message : 'Unknown error';
+              await updatePaymentLockoutStatus(lockout.id, 'failed', errorMessage);
             }
 
             throw handlerError;

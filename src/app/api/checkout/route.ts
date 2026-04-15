@@ -4,6 +4,7 @@ import { authOptions } from '@/lib/next-auth-options';
 import { createCheckoutSession, getStripeErrorMessage } from '@/lib/stripe';
 import prisma from '@/lib/prisma';
 import { trackPaymentInitiatedServer } from '@/lib/ga4-server';
+import { ensureEnv, requireEnvVar } from '@/lib/validation';
 
 // Plan data for metadata
 const PLAN_DATA = {
@@ -17,6 +18,10 @@ const PLAN_DATA = {
 
 export async function POST(req: NextRequest) {
   try {
+    // Validate required environment variables
+    ensureEnv('stripe');
+    ensureEnv('app');
+
     const { userId, planType, customerEmail, clientId } = await req.json();
 
     if (!userId || !planType) {
