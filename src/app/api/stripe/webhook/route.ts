@@ -9,9 +9,9 @@ import {
   trackPaymentFailedServer,
 } from '@/lib/ga4-server';
 import { triggerPaymentCompletionHandler } from '@/lib/payment-completion';
-import { updatePaymentLockoutStatus } from '@/lib/payment-lockout';
 import { checkRateLimit } from '@/lib/rate-limit';
 import { requireEnvVar } from '@/lib/validation';
+import { updatePaymentLockoutStatus } from '@/lib/payment-lockout';
 
 export async function POST(req: Request) {
   // Validate required environment variables
@@ -37,7 +37,7 @@ export async function POST(req: Request) {
 
   try {
     event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
-  } catch (error: unknown) {
+  } catch (error: any) {
     console.error('Webhook signature verification failed:', error);
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
   }
