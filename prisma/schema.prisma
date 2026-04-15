@@ -23,6 +23,7 @@ model User {
   clients         Client[]
   appointments    Appointment[]
   businessHours   BusinessHours[]
+  paymentLockouts PaymentLockout[]
 
   paymentLockouts PaymentLockout[]
   @@map("users")
@@ -46,6 +47,8 @@ model Profile {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([stripeCustomerId])
+  @@index([subscriptionStatus])
   @@map("profiles")
 }
 
@@ -107,6 +110,9 @@ model Appointment {
   client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
   pet    Pet?   @relation(fields: [petId], references: [id], onDelete: SetNull)
 
+  @@index([userId, startTime])
+  @@index([userId, status, reminderSent])
+  @@index([userId, status, dayOfReminderSent])
   @@map("appointments")
 }
 
@@ -196,6 +202,7 @@ model PaymentLockout {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, paymentId])
+  @@index([userId, paymentId])
   @@map("payment_lockouts")
 }
 
