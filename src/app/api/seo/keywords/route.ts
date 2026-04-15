@@ -13,6 +13,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/next-auth-options';
 import { checkRateLimit } from '@/lib/rate-limit';
+import prisma from '@/lib/prisma';
 import {
   fetchCompetitorKeywords,
   fetchRelatedKeywords,
@@ -72,6 +73,19 @@ export async function GET(req: NextRequest) {
       }
 
       const keywords = await fetchCompetitorKeywords(domain, { minVolume });
+
+      // Persist research results
+      await prisma.keywordResearch.create({
+        data: {
+          userId: session.user.id,
+          competitorDomain: domain,
+          researchType: 'competitor',
+          keywordsFound: keywords.length,
+          minVolume: minVolume || null,
+          resultsJson: keywords as any,
+        },
+      }).catch((e: unknown) => console.error('Failed to persist keyword research:', e));
+
       return NextResponse.json({ success: true, data: keywords });
     }
 

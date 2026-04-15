@@ -4,26 +4,10 @@
  * Shared utilities for keyword analysis and opportunity scoring.
  */
 
-import { KeywordData } from './spyfu';
+import { KeywordData, calculateOpportunityScore } from './spyfu';
 
-/**
- * Calculate opportunity score for a keyword
- * Higher score = better opportunity (low difficulty, decent volume)
- */
-export function calculateOpportunityScore(keyword: KeywordData): number {
-  const volumeWeight = 0.4;
-  const difficultyWeight = 0.6;
-
-  // Normalize volume (log scale) - typical range 0-100k
-  const normalizedVolume = Math.min(Math.log10(keyword.searchVolume + 1) / 5, 1);
-
-  // Normalize difficulty (0-100 scale, inverted so lower is better)
-  const normalizedDifficulty = (100 - Math.min(keyword.difficulty, 100)) / 100;
-
-  return Math.round(
-    (normalizedVolume * volumeWeight + normalizedDifficulty * difficultyWeight) * 100
-  );
-}
+// Re-export calculateOpportunityScore from spyfu.ts for backward compatibility
+export { calculateOpportunityScore };
 
 /**
  * Calculate keyword difficulty tier

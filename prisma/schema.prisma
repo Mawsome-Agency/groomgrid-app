@@ -4,7 +4,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url = env("DATABASE_URL")
 }
 
 model User {
@@ -17,13 +16,14 @@ model User {
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @updatedAt @map("updated_at")
 
-  profile         Profile?
-  dripQueue       DripEmailQueue[]
-  feedback        Feedback[]
-  analyticsEvents AnalyticsEvent[]
-  clients         Client[]
-  appointments    Appointment[]
-  businessHours   BusinessHours[]
+  profile          Profile?
+  dripQueue        DripEmailQueue[]
+  feedback         Feedback[]
+  analyticsEvents  AnalyticsEvent[]
+  clients          Client[]
+  appointments     Appointment[]
+  businessHours    BusinessHours[]
+  keywordResearch  KeywordResearch[]
 
   @@map("users")
 }
@@ -179,6 +179,26 @@ model PaymentEvent {
 
   @@unique([paymentId, eventType])
   @@map("payment_events")
+}
+
+// SEO Keyword Research
+model KeywordResearch {
+  id                  String   @id @default(cuid())
+  userId              String   @map("user_id")
+  competitorDomain    String   @map("competitor_domain")
+  researchType        String   @map("research_type") // competitor, gap-analysis, questions, quick-wins
+  keywordsFound       Int      @default(0) @map("keywords_found")
+  gapsFound           Int?     @map("gaps_found")
+  resultsJson         Json?    @map("results_json")
+  minVolume           Int?     @map("min_volume")
+  maxPosition         Int?     @map("max_position")
+  createdAt           DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([competitorDomain])
+  @@map("keyword_research")
 }
 
 // A/B Testing Framework

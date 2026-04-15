@@ -16,6 +16,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/next-auth-options';
 import { checkRateLimit } from '@/lib/rate-limit';
+import prisma from '@/lib/prisma';
 import {
   fetchCompetitorKeywords,
   analyzeContentGaps,
@@ -130,10 +131,26 @@ export async function POST(req: NextRequest) {
       }
     );
 
+    const topGaps = gapResult.gaps.slice(0, 50);
+
+    // Persist gap analysis results
+    await prisma.keywordResearch.create({
+      data: {
+        userId: session.user.id,
+        competitorDomain: validCompetitors.join(','),
+        researchType: 'gap-analysis',
+        keywordsFound: gapResult.metadata.totalCompetitorKeywords,
+        gapsFound: gapResult.metadata.gapsFound,
+        minVolume: minVolume || null,
+        maxPosition: maxPosition || null,
+        resultsJson: topGaps as any,
+      },
+    }).catch((e: unknown) => console.error('Failed to persist gap analysis:', e));
+
     return NextResponse.json({
       success: true,
       data: {
-        gaps: gapResult.gaps.slice(0, 50), // Limit to top 50
+        gaps: topGaps,
         metadata: {
           ...gapResult.metadata,
           ourDomain,
