@@ -1,6 +1,7 @@
 import Stripe from 'stripe';
+import { requireEnvVar } from './validation';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+const stripe = new Stripe(requireEnvVar('STRIPE_SECRET_KEY'), {
   apiVersion: "2023-10-16",
 });
 
@@ -14,9 +15,9 @@ export interface CreateCheckoutSessionParams {
 }
 
 const PRICE_IDS = {
-  solo: process.env.STRIPE_PRICE_SOLO!,
-  salon: process.env.STRIPE_PRICE_SALON!,
-  enterprise: process.env.STRIPE_PRICE_ENTERPRISE!,
+  solo: requireEnvVar('STRIPE_PRICE_SOLO'),
+  salon: requireEnvVar('STRIPE_PRICE_SALON'),
+  enterprise: requireEnvVar('STRIPE_PRICE_ENTERPRISE'),
 } as const;
 
 export async function createCheckoutSession({

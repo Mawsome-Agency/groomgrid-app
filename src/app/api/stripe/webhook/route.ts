@@ -9,15 +9,33 @@ import {
   trackPaymentFailedServer,
 } from '@/lib/ga4-server';
 import { triggerPaymentCompletionHandler } from '@/lib/payment-completion';
+import { checkRateLimit } from '@/lib/rate-limit';
+import { requireEnvVar } from '@/lib/validation';
 
 export async function POST(req: Request) {
+  // Validate required environment variables
+  const webhookSecret = requireEnvVar('STRIPE_WEBHOOK_SECRET');
+
+  // Rate limiting: prevent webhook spam
+  // Use IP address as key, allow 100 requests per minute
+  const ip = headers().get('x-forwarded-for') || headers().get('x-real-ip') || 'unknown';
+  const rateLimitResult = checkRateLimit(`webhook:${ip}`, 100, 60 * 1000);
+
+  if (!rateLimitResult.allowed) {
+    console.warn(`[Webhook] Rate limited for IP ${ip}: ${rateLimitResult.retryAfter}s until reset`);
+    return NextResponse.json(
+      { error: 'Too many requests', retryAfter: rateLimitResult.retryAfter },
+      { status: 429 }
+    );
+  }
+
   const body = await req.text();
   const signature = headers().get('stripe-signature')!;
 
   let event;
 
   try {
-    event = stripe.webhooks.constructEvent(body, signature, process.env.STRIPE_WEBHOOK_SECRET!);
+    event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
   } catch (error: any) {
     console.error('Webhook signature verification failed:', error);
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
