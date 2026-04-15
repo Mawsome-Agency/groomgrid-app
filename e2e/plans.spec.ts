@@ -22,7 +22,7 @@ test.describe('Plans page', () => {
     if (!url.includes('/plans')) {
       test.skip();
     }
-    await expect(page.getByRole('heading', { name: /Choose Your Plan/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /Simple, Transparent Pricing/i })).toBeVisible();
   });
 
   test('shows all three plan cards', async ({ page }) => {
@@ -57,7 +57,7 @@ test.describe('Plans page', () => {
       test.skip();
     }
     await expect(page.getByText(/Trusted by Professional Groomers/i)).toBeVisible();
-    await expect(page.getByText(/Sarah Mitchell/i)).toBeVisible();
+    await expect(page.getByText(/Sarah Johnson/i)).toBeVisible();
   });
 
   test('shows FAQ section', async ({ page }) => {
@@ -66,24 +66,25 @@ test.describe('Plans page', () => {
       test.skip();
     }
     await expect(page.getByText(/Frequently Asked Questions/i)).toBeVisible();
-    await expect(page.getByText(/What happens after the free trial/i)).toBeVisible();
+    await expect(page.getByText(/Is there a free trial/i)).toBeVisible();
   });
 
-  test('shows sign out button in header', async ({ page }) => {
+  test('shows start free trial button in header', async ({ page }) => {
     const url = page.url();
     if (!url.includes('/plans')) {
       test.skip();
     }
-    await expect(page.getByRole('button', { name: /Sign Out/i })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Start Free Trial/i })).toBeVisible();
   });
 
-  test('redirects unauthenticated users to login', async ({ browser }) => {
+  test('allows unauthenticated users to access the page', async ({ browser }) => {
     // Create a fresh browser context with no auth state
     const freshContext = await browser.newContext();
     const freshPage = await freshContext.newPage();
 
     await freshPage.goto('/plans');
-    await expect(freshPage).toHaveURL(/\/login/, { timeout: 20_000 });
+    await expect(freshPage).toHaveURL(/\/plans/, { timeout: 20_000 });
+    await expect(freshPage.getByRole('heading', { name: /Simple, Transparent Pricing/i })).toBeVisible();
 
     await freshContext.close();
   });
