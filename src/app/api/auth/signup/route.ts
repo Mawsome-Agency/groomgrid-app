@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
 import prisma from '@/lib/prisma'
+import { sendWelcomeEmail } from '@/lib/email/welcome'
 
 // Simple in-memory rate limiter for signup attempts
 // For production, use @upstash/ratelimit with Redis
@@ -89,6 +90,11 @@ export async function POST(req: NextRequest) {
         },
       },
     })
+
+    // Non-blocking — fire and forget so signup response is never delayed
+    sendWelcomeEmail(user.email, businessName).catch(err =>
+      console.error('Welcome email failed:', err)
+    )
 
     return NextResponse.json({ success: true, userId: user.id })
   } catch (error) {
