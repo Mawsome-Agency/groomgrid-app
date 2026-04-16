@@ -1,9 +1,19 @@
-import { NextResponse } from 'next/server';
+/**
+ * Health Check API
+ *
+ * GET /api/health
+ * Returns system connectivity status: database reachability,
+ * environment variable presence, and aggregate health.
+ */
 
-export async function GET() {
-  return NextResponse.json({ 
-    status: 'ok', 
-    timestamp: new Date().toISOString(),
-    version: process.env.APP_VERSION || 'unknown'
-  });
+import { NextResponse } from 'next/server';
+import { buildHealthReport, HealthReport } from '@/lib/health-check';
+
+export async function GET(): Promise<NextResponse<HealthReport>> {
+  const report = await buildHealthReport();
+
+  // Return 503 when critical so load balancers / monitors detect the issue.
+  const httpStatus = report.status === 'critical' ? 503 : 200;
+
+  return NextResponse.json(report, { status: httpStatus });
 }
