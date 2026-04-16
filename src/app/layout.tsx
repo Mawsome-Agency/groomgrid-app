@@ -6,6 +6,8 @@ import { SessionProvider } from '@/components/SessionProvider';
 import { ABTestProvider } from '@/components/ab-test';
 import SessionExpirationDetector from '@/components/session-expiration/SessionExpirationDetector';
 import { NetworkStatusProvider } from '@/context/NetworkStatusContext';
+import { RequestQueueProvider } from '@/context/RequestQueueContext';
+import { OfflineBanner } from '@/components/network';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -40,8 +42,11 @@ export default function RootLayout({
         <SessionProvider>
           <ABTestProvider>
             <NetworkStatusProvider>
-              {children}
-              <SessionExpirationDetector />
+              <RequestQueueProvider>
+                <OfflineBanner position="top" className="fixed inset-x-0 top-0" />
+                {children}
+                <SessionExpirationDetector />
+              </RequestQueueProvider>
             </NetworkStatusProvider>
           </ABTestProvider>
         </SessionProvider>

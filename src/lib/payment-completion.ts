@@ -16,7 +16,6 @@ import Stripe from 'stripe';
 import prisma from '@/lib/prisma';
 import { trackCheckoutCompletedServer, trackSubscriptionStartedServer } from '@/lib/ga4-server';
 import type { Prisma } from '@prisma/client';
-import type { Prisma } from '@prisma/client';
 
 export type PaymentEventType = 'PAYMENT_INITIATED' | 'PAYMENT_CONFIRMED' | 'COMPLETION_PROCESSED';
 

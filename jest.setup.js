@@ -40,3 +40,4 @@ global.ResizeObserver = class ResizeObserver {
   observe() {}
   unobserve() {}
 }
+jest.mock('@/lib/ga4-server');
