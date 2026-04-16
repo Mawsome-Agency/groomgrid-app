@@ -3,9 +3,10 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
-import { Calendar, Users, DollarSign, Plus, LogOut, Settings, Menu, X } from 'lucide-react';
+import { Calendar, Users, DollarSign, Plus, LogOut, Settings, Menu, X, AlertCircle, RefreshCw } from 'lucide-react';
 import { trackPageView } from '@/lib/ga4';
 import PaymentProcessingBanner from '@/components/PaymentProcessingBanner';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 interface Appointment {
   id: string;
@@ -22,6 +23,14 @@ interface Client {
   _count: { appointments: number };
 }
 
+interface DashboardError {
+  type: 'network' | 'timeout' | 'server' | 'parse' | 'unknown';
+  message: string;
+  retryable: boolean;
+}
+
+const FETCH_TIMEOUT = 15000; // 15 seconds
+
 export default function DashboardPage() {
   const router = useRouter();
   const { data: session, status } = useSession();
@@ -31,7 +40,8 @@ export default function DashboardPage() {
   const [weekRevenue, setWeekRevenue] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<DashboardError | null>(null);
+  const [isRetrying, setIsRetrying] = useState(false);
 
   useEffect(() => {
     trackPageView('/dashboard', 'Dashboard');
@@ -48,30 +58,57 @@ export default function DashboardPage() {
     }
   }, [status, session]);
 
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = async (signal?: AbortSignal) => {
+    setLoading(true);
+    setError(null);
+
     try {
-      setError(null); // Clear any previous errors
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT);
+
+      // Combine the passed signal with our timeout signal
+      const combinedSignal = signal ?
+        AbortSignal.any([signal, controller.signal]) :
+        controller.signal;
+
       const [profileRes, appointmentsRes, clientsRes] = await Promise.all([
-        fetch(`/api/profile?userId=${session?.user?.id}`),
-        fetch('/api/clients'),
-        fetch('/api/appointments'),
+        fetch(`/api/profile?userId=${session?.user?.id}`, { signal: combinedSignal }),
+        fetch('/api/clients', { signal: combinedSignal }),
+        fetch('/api/appointments', { signal: combinedSignal }),
       ]);
 
-      // Check if any requests failed
-      if (!profileRes.ok || !clientsRes.ok || !appointmentsRes.ok) {
-        const errors = [];
-        if (!profileRes.ok) errors.push(`Profile API (${profileRes.status})`);
-        if (!clientsRes.ok) errors.push(`Clients API (${clientsRes.status})`);
-        if (!appointmentsRes.ok) errors.push(`Appointments API (${appointmentsRes.status})`);
+      clearTimeout(timeoutId);
 
-        setError(`Failed to load data from: ${errors.join(', ')}. Please try again.`);
-        return;
+      // Check for HTTP errors
+      const errors: string[] = [];
+
+      if (!profileRes.ok) {
+        errors.push(`Profile: ${profileRes.status}`);
+      }
+      if (!clientsRes.ok) {
+        errors.push(`Clients: ${clientsRes.status}`);
+      }
+      if (!appointmentsRes.ok) {
+        errors.push(`Appointments: ${appointmentsRes.status}`);
       }
 
-      const profileData = await profileRes.json();
-      const clientsData = await clientsRes.json();
-      const appointmentsData = await appointmentsRes.json();
+      if (errors.length > 0) {
+        throw new Error(`Server errors: ${errors.join(', ')}`);
+      }
 
+      // Parse responses
+      let profileData, clientsData, appointmentsData;
+
+      try {
+        profileData = await profileRes.json();
+        clientsData = await clientsRes.json();
+        appointmentsData = await appointmentsRes.json();
+      } catch (parseErr) {
+        console.error('Failed to parse API responses:', parseErr);
+        throw new Error('Unable to process server response');
+      }
+
+      // Set state with parsed data
       setProfile(profileData.profile);
       setClientCount(clientsData.clients.length);
 
@@ -103,12 +140,52 @@ export default function DashboardPage() {
         return sum + (servicePrices[appt.service] || 0);
       }, 0);
       setWeekRevenue(revenue);
-    } catch (err) {
+
+    } catch (err: any) {
       console.error('Failed to fetch dashboard data:', err);
-      setError('Failed to load dashboard data. This might be a temporary network issue. Please try again.');
+
+      // Determine error type and user-friendly message
+      let errorType: DashboardError['type'] = 'unknown';
+      let errorMessage = 'Unable to load your dashboard';
+      let retryable = true;
+
+      if (err.name === 'AbortError') {
+        errorType = 'timeout';
+        errorMessage = 'Request timed out. Please check your connection and try again.';
+      } else if (err.message?.includes('Failed to fetch') || err.message?.includes('NetworkError')) {
+        errorType = 'network';
+        errorMessage = 'Network connection issue. Please check your internet connection.';
+      } else if (err.message?.includes('Server errors')) {
+        errorType = 'server';
+        errorMessage = 'Server is temporarily unavailable. Please try again later.';
+      } else if (err.message?.includes('parse') || err.message?.includes('JSON')) {
+        errorType = 'parse';
+        errorMessage = 'Unable to process data. Please try again.';
+        retryable = false;
+      }
+
+      setError({
+        type: errorType,
+        message: errorMessage,
+        retryable,
+      });
+
+      // Log to Sentry if available (non-blocking)
+      if (typeof window !== 'undefined' && (window as any).Sentry) {
+        (window as any).Sentry.captureException(err, {
+          tags: { component: 'dashboard', errorType },
+          extra: { userId: session?.user?.id },
+        });
+      }
     } finally {
       setLoading(false);
+      setIsRetrying(false);
     }
+  };
+
+  const handleRetry = () => {
+    setIsRetrying(true);
+    fetchDashboardData();
   };
 
   const handleSignOut = async () => {
@@ -131,88 +208,51 @@ export default function DashboardPage() {
   if (status === 'loading' || loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-stone-50 flex items-center justify-center">
-        <div className="text-center">Loading...</div>
+        <div className="text-center">
+          <LoadingSpinner size="lg" />
+          <p className="mt-4 text-stone-600">Loading your dashboard...</p>
+        </div>
       </div>
     );
   }
 
+  // Show error state if there's an error
   if (error) {
     return (
-      <div className="min-h-screen bg-stone-50">
-        {/* Mobile Header */}
-        <header className="bg-white border-b border-stone-200 lg:hidden">
-          <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-            <div>
-              <h1 className="text-xl font-bold text-green-600">GroomGrid</h1>
-              <p className="text-xs text-stone-500">{profile?.business_name || session?.user?.name || 'My Business'}</p>
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-stone-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md w-full">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
+              <AlertCircle className="w-6 h-6 text-red-600" />
             </div>
+            <h2 className="text-xl font-semibold text-stone-900">Unable to Load Dashboard</h2>
+          </div>
+          <p className="text-stone-600 mb-6">{error.message}</p>
+          {error.retryable && (
             <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 text-stone-600"
+              onClick={handleRetry}
+              disabled={isRetrying}
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {mobileMenuOpen ? <X /> : <Menu />}
+              {isRetrying ? (
+                <>
+                  <LoadingSpinner size="sm" />
+                  Retrying...
+                </>
+              ) : (
+                <>
+                  <RefreshCw className="w-4 h-4" />
+                  Try Again
+                </>
+              )}
             </button>
-          </div>
-        </header>
-
-        <div className="max-w-7xl mx-auto px-4 py-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            {/* Sidebar (Desktop) */}
-            <aside className="hidden lg:block">
-              <div className="bg-white rounded-2xl shadow-sm p-6 sticky top-8">
-                <h1 className="text-2xl font-bold text-green-600 mb-6">GroomGrid</h1>
-                <nav className="space-y-2">
-                  <a href="/dashboard" className="flex items-center gap-3 px-4 py-3 rounded-xl bg-green-50 text-green-700 font-medium">
-                    <Calendar className="w-5 h-5" /> Today
-                  </a>
-                  <a href="/schedule" className="flex items-center gap-3 px-4 py-3 rounded-xl text-stone-600 hover:bg-stone-50 transition-colors">
-                    <Calendar className="w-5 h-5" /> Schedule
-                  </a>
-                  <a href="/clients" className="flex items-center gap-3 px-4 py-3 rounded-xl text-stone-600 hover:bg-stone-50 transition-colors">
-                    <Users className="w-5 h-5" /> Clients
-                  </a>
-                  <a href="/settings" className="flex items-center gap-3 px-4 py-3 rounded-xl text-stone-600 hover:bg-stone-50 transition-colors">
-                    <Settings className="w-5 h-5" /> Settings
-                  </a>
-                </nav>
-                <div className="mt-8 pt-6 border-t border-stone-200">
-                  <button
-                    onClick={handleSignOut}
-                    className="flex items-center gap-2 text-red-600 hover:text-red-700 text-sm"
-                  >
-                    <LogOut className="w-4 h-4" /> Sign Out
-                  </button>
-                </div>
-              </div>
-            </aside>
-
-            {/* Main Content */}
-            <main className="lg:col-span-3">
-              <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-lg mb-6">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <svg className="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                  <div className="ml-3">
-                    <h3 className="text-sm font-medium text-red-800">Failed to load dashboard</h3>
-                    <div className="mt-2 text-sm text-red-700">
-                      <p>{error}</p>
-                    </div>
-                    <div className="mt-4">
-                      <button
-                        onClick={fetchDashboardData}
-                        className="bg-red-100 px-2 py-1.5 rounded-md text-sm font-medium text-red-800 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-600"
-                      >
-                        Retry Now
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </main>
-          </div>
+          )}
+          <button
+            onClick={() => router.push('/')}
+            className="w-full mt-3 px-4 py-3 text-stone-600 hover:text-stone-900 transition-colors"
+          >
+            Return to Home
+          </button>
         </div>
       </div>
     );
