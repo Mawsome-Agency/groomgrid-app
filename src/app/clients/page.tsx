@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
+import { Plus, Mail, Phone, Calendar, ChevronRight, Search } from 'lucide-react';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import { trackPageView } from '@/lib/ga4';
 
@@ -30,6 +31,7 @@ export default function ClientsPage() {
   const [filteredClients, setFilteredClients] = useState<Client[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
+  const [loading, setLoading] = useState(true);
   const { isOnline } = useOnlineStatus();
 
   useEffect(() => {
