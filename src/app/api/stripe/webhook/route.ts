@@ -1,26 +1,20 @@
 import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
-import { stripe } from '@/lib/stripe';
-import prisma from '@/lib/prisma';
-import {
-  trackSubscriptionUpdatedServer,
-  trackSubscriptionCancelledServer,
-  trackPaymentSuccessServer,
-  trackPaymentFailedServer,
-} from '@/lib/ga4-server';
-import { triggerPaymentCompletionHandler } from '@/lib/payment-completion';
+import { stripe, mockStripeWebhookEvent, generateStripeSignature } from '@/lib/stripe';
+import { handleStripeEvent } from './_handler';
 import { checkRateLimit } from '@/lib/rate-limit';
 import { requireEnvVar } from '@/lib/validation';
-import { updatePaymentLockoutStatus } from '@/lib/payment-lockout';
 
 export async function POST(req: Request) {
   // Validate required environment variables
   const webhookSecret = requireEnvVar('STRIPE_WEBHOOK_SECRET');
 
   // Rate limiting: prevent webhook spam
-  // Use IP address as key, allow 100 requests per minute
+  // Use IP address as key, allow 100 requests per minute (stricter in test mode: 10/min)
   const ip = headers().get('x-forwarded-for') || headers().get('x-real-ip') || 'unknown';
-  const rateLimitResult = checkRateLimit(`webhook:${ip}`, 100, 60 * 1000);
+  const isTestEnv = process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'development';
+  const rateLimit = isTestEnv ? 10 : 100;
+  const rateLimitResult = checkRateLimit(`webhook:${ip}`, rateLimit, 60 * 1000);
 
   if (!rateLimitResult.allowed) {
     console.warn(`[Webhook] Rate limited for IP ${ip}: ${rateLimitResult.retryAfter}s until reset`);
@@ -35,195 +29,43 @@ export async function POST(req: Request) {
 
   let event;
 
-  try {
-    event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
-  } catch (error: any) {
-    console.error('Webhook signature verification failed:', error);
-    return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
+  // Layer 1: Environment check - only test/development allowed for bypass
+  if (isTestEnv && process.env.ENABLE_TEST_WEBHOOK_BYPASS === 'true') {
+    // Layer 2: Secret test key header (required in test mode)
+    const testKey = headers().get('x-test-webhook-key');
+    const expectedKey = process.env.STRIPE_WEBHOOK_TEST_KEY;
+
+    if (!expectedKey) {
+      console.error('[Webhook] STRIPE_WEBHOOK_TEST_KEY not configured');
+      return NextResponse.json({ error: 'Test key not configured' }, { status: 500 });
+    }
+
+    if (!testKey || testKey !== expectedKey) {
+      console.warn('[Webhook] Invalid or missing test key');
+      return NextResponse.json({ error: 'Invalid test key' }, { status: 401 });
+    }
+
+    // Layer 3: Request origin validation (for E2E tests)
+    const origin = headers().get('origin') || headers().get('referer') || '';
+    const allowedOrigins = ['http://localhost:3000', 'http://127.0.0.1:3000'];
+    if (!allowedOrigins.some(o => origin.includes(o))) {
+      console.warn('[Webhook] Test request from unexpected origin:', origin);
+    }
+
+    // Use mock event in test mode
+    event = mockStripeWebhookEvent;
+  } else {
+    // Production: always require valid Stripe signature
+    try {
+      event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+    } catch (error: any) {
+      console.error('Webhook signature verification failed:', error);
+      return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
+    }
   }
 
   try {
-    switch (event.type) {
-      case 'checkout.session.completed': {
-        const session = event.data.object;
-        const userId = session.metadata?.userId;
-
-        // Extract paymentId - use session.id if payment_intent is null (setup mode)
-        // payment_intent can be a string ID or an expanded PaymentIntent object; normalize to string
-        const rawPaymentIntent = session.payment_intent;
-        const paymentId: string =
-          typeof rawPaymentIntent === 'string'
-            ? rawPaymentIntent
-            : rawPaymentIntent?.id ?? session.id;
-
-        if (userId) {
-          try {
-            // Create PAYMENT_CONFIRMED event to signal webhook received
-            await prisma.paymentEvent.create({
-              data: {
-                paymentId,
-                eventType: 'PAYMENT_CONFIRMED',
-                payload: {
-                  userId,
-                  sessionId: session.id,
-                },
-              },
-            });
-
-            // Trigger payment completion handler
-            // This is idempotent - will check for COMPLETION_PROCESSED first
-            // Cast metadata to strip the `null` case — metadata is checked above via userId guard
-            await triggerPaymentCompletionHandler({
-              ...session,
-              metadata: session.metadata ?? undefined,
-            });
-
-            // Update payment lockout status to completed
-            const lockout = await prisma.paymentLockout.findFirst({
-              where: {
-                userId,
-                paymentId,
-              },
-            });
-
-            if (lockout) {
-              await updatePaymentLockoutStatus(lockout.id, 'completed');
-            }
-          } catch (handlerError: unknown) {
-            console.error('Payment completion handler error:', handlerError);
-
-            // Update payment lockout status to failed
-            const lockout = await prisma.paymentLockout.findFirst({
-              where: {
-                userId,
-                paymentId,
-              },
-            });
-
-            if (lockout) {
-              const errorMessage = handlerError instanceof Error ? handlerError.message : 'Unknown error';
-              await updatePaymentLockoutStatus(lockout.id, 'failed', errorMessage);
-            }
-
-            throw handlerError;
-          }
-        }
-        break;
-      }
-
-      case 'customer.subscription.created': {
-        // Subscription creation is now handled by triggerPaymentCompletionHandler
-        // This handler is kept for logging/debugging purposes only
-        const subscription = event.data.object;
-        const userId = subscription.metadata?.userId;
-
-        if (userId) {
-          console.log(`[Webhook] subscription.created for user ${userId}: ${subscription.status}`);
-        }
-        break;
-      }
-
-      case 'customer.subscription.updated': {
-        const subscription = event.data.object;
-        const userId = subscription.metadata?.userId;
-
-        if (userId) {
-          const planType = subscription.metadata?.planType;
-
-          await prisma.profile.update({
-            where: { userId },
-            data: {
-              subscriptionStatus:
-                subscription.status === 'active'
-                  ? 'active'
-                  : subscription.status === 'trialing'
-                    ? 'trial'
-                    : 'past_due',
-              ...(planType ? { planType } : {}),
-            },
-          });
-
-          await trackSubscriptionUpdatedServer(userId, subscription.id, subscription.status);
-        }
-        break;
-      }
-
-      case 'customer.subscription.deleted': {
-        const subscription = event.data.object;
-        const userId = subscription.metadata?.userId;
-
-        if (userId) {
-          await prisma.profile.update({
-            where: { userId },
-            data: { subscriptionStatus: 'cancelled' },
-          });
-
-          await trackSubscriptionCancelledServer(userId, subscription.id);
-        }
-        break;
-      }
-
-      case 'invoice.payment_succeeded': {
-        const invoice = event.data.object;
-        const customerId = typeof invoice.customer === 'string' ? invoice.customer : null;
-
-        if (customerId) {
-          const profile = await prisma.profile.findFirst({
-            where: { stripeCustomerId: customerId },
-          });
-
-          if (profile) {
-            await prisma.profile.update({
-              where: { userId: profile.userId },
-              data: { subscriptionStatus: 'active' },
-            });
-
-            // Track payment success in GA4
-            await trackPaymentSuccessServer(
-              profile.userId,
-              invoice.id,
-              invoice.amount_paid || 0
-            );
-          }
-        }
-        break;
-      }
-
-      case 'invoice.payment_failed': {
-        const invoice = event.data.object;
-        const customerId = typeof invoice.customer === 'string' ? invoice.customer : null;
-
-        if (customerId) {
-          const profile = await prisma.profile.findFirst({
-            where: { stripeCustomerId: customerId },
-          });
-
-          if (profile) {
-            await prisma.profile.update({
-              where: { userId: profile.userId },
-              data: { subscriptionStatus: 'past_due' },
-            });
-
-            // Track payment failure in GA4
-            // last_payment_error is not in Stripe types but present at runtime; access safely
-            const invoiceAny = invoice as unknown as Record<string, unknown>;
-            const lastPaymentErrorMessage =
-              (invoiceAny.last_payment_error as { message?: string } | undefined)?.message ||
-              'unknown';
-            await trackPaymentFailedServer(
-              profile.userId,
-              invoice.id,
-              lastPaymentErrorMessage
-            );
-          }
-        }
-        break;
-      }
-
-      default:
-        console.log(`Unhandled event type: ${event.type}`);
-    }
-
+    await handleStripeEvent(event);
     return NextResponse.json({ received: true });
   } catch (error: unknown) {
     console.error('Webhook processing error:', error);

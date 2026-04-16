@@ -17,6 +17,7 @@ interface NetworkStatusContextValue {
   lastChecked: Date | null;
   errorType: NetworkErrorType | null;
   checkConnection: () => Promise<boolean>;
+  goOnline: () => void;
 }
 
 const NetworkStatusContext = createContext<NetworkStatusContextValue | undefined>(undefined);
@@ -73,6 +74,13 @@ export const NetworkStatusProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, []);
 
+  const goOnline = useCallback(() => {
+    setIsOnline(true);
+    setWasOffline(true);
+    setLastChanged(new Date());
+    setErrorType(null);
+  }, []);
+
   const value = useMemo<NetworkStatusContextValue>(() => ({
     isOnline,
     isOffline: !isOnline,
@@ -81,7 +89,8 @@ export const NetworkStatusProvider: React.FC<{ children: React.ReactNode }> = ({
     lastChecked,
     errorType,
     checkConnection,
-  }), [isOnline, wasOffline, lastChanged, lastChecked, errorType, checkConnection]);
+    goOnline,
+  }), [isOnline, wasOffline, lastChanged, lastChecked, errorType, checkConnection, goOnline]);
 
   return (
     <NetworkStatusContext.Provider value={value}>

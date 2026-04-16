@@ -82,7 +82,10 @@ export async function getPaymentLockoutByPaymentId(paymentId: string): Promise<P
 /**
  * Deletes a payment lockout (when payment is fully processed)
  */
-export async function deletePaymentLockout(lockoutId: string): Promise<void> {
+export async function resetLockoutForTest(id: string): Promise<void> {
+  await prisma.paymentLockout.delete({ where: { id } });
+}
+
   await prisma.paymentLockout.delete({
     where: { id: lockoutId },
   });
