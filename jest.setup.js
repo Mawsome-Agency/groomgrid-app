@@ -23,6 +23,7 @@ if (typeof global.TextDecoder === 'undefined') {
 global.requestAnimationFrame = (callback) => { callback(0); return 0; };
 global.cancelAnimationFrame = () => {};
 
+
 // Mock environment variables
 process.env.DATABASE_URL = 'postgresql://test:test@localhost:5432/groomgrid_test'
 process.env.NEXTAUTH_URL = 'http://localhost:3000'
