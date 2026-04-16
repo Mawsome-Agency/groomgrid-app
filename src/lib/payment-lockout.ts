@@ -86,11 +86,6 @@ export async function resetLockoutForTest(id: string): Promise<void> {
   await prisma.paymentLockout.delete({ where: { id } });
 }
 
-  await prisma.paymentLockout.delete({
-    where: { id: lockoutId },
-  });
-}
-
 /**
  * Manually retry a failed payment lockout
  */

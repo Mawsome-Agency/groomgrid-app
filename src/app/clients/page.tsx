@@ -75,8 +75,10 @@ export default function ClientsPage() {
     }
   };
 
-  const handleAddClient = async (formData: FormData) => {
+  const handleAddClient = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     try {
+      const formData = new FormData(e.currentTarget);
       const name = formData.get('name') as string;
       const email = formData.get('email') as string;
       const phone = formData.get('phone') as string;
@@ -201,7 +203,7 @@ export default function ClientsPage() {
             <div className="p-6">
               <h2 className="text-2xl font-bold text-stone-900 mb-6">Add New Client</h2>
               
-              <form action={handleAddClient} className="space-y-4">
+              <form onSubmit={handleAddClient} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-stone-700 mb-1">
                     Client Name *

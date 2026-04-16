@@ -12,6 +12,7 @@ echo ""
 # 1. Install deps + build
 echo "[1/4] Building production app..."
 npm install --omit=dev
+rm -rf .next
 NODE_ENV=production node_modules/.bin/next build
 
 # 2. Enable nginx site

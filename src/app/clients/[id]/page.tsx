@@ -59,8 +59,10 @@ export default function ClientDetailPage() {
     }
   };
 
-  const handleAddPet = async (formData: FormData) => {
+  const handleAddPet = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     try {
+      const formData = new FormData(e.currentTarget);
       const name = formData.get('name') as string;
       const breed = formData.get('breed') as string;
       const size = formData.get('size') as string;
@@ -228,7 +230,7 @@ export default function ClientDetailPage() {
             <div className="p-6">
               <h2 className="text-2xl font-bold text-stone-900 mb-6">Add Pet</h2>
               
-              <form action={handleAddPet} className="space-y-4">
+              <form onSubmit={handleAddPet} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-stone-700 mb-1">
                     Pet Name *
