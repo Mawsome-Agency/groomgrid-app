@@ -2,42 +2,16 @@ import { NextRequest, NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
 import prisma from '@/lib/prisma'
 import { sendWelcomeEmail } from '@/lib/email/welcome'
-
-// Simple in-memory rate limiter for signup attempts
-// For production, use @upstash/ratelimit with Redis
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>()
-const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000 // 15 minutes
-const MAX_SIGNUP_ATTEMPTS = 5
-
-function getRateLimitKey(req: NextRequest): string {
-  const forwarded = req.headers.get('x-forwarded-for')
-  const ip = forwarded ? forwarded.split(',')[0].trim() : 'unknown'
-  return ip
-}
-
-function checkRateLimit(req: NextRequest): { allowed: boolean; retryAfter?: number } {
-  const key = getRateLimitKey(req)
-  const now = Date.now()
-  const record = rateLimitMap.get(key)
-
-  if (!record || now > record.resetAt) {
-    // Start new window
-    rateLimitMap.set(key, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS })
-    return { allowed: true }
-  }
-
-  if (record.count >= MAX_SIGNUP_ATTEMPTS) {
-    const retryAfter = Math.ceil((record.resetAt - now) / 1000)
-    return { allowed: false, retryAfter }
-  }
-
-  record.count++
-  return { allowed: true }
-}
+import {
+  getRateLimitKey,
+  checkRateLimit,
+  MAX_SIGNUP_ATTEMPTS,
+} from '@/lib/signup-rate-limit'
 
 export async function POST(req: NextRequest) {
   // Check rate limit
-  const { allowed, retryAfter } = checkRateLimit(req)
+  const key = getRateLimitKey(req.headers)
+  const { allowed, retryAfter } = checkRateLimit(key)
   if (!allowed) {
     return NextResponse.json(
       {

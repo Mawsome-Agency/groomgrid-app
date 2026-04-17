@@ -203,12 +203,11 @@ test.describe('Full signup-to-dashboard journey', () => {
   // ── Step 12: Onboarding page accessible ──────────────────────────────────
 
   test('step 12: onboarding page loads for authenticated user', async ({ page }) => {
-    const freshEmail = generateTestEmail();
-    await page.request.post('/api/auth/signup', {
-      data: { email: freshEmail, password, businessName },
-    });
+    // Reuse the shared account from beforeAll — no fresh signup needed here.
+    // Steps 12-15 don't test the signup flow; they test post-auth page behaviour.
+    // Creating a new account each time exhausts the 5-attempt rate-limit bucket.
     await page.goto('/login');
-    await page.getByLabel(/Email Address/i).fill(freshEmail);
+    await page.getByLabel(/Email Address/i).fill(email);
     await page.getByLabel(/Password/i).fill(password);
     await page.getByRole('button', { name: /Sign In/i }).click();
     await expect(page).toHaveURL(/\/(welcome|plans|dashboard|onboarding)/, { timeout: 30_000 });
@@ -220,12 +219,9 @@ test.describe('Full signup-to-dashboard journey', () => {
   // ── Step 13: Onboarding step 1 renders client form ───────────────────────
 
   test('step 13: onboarding step 1 shows client name and pet name fields', async ({ page }) => {
-    const freshEmail = generateTestEmail();
-    await page.request.post('/api/auth/signup', {
-      data: { email: freshEmail, password, businessName },
-    });
+    // Reuse the shared account from beforeAll — avoids surplus signup API calls.
     await page.goto('/login');
-    await page.getByLabel(/Email Address/i).fill(freshEmail);
+    await page.getByLabel(/Email Address/i).fill(email);
     await page.getByLabel(/Password/i).fill(password);
     await page.getByRole('button', { name: /Sign In/i }).click();
     await expect(page).toHaveURL(/\/(welcome|plans|dashboard|onboarding)/, { timeout: 30_000 });
@@ -244,12 +240,9 @@ test.describe('Full signup-to-dashboard journey', () => {
   // ── Step 14: Skip onboarding tutorial ────────────────────────────────────
 
   test('step 14: skip tutorial button navigates to dashboard', async ({ page }) => {
-    const freshEmail = generateTestEmail();
-    await page.request.post('/api/auth/signup', {
-      data: { email: freshEmail, password, businessName },
-    });
+    // Reuse the shared account from beforeAll — avoids surplus signup API calls.
     await page.goto('/login');
-    await page.getByLabel(/Email Address/i).fill(freshEmail);
+    await page.getByLabel(/Email Address/i).fill(email);
     await page.getByLabel(/Password/i).fill(password);
     await page.getByRole('button', { name: /Sign In/i }).click();
     await expect(page).toHaveURL(/\/(welcome|plans|dashboard|onboarding)/, { timeout: 30_000 });
@@ -267,12 +260,9 @@ test.describe('Full signup-to-dashboard journey', () => {
   // ── Step 15: Dashboard renders with welcome card ──────────────────────────
 
   test('step 15: dashboard renders welcome card for new users', async ({ page }) => {
-    const freshEmail = generateTestEmail();
-    await page.request.post('/api/auth/signup', {
-      data: { email: freshEmail, password, businessName },
-    });
+    // Reuse the shared account from beforeAll — avoids surplus signup API calls.
     await page.goto('/login');
-    await page.getByLabel(/Email Address/i).fill(freshEmail);
+    await page.getByLabel(/Email Address/i).fill(email);
     await page.getByLabel(/Password/i).fill(password);
     await page.getByRole('button', { name: /Sign In/i }).click();
     await expect(page).toHaveURL(/\/(welcome|plans|dashboard|onboarding)/, { timeout: 30_000 });
