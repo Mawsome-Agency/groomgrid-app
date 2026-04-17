@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import Tooltip from "@/components/ui/Tooltip";
 import { useAnalytics } from "@/hooks/use-analytics";
 
-export default function PciBadge({ className, location = "plans" }: { className?: string; location?: "plans" | "success" | "billing" }) {
+export default function PciBadge({ className, location = "plans" }: { className?: string; location?: "plans" | "success" | "billing" | "signup" }) {
   const { track } = useAnalytics();
 
   const handleClick = () => {
