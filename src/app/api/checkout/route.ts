@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createCheckoutSession, getStripeErrorMessage } from '@/lib/stripe';
+import { createCheckoutSession, getCheckoutSession, getStripeErrorMessage } from '@/lib/stripe';
 import prisma from '@/lib/prisma';
 import { trackPaymentInitiatedServer } from '@/lib/ga4-server';
 import { ensureEnv } from '@/lib/validation';
@@ -38,10 +38,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid plan type', errorType: 'generic' }, { status: 400 });
     }
 
-    // Idempotency check
+    // Idempotency check — retrieve the live session URL from Stripe rather than
+    // constructing it, so we never return an expired or malformed URL.
     const existingSessionId = await ensureIdempotentLockout(userId, planType);
     if (existingSessionId) {
-      return NextResponse.json({ url: `https://checkout.stripe.com/pay/${existingSessionId}`, sessionId: existingSessionId });
+      const existingSession = await getCheckoutSession(existingSessionId);
+      return NextResponse.json({ url: existingSession.url, sessionId: existingSessionId });
     }
 
     const profile = await prisma.profile.findUnique({ where: { userId } });

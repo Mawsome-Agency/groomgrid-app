@@ -41,26 +41,27 @@ export async function createCheckoutSession({
         quantity: 1,
       },
     ],
+    // Session-level metadata: read by webhook handler and success handler via session.metadata
+    metadata: {
+      userId,
+      planType,
+      businessName,
+      planName: planData?.name || planType,
+      planPrice: planData?.price?.toString() || '0',
+      isTrial: 'true',
+      clientId: clientId || '',
+    },
     subscription_data: {
       trial_period_days: 14,
-      metadata: {
-        userId,
-        planType,
-        businessName,
-        planName: planData?.name || planType,
-        planPrice: planData?.price?.toString() || '0',
-        isTrial: 'true',
-        clientId: clientId || '',
-      },
+      // Subscription-level metadata: read by subscription.updated/deleted events
+      metadata: { userId, planType },
     },
     success_url: `${process.env.NEXT_PUBLIC_APP_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/checkout/cancel?plan=${planType}`,
     allow_promotion_codes: true,
     billing_address_collection: 'required',
-    customer_update: {
-      address: 'auto',
-      name: 'auto',
-    },
+    // Note: customer_update requires an existing Stripe customer ID.
+    // New users don't have one yet — add to billing portal flow instead.
   });
 
   return session;
