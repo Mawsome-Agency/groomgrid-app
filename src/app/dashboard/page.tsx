@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
 import { Calendar, Users, DollarSign, Plus, LogOut, Settings, Menu, X, AlertCircle, RefreshCw } from 'lucide-react';
@@ -71,7 +71,7 @@ export default function DashboardPage() {
         AbortSignal.any([signal, controller.signal]) :
         controller.signal;
 
-      const [profileRes, appointmentsRes, clientsRes] = await Promise.all([
+      const [profileRes, clientsRes, appointmentsRes] = await Promise.all([
         fetch(`/api/profile?userId=${session?.user?.id}`, { signal: combinedSignal }),
         fetch('/api/clients', { signal: combinedSignal }),
         fetch('/api/appointments', { signal: combinedSignal }),

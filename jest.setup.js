@@ -1,3 +1,12 @@
+// Ensure React loads its development build with act() support regardless of system NODE_ENV.
+// MUST be set before any require() that could load React.
+process.env.NODE_ENV = 'test'
+
+// Expose Node 18+ Web API globals to jest workers (needed for next/server)
+if (typeof global.Request === 'undefined') global.Request = globalThis.Request
+if (typeof global.Response === 'undefined') global.Response = globalThis.Response
+if (typeof global.Headers === 'undefined') global.Headers = globalThis.Headers
+
 require('@testing-library/jest-dom')
 
 // Polyfill TextEncoder/TextDecoder for Prisma in jsdom environment

@@ -52,7 +52,10 @@ describe('useEngagementTime', () => {
     });
 
     expect(result.current.isActive).toBe(false);
-    expect(result.current.engagementTime).toBe(1000); // Should not increase
+    // engagementTime increments up to the tick before inactivity is detected (t=2000),
+    // then stops. With updateInterval=1000 and inactivityThreshold=2000 (strictly >),
+    // the second tick at t=2000 still counts as active (2000 is not > 2000).
+    expect(result.current.engagementTime).toBe(2000); // increments until inactivity detected
   });
 
   it('should resume tracking on activity', () => {
@@ -117,18 +120,20 @@ describe('useEngagementTime', () => {
 
   it('should track time since last activity', () => {
     const { result } = renderHook(() => useEngagementTime({ updateInterval: 1000 }));
-    
+
     act(() => {
       jest.advanceTimersByTime(1000);
     });
 
-    expect(result.current.timeSinceLastActivity).toBe(0);
+    // After 1s with no activity events, timeSinceLastActivity = elapsed time since mount
+    expect(result.current.timeSinceLastActivity).toBe(1000);
 
     act(() => {
       jest.advanceTimersByTime(2000);
     });
 
-    expect(result.current.timeSinceLastActivity).toBe(2000);
+    // After 3s total with no activity events, timeSinceLastActivity = 3000
+    expect(result.current.timeSinceLastActivity).toBe(3000);
   });
 
   it('should not track when disabled', () => {

@@ -6,28 +6,34 @@ import * as ga4 from '@/lib/ga4-server';
 // Mock dependencies
 jest.mock('@/lib/payment-completion');
 jest.mock('@/lib/ga4-server');
+jest.mock('@/lib/payment-lockout', () => ({
+  updatePaymentLockoutStatus: jest.fn().mockResolvedValue(undefined),
+}));
+
+// Define prisma mock inline using a self-referential object to avoid jest.mock() hoisting issues
+jest.mock('@/lib/prisma', () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const mock: Record<string, any> = {
+    paymentEvent: {
+      create: jest.fn().mockResolvedValue({}),
+      findFirst: jest.fn().mockResolvedValue(null),
+      findUnique: jest.fn().mockResolvedValue(null),
+    },
+    profile: {
+      update: jest.fn().mockResolvedValue({}),
+      findFirst: jest.fn().mockResolvedValue(null),
+    },
+    paymentLockout: {
+      findFirst: jest.fn().mockResolvedValue(null),
+      update: jest.fn().mockResolvedValue({}),
+    },
+  };
+  mock.$transaction = jest.fn((fn: Function) => fn(mock));
+  return { prisma: mock, default: mock };
+});
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const mockPrisma: Record<string, any> = {
-  paymentEvent: {
-    create: jest.fn().mockResolvedValue({}),
-    findFirst: jest.fn().mockResolvedValue(null),
-    findUnique: jest.fn().mockResolvedValue(null),
-  },
-  profile: {
-    update: jest.fn().mockResolvedValue({}),
-    findFirst: jest.fn().mockResolvedValue(null),
-  },
-  paymentLockout: {
-    findFirst: jest.fn().mockResolvedValue(null),
-    update: jest.fn().mockResolvedValue({}),
-  },
-  $transaction: jest.fn((fn: Function) => fn(mockPrisma)),
-};
-
-jest.mock('@/lib/prisma', () => ({
-  prisma: mockPrisma,
-}));
+const mockPrisma: Record<string, any> = jest.requireMock('@/lib/prisma').prisma;
 
 describe('handleStripeEvent', () => {
   beforeEach(() => {

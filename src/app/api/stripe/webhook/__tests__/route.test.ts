@@ -6,6 +6,26 @@ import {
 } from '@/lib/stripe';
 import { triggerPaymentCompletionHandler } from '@/lib/payment-completion';
 
+// Mock next/server to avoid Edge Runtime requirements in Jest/jsdom environment
+jest.mock('next/server', () => ({
+  NextResponse: {
+    json: (body: unknown, init?: ResponseInit) => new Response(JSON.stringify(body), {
+      ...init,
+      headers: { 'Content-Type': 'application/json', ...(init?.headers ?? {}) },
+    }),
+  },
+}));
+
+// Mock next/headers to provide a synchronous headers() stub
+jest.mock('next/headers', () => ({
+  headers: () => Promise.resolve(new Headers()),
+}));
+
+// Mock rate-limit to always allow in tests
+jest.mock('@/lib/rate-limit', () => ({
+  checkRateLimit: () => ({ allowed: true, retryAfter: 0 }),
+}));
+
 // Mock dependencies
 jest.mock('@/lib/payment-completion', () => ({
   triggerPaymentCompletionHandler: jest.fn().mockResolvedValue(undefined),
@@ -92,7 +112,7 @@ describe('Stripe webhook route (test mode)', () => {
   });
 
   it('should verify Stripe signature in production mode', async () => {
-    process.env.NODE_ENV = 'production';
+    (process.env as Record<string, string>).NODE_ENV = 'production';
     process.env.ENABLE_TEST_WEBHOOK_BYPASS = 'false';
 
     const payload = JSON.stringify(mockStripeWebhookEvent);
@@ -111,7 +131,7 @@ describe('Stripe webhook route (test mode)', () => {
   });
 
   it('should reject invalid signature in production mode', async () => {
-    process.env.NODE_ENV = 'production';
+    (process.env as Record<string, string>).NODE_ENV = 'production';
     process.env.ENABLE_TEST_WEBHOOK_BYPASS = 'false';
 
     const req = new Request('http://localhost/api/stripe/webhook', {

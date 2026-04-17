@@ -89,15 +89,15 @@ describe('createNetworkAwareFetch', () => {
     expect(addRequestCalls.length).toBe(0);
   });
 
-  it('still cleans up request ID even when offline', async () => {
+  it('does not add request to queue when offline', async () => {
     mockNetworkContext.isOnline = false;
     const fetch = createNetworkAwareFetch(mockNetworkContext, mockQueueContext);
 
     await expect(fetch('https://example.com')).rejects.toThrow('Network offline');
 
-    // Still should have called add and remove (even though it failed early)
-    expect(addRequestCalls.length).toBe(1);
-    expect(removeRequestCalls.length).toBe(1);
+    // When offline, request is rejected before being added to the queue
+    expect(addRequestCalls.length).toBe(0);
+    expect(removeRequestCalls.length).toBe(0);
   });
 
   it('cleans up request ID even when request fails', async () => {

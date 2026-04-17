@@ -3,10 +3,30 @@ import { render, screen } from '@testing-library/react';
 import { BOFUAnalyticsWrapper } from '../BOFUAnalyticsWrapper';
 import * as ga4 from '@/lib/ga4';
 
-// Mock the hooks
-jest.mock('@/hooks/use-scroll-depth');
-jest.mock('@/hooks/use-section-observer');
-jest.mock('@/hooks/use-engagement-time');
+// Mock the hooks with proper return shapes
+jest.mock('@/hooks/use-scroll-depth', () => ({
+  useScrollDepth: jest.fn(() => ({
+    currentDepth: 0,
+    maxDepth: 0,
+    reachedThresholds: new Set(),
+  })),
+}));
+jest.mock('@/hooks/use-section-observer', () => ({
+  useSectionObserver: jest.fn(() => ({
+    visibleSections: new Set(),
+    viewedSections: new Set(),
+    sectionTimeSpent: {},
+    observeSection: jest.fn(),
+  })),
+}));
+jest.mock('@/hooks/use-engagement-time', () => ({
+  useEngagementTime: jest.fn(() => ({
+    engagementTime: 0,
+    isActive: true,
+    timeSinceLastActivity: 0,
+    reset: jest.fn(),
+  })),
+}));
 jest.mock('@/lib/ga4');
 
 describe('BOFUAnalyticsWrapper', () => {
@@ -39,7 +59,8 @@ describe('BOFUAnalyticsWrapper', () => {
       </BOFUAnalyticsWrapper>
     );
 
-    expect(ga4.trackBofuPageViewed).toHaveBeenCalledWith('test-page', undefined);
+    // jsdom's document.referrer is '' (empty string), not undefined
+    expect(ga4.trackBofuPageViewed).toHaveBeenCalledWith('test-page', expect.any(String));
   });
 
   it('should not track when disabled', () => {

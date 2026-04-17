@@ -131,11 +131,12 @@ export async function triggerPaymentCompletionHandler(
       const price = planPriceMap[planType] ?? 0;
 
       await trackSubscriptionStartedServer(
-        userId,
-        stripeSubscriptionId,
-        planType,
-        'trial',
-        price
+        userId,          // clientId (GA4 client ID — using userId as fallback)
+        userId,          // userId
+        stripeSubscriptionId,  // subscriptionId
+        planType,        // planType
+        'trial',         // status
+        price            // price
       );
     }
   } catch (error) {

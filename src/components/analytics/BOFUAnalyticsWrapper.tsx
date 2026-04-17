@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useScrollDepth } from '@/hooks/use-scroll-depth';
 import { useSectionObserver } from '@/hooks/use-section-observer';
 import { useEngagementTime } from '@/hooks/use-engagement-time';

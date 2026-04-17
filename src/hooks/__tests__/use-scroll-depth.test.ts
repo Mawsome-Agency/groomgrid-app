@@ -1,6 +1,10 @@
 import { renderHook, act } from '@testing-library/react';
 import { useScrollDepth } from '../use-scroll-depth';
 
+// RAF is a no-op in jsdom — replace with a synchronous implementation so state updates work
+global.requestAnimationFrame = (cb: FrameRequestCallback) => { cb(performance.now()); return 0; };
+global.cancelAnimationFrame = jest.fn();
+
 // Mock window and document
 const mockScrollTop = 0;
 const mockScrollHeight = 1000;

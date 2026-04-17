@@ -2,9 +2,12 @@ import { renderHook, act } from '@testing-library/react';
 import { useSectionObserver } from '../use-section-observer';
 
 // Mock IntersectionObserver
-class MockIntersectionObserver {
+class MockIntersectionObserver implements IntersectionObserver {
   callback: IntersectionObserverCallback;
   elements: Set<Element> = new Set();
+  readonly root: Element | Document | null = null;
+  readonly rootMargin: string = '0px';
+  readonly thresholds: ReadonlyArray<number> = [0];
 
   constructor(callback: IntersectionObserverCallback, options?: IntersectionObserverInit) {
     this.callback = callback;
@@ -22,6 +25,10 @@ class MockIntersectionObserver {
 
   disconnect() {
     this.elements.clear();
+  }
+
+  takeRecords(): IntersectionObserverEntry[] {
+    return [];
   }
 }
 

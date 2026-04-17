@@ -9,9 +9,12 @@ export async function POST(req: Request) {
   // Validate required environment variables
   const webhookSecret = requireEnvVar('STRIPE_WEBHOOK_SECRET');
 
+  // Next.js 15: headers() is async
+  const headersList = await headers();
+
   // Rate limiting: prevent webhook spam
   // Use IP address as key, allow 100 requests per minute (stricter in test mode: 10/min)
-  const ip = headers().get('x-forwarded-for') || headers().get('x-real-ip') || 'unknown';
+  const ip = headersList.get('x-forwarded-for') || headersList.get('x-real-ip') || 'unknown';
   const isTestEnv = process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'development';
   const rateLimit = isTestEnv ? 10 : 100;
   const rateLimitResult = checkRateLimit(`webhook:${ip}`, rateLimit, 60 * 1000);
@@ -25,14 +28,14 @@ export async function POST(req: Request) {
   }
 
   const body = await req.text();
-  const signature = headers().get('stripe-signature')!;
+  const signature = headersList.get('stripe-signature')!;
 
   let event;
 
   // Layer 1: Environment check - only test/development allowed for bypass
   if (isTestEnv && process.env.ENABLE_TEST_WEBHOOK_BYPASS === 'true') {
     // Layer 2: Secret test key header (required in test mode)
-    const testKey = headers().get('x-test-webhook-key');
+    const testKey = headersList.get('x-test-webhook-key');
     const expectedKey = process.env.STRIPE_WEBHOOK_TEST_KEY;
 
     if (!expectedKey) {
@@ -46,7 +49,7 @@ export async function POST(req: Request) {
     }
 
     // Layer 3: Request origin validation (for E2E tests)
-    const origin = headers().get('origin') || headers().get('referer') || '';
+    const origin = headersList.get('origin') || headersList.get('referer') || '';
     const allowedOrigins = ['http://localhost:3000', 'http://127.0.0.1:3000'];
     if (!allowedOrigins.some(o => origin.includes(o))) {
       console.warn('[Webhook] Test request from unexpected origin:', origin);
