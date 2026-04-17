@@ -13,7 +13,7 @@ class MockIntersectionObserver {
   observe(element: Element) {
     this.elements.add(element);
     // Simulate element becoming visible
-    this.callback([{ target: element, isIntersecting: true } as IntersectionObserverEntry], this);
+    this.callback([{ target: element, isIntersecting: true } as IntersectionObserverEntry], this as unknown as IntersectionObserver);
   }
 
   unobserve(element: Element) {

@@ -34,10 +34,13 @@ describe('useEngagementTime', () => {
   });
 
   it('should pause tracking when inactive', () => {
-    const { result } = renderHook(() => 
-      useEngagementTime({ inactivityThreshold: 2000, updateInterval: 1000 })
+    // Use inactivityThreshold: 1500 so user becomes inactive between the 1st and 2nd intervals.
+    // At t=1000ms: timeSinceActivity=1000 < 1500 → still active, engagementTime=1000.
+    // At t=2000ms: timeSinceActivity=2000 > 1500 → inactive, does NOT increment.
+    const { result } = renderHook(() =>
+      useEngagementTime({ inactivityThreshold: 1500, updateInterval: 1000 })
     );
-    
+
     // Track for 1 second
     act(() => {
       jest.advanceTimersByTime(1000);
@@ -46,13 +49,13 @@ describe('useEngagementTime', () => {
     expect(result.current.engagementTime).toBe(1000);
     expect(result.current.isActive).toBe(true);
 
-    // Simulate inactivity
+    // Simulate inactivity (2 more intervals — user crosses threshold at 2nd tick)
     act(() => {
       jest.advanceTimersByTime(2000);
     });
 
     expect(result.current.isActive).toBe(false);
-    expect(result.current.engagementTime).toBe(1000); // Should not increase
+    expect(result.current.engagementTime).toBe(1000); // Should not increase after inactive
   });
 
   it('should resume tracking on activity', () => {
@@ -117,13 +120,20 @@ describe('useEngagementTime', () => {
 
   it('should track time since last activity', () => {
     const { result } = renderHook(() => useEngagementTime({ updateInterval: 1000 }));
-    
+
+    // Dispatch activity to reset the lastActivity timestamp to "now"
     act(() => {
       jest.advanceTimersByTime(1000);
     });
+    // Simulate activity to reset the clock
+    act(() => {
+      window.dispatchEvent(new Event('mousemove'));
+    });
 
+    // Right after activity: timeSinceLastActivity resets to 0
     expect(result.current.timeSinceLastActivity).toBe(0);
 
+    // Advance 2 more intervals with no activity → timeSinceLastActivity = 2000
     act(() => {
       jest.advanceTimersByTime(2000);
     });

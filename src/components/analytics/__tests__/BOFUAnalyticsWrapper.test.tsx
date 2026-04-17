@@ -3,15 +3,34 @@ import { render, screen } from '@testing-library/react';
 import { BOFUAnalyticsWrapper } from '../BOFUAnalyticsWrapper';
 import * as ga4 from '@/lib/ga4';
 
-// Mock the hooks
+// Mock the analytics hooks and ga4 library
 jest.mock('@/hooks/use-scroll-depth');
 jest.mock('@/hooks/use-section-observer');
 jest.mock('@/hooks/use-engagement-time');
 jest.mock('@/lib/ga4');
 
+import { useScrollDepth } from '@/hooks/use-scroll-depth';
+import { useSectionObserver } from '@/hooks/use-section-observer';
+import { useEngagementTime } from '@/hooks/use-engagement-time';
+
 describe('BOFUAnalyticsWrapper', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+
+    // Provide correct return shapes so destructuring in BOFUAnalyticsWrapper doesn't crash
+    (useScrollDepth as jest.Mock).mockReturnValue({ maxDepth: 0 });
+    (useSectionObserver as jest.Mock).mockReturnValue({
+      visibleSections: new Set<string>(),
+      viewedSections: new Set<string>(),
+      sectionTimeSpent: {} as Record<string, number>,
+      observeSection: jest.fn(() => jest.fn()),
+    });
+    (useEngagementTime as jest.Mock).mockReturnValue({
+      engagementTime: 0,
+      isActive: true,
+      timeSinceLastActivity: 0,
+      reset: jest.fn(),
+    });
   });
 
   it('should render children', () => {
@@ -39,7 +58,8 @@ describe('BOFUAnalyticsWrapper', () => {
       </BOFUAnalyticsWrapper>
     );
 
-    expect(ga4.trackBofuPageViewed).toHaveBeenCalledWith('test-page', undefined);
+    // document.referrer is "" in jsdom (not undefined), so the component passes ""
+    expect(ga4.trackBofuPageViewed).toHaveBeenCalledWith('test-page', '');
   });
 
   it('should not track when disabled', () => {
