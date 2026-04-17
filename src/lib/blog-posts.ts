@@ -7,6 +7,12 @@ export interface BlogPost {
 
 export const blogPosts: BlogPost[] = [
   {
+    slug: 'dog-grooming-software',
+    title: 'Dog Grooming Software: The 2026 Buyer\'s Guide for Professional Groomers',
+    description: 'Compare the best dog grooming software for 2026. Covers scheduling, client records, automated reminders, payments, and what to look for before you buy.',
+    publishedAt: '2026-04-17',
+  },
+  {
     slug: 'dog-grooming-business-management',
     title: 'Dog Grooming Business Management: The Complete Guide',
     description: 'Learn how to manage your dog grooming business like a pro — scheduling, client retention, deposits, payments, and the tools that make it all click.',
