@@ -87,6 +87,20 @@ export async function resetLockoutForTest(id: string): Promise<void> {
 }
 
 /**
+ * Deletes a payment lockout
+ */
+export async function deletePaymentLockout(id: string): Promise<void> {
+  await prisma.paymentLockout.delete({ where: { id } });
+}
+
+/**
+ * Resets a payment lockout by payment ID (for testing)
+ */
+export async function resetLockoutByPaymentId(paymentId: string): Promise<void> {
+  await prisma.paymentLockout.delete({ where: { paymentId } });
+}
+
+/**
  * Manually retry a failed payment lockout
  */
 export async function retryPaymentLockout(lockoutId: string): Promise<PaymentLockout> {
@@ -99,7 +113,7 @@ export async function retryPaymentLockout(lockoutId: string): Promise<PaymentLoc
   }
 
   // Update retry count and last retry time
-  return prisma.paymentLockout.update({
+  return await prisma.paymentLockout.update({
     where: { id: lockoutId },
     data: {
       retryCount: { increment: 1 },
