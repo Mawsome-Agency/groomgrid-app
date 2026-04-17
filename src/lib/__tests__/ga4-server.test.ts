@@ -130,7 +130,7 @@ describe('ga4-server.ts', () => {
     });
 
     it('should return early if API_SECRET not set in development', async () => {
-      process.env.NODE_ENV = 'development';
+      (process.env as any).NODE_ENV = 'development';
       delete process.env.GA4_API_SECRET;
       (global as any).fetch = jest.fn();
       const consoleWarn = jest.spyOn(console, 'warn');
@@ -146,7 +146,7 @@ describe('ga4-server.ts', () => {
     });
 
     it('should not warn in production if API_SECRET not set', async () => {
-      process.env.NODE_ENV = 'production';
+      (process.env as any).NODE_ENV = 'production';
       delete process.env.GA4_API_SECRET;
       (global as any).fetch = jest.fn();
       const consoleWarn = jest.spyOn(console, 'warn');
@@ -175,7 +175,7 @@ describe('ga4-server.ts', () => {
     });
 
     it('should warn on non-ok response in development', async () => {
-      process.env.NODE_ENV = 'development';
+      (process.env as any).NODE_ENV = 'development';
       (global as any).fetch = jest.fn().mockResolvedValue({
         ok: false,
         status: 400,
@@ -193,7 +193,7 @@ describe('ga4-server.ts', () => {
     });
 
     it('should not warn on non-ok response in production', async () => {
-      process.env.NODE_ENV = 'production';
+      (process.env as any).NODE_ENV = 'production';
       (global as any).fetch = jest.fn().mockResolvedValue({
         ok: false,
         status: 400,

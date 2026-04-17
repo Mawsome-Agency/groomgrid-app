@@ -31,6 +31,7 @@ describe('ga4.ts', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    window.gtag = jest.fn();
     window.dataLayer = [];
     localStorage.clear();
   });
