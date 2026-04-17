@@ -2,6 +2,7 @@
 
 import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import { ArrowLeft, CheckCircle, Calendar } from 'lucide-react';
 
 function CheckoutCancelPageInner() {
@@ -20,15 +21,6 @@ function CheckoutCancelPageInner() {
     }
   }, [searchParams]);
 
-  const handleReturnToPlans = () => {
-    // Preserve selected plan if exists
-    if (selectedPlan) {
-      router.push(`/plans?selected=${selectedPlan}`);
-    } else {
-      router.push('/plans');
-    }
-  };
-
   if (!mounted) {
     return <div className="min-h-screen bg-gray-50" />;
   }
@@ -45,7 +37,7 @@ function CheckoutCancelPageInner() {
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <h1 className="text-xl font-bold text-green-600">GroomGrid</h1>
+          <span className="text-xl font-bold text-green-600">GroomGrid</span>
         </div>
       </header>
 
@@ -57,9 +49,9 @@ function CheckoutCancelPageInner() {
               <Calendar className="w-6 h-6 text-stone-600" aria-hidden="true" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-stone-900 mb-2">Checkout Cancelled</h2>
+              <h1 className="text-2xl font-bold text-stone-900 mb-2">Payment Cancelled</h1>
               <p className="text-stone-600">
-                No worries! Your checkout was cancelled, and you haven't been charged.
+                No worries! Your checkout was cancelled and no charge was made to your account.
               </p>
             </div>
           </div>
@@ -98,13 +90,12 @@ function CheckoutCancelPageInner() {
           </div>
 
           {/* Action Button */}
-          <button
-            onClick={handleReturnToPlans}
-            className="w-full bg-green-600 text-white font-semibold py-3 px-6 rounded-xl hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
-            aria-label="Return to plans"
+          <Link
+            href={selectedPlan ? `/plans?selected=${selectedPlan}` : '/plans'}
+            className="w-full bg-green-600 text-white font-semibold py-3 px-6 rounded-xl hover:bg-green-700 transition-colors flex items-center justify-center gap-2 text-center"
           >
-            {selectedPlan ? `Continue with ${selectedPlan.charAt(0).toUpperCase() + selectedPlan.slice(1)} Plan` : 'Choose a Plan'}
-          </button>
+            Return to Plans
+          </Link>
         </div>
 
         {/* Support Info */}

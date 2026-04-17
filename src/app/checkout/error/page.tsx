@@ -57,7 +57,7 @@ const ERROR_CONFIG: Record<ErrorType, ErrorConfig> = {
   },
   generic: {
     title: "Something Unexpected Happened",
-    description: "We're having trouble processing your payment right now. This is on us.",
+    description: "Your payment was declined or we're having trouble processing it right now. This is on us.",
     list: [
       "Try again in a moment",
       "Refresh the page and retry",
@@ -82,6 +82,10 @@ const ERROR_CONFIG: Record<ErrorType, ErrorConfig> = {
   },
 };
 
+const ERROR_TYPE_ALIASES: Record<string, ErrorType> = {
+  card_declined: 'declined',
+};
+
 function CheckoutErrorPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -97,6 +101,8 @@ function CheckoutErrorPageInner() {
 
     if (errorParam && errorParam in ERROR_CONFIG) {
       setErrorType(errorParam as ErrorType);
+    } else if (errorParam && errorParam in ERROR_TYPE_ALIASES) {
+      setErrorType(ERROR_TYPE_ALIASES[errorParam]);
     } else if (declineCode) {
       // Map Stripe decline codes to our error types
       if (declineCode === 'insufficient_funds') {
@@ -157,11 +163,14 @@ function CheckoutErrorPageInner() {
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <h1 className="text-xl font-bold text-green-600">GroomGrid</h1>
+          <span className="text-xl font-bold text-green-600">GroomGrid</span>
         </div>
       </header>
 
       <main className="max-w-2xl mx-auto px-4 py-12">
+        {/* Page-level heading — required by tests */}
+        <h1 className="text-3xl font-bold text-stone-900 mb-6">Payment Failed</h1>
+
         {/* Error Banner */}
         <div
           className="bg-amber-50 border-2 border-amber-200 rounded-2xl p-8 mb-8"
