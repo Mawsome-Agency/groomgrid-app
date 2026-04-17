@@ -4,11 +4,11 @@ import { Lock, Shield } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAnalytics } from "@/hooks/use-analytics";
 
-export default function SecureHeader({ className }: { className?: string }) {
+export default function SecureHeader({ className, location = "plans" }: { className?: string; location?: string }) {
   const { track } = useAnalytics();
 
   const handleClick = () => {
-    track("trust_badge_interacted", { badge_type: "secure_header", location: "plans" });
+    track("trust_badge_interacted", { badge_type: "secure_header", location });
   };
 
   return (
