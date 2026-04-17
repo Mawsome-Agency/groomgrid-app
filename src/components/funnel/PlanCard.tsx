@@ -62,11 +62,13 @@ export default function PlanCard({ plan, selected, onSelect, isLoading, isDimmed
       </ul>
 
       <button
+        disabled={isLoading}
         className={cn(
           "w-full py-3 rounded-xl font-semibold transition-all",
           selected
             ? "bg-green-500 text-white hover:bg-green-600"
-            : "bg-stone-100 text-stone-700 hover:bg-stone-200"
+            : "bg-stone-100 text-stone-700 hover:bg-stone-200",
+          isLoading && "opacity-50 cursor-not-allowed"
         )}
       >
         {selected ? 'Selected' : 'Choose Plan'}
