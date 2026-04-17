@@ -10,6 +10,7 @@
 jest.mock('@/lib/stripe', () => ({
   __esModule: true,
   createCheckoutSession: jest.fn(),
+  getCheckoutSession: jest.fn(),
   getStripeErrorMessage: jest.fn(),
 }));
 
@@ -39,7 +40,7 @@ jest.mock('@/lib/validation', () => ({
 
 import { NextRequest } from 'next/server';
 import { validatePlan, ensureIdempotentLockout, POST } from '@/app/api/checkout/route';
-import { createCheckoutSession, getStripeErrorMessage } from '@/lib/stripe';
+import { createCheckoutSession, getCheckoutSession, getStripeErrorMessage } from '@/lib/stripe';
 import prisma from '@/lib/prisma';
 import { trackPaymentInitiatedServer } from '@/lib/ga4-server';
 
@@ -47,6 +48,7 @@ import { trackPaymentInitiatedServer } from '@/lib/ga4-server';
 const mockFindFirstLockout = prisma.paymentLockout.findFirst as jest.MockedFunction<typeof prisma.paymentLockout.findFirst>;
 const mockFindUniqueProfile = prisma.profile.findUnique as jest.MockedFunction<typeof prisma.profile.findUnique>;
 const mockCreateCheckoutSession = createCheckoutSession as jest.MockedFunction<typeof createCheckoutSession>;
+const mockGetCheckoutSession = getCheckoutSession as jest.MockedFunction<typeof getCheckoutSession>;
 const mockGetStripeErrorMessage = getStripeErrorMessage as jest.MockedFunction<typeof getStripeErrorMessage>;
 const mockTrackPayment = trackPaymentInitiatedServer as jest.MockedFunction<typeof trackPaymentInitiatedServer>;
 
@@ -169,7 +171,7 @@ describe('POST /api/checkout', () => {
     } as any);
     mockCreateCheckoutSession.mockResolvedValue({
       id: 'cs_test_abc123',
-      url: 'https://checkout.stripe.com/pay/cs_test_abc123',
+      url: 'https://checkout.stripe.com/c/pay/cs_test_abc123',
     } as any);
     mockTrackPayment.mockResolvedValue(undefined);
     mockGetStripeErrorMessage.mockReturnValue({
@@ -186,7 +188,7 @@ describe('POST /api/checkout', () => {
     const body = await res.json();
 
     expect(res.status).toBe(200);
-    expect(body.url).toBe('https://checkout.stripe.com/pay/cs_test_abc123');
+    expect(body.url).toBe('https://checkout.stripe.com/c/pay/cs_test_abc123');
     expect(body.sessionId).toBe('cs_test_abc123');
   });
 
@@ -223,8 +225,10 @@ describe('POST /api/checkout', () => {
     expect(mockTrackPayment).toHaveBeenCalledWith('user-123', 'cs_test_abc123', 'solo');
   });
 
-  // ── Idempotency ─────────────────────────────
-  it('returns cached session URL when lockout already exists', async () => {
+  // ── Idempotency — Bug 4 fix ─────────────────
+  // When a lockout exists, the route now retrieves the session from Stripe
+  // and returns its `url` field (not a manually-constructed URL).
+  it('returns Stripe session URL when lockout already exists', async () => {
     mockFindFirstLockout.mockResolvedValueOnce({
       id: 'lockout-1',
       userId: 'user-123',
@@ -237,6 +241,10 @@ describe('POST /api/checkout', () => {
       createdAt: new Date(),
       updatedAt: new Date(),
     });
+    mockGetCheckoutSession.mockResolvedValueOnce({
+      id: 'cs_cached_xyz',
+      url: 'https://checkout.stripe.com/c/pay/cs_cached_xyz',
+    } as any);
 
     const req = makeRequest({ userId: 'user-123', planType: 'solo' });
     const res = await POST(req);
@@ -244,7 +252,10 @@ describe('POST /api/checkout', () => {
 
     expect(res.status).toBe(200);
     expect(body.sessionId).toBe('cs_cached_xyz');
-    expect(body.url).toContain('cs_cached_xyz');
+    // URL must come from Stripe, not be manually constructed
+    expect(body.url).toBe('https://checkout.stripe.com/c/pay/cs_cached_xyz');
+    // Stripe session retrieval was called with the cached session ID
+    expect(mockGetCheckoutSession).toHaveBeenCalledWith('cs_cached_xyz');
     // Must NOT create a new Stripe session
     expect(mockCreateCheckoutSession).not.toHaveBeenCalled();
     // Must NOT call GA4 tracking
