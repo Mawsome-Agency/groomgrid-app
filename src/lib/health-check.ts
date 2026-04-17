@@ -55,8 +55,8 @@ export async function checkDatabase(): Promise<HealthCheckResult> {
 
 /**
  * Check that required environment variables for core app modules are present.
- * This checks the 'app' module vars (NEXTAUTH_URL, NEXTAUTH_SECRET, NEXT_PUBLIC_APP_URL)
- * plus DATABASE_URL since the health endpoint depends on DB connectivity.
+ * Checks auth/DB vars plus Mailgun email config (required for password reset,
+ * welcome emails, and booking confirmations).
  */
 export function checkEnvironmentVars(): HealthCheckResult[] {
   const checks: HealthCheckResult[] = [];
@@ -66,6 +66,8 @@ export function checkEnvironmentVars(): HealthCheckResult[] {
     { name: 'NEXTAUTH_URL', label: 'NextAuth URL' },
     { name: 'NEXTAUTH_SECRET', label: 'NextAuth secret' },
     { name: 'NEXT_PUBLIC_APP_URL', label: 'Public app URL' },
+    { name: 'MAILGUN_API_KEY', label: 'Mailgun API key' },
+    { name: 'MAILGUN_DOMAIN', label: 'Mailgun sending domain' },
   ];
 
   for (const { name, label } of criticalVars) {
