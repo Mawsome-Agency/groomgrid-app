@@ -4,6 +4,7 @@ import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import TrustSignals from '@/components/trust/TrustSignals';
 import { BillingSummaryData } from '@/components/trust/BillingSummary';
+import { trackPaymentPageView } from '@/lib/ga4';
 
 function CheckoutSuccessContent() {
   const router = useRouter();
@@ -49,6 +50,9 @@ function CheckoutSuccessContent() {
 
         setBillingData(data);
         setLoadingBilling(false);
+
+        // Track payment page view — user reached checkout success
+        trackPaymentPageView('checkout_success', data.planName);
       } catch (error) {
         console.error('Error fetching billing data:', error);
         setLoadingBilling(false);

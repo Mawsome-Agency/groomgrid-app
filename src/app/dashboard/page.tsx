@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
 import { Calendar, Users, DollarSign, Plus, LogOut, Settings, Menu, X, AlertCircle, RefreshCw } from 'lucide-react';
-import { trackPageView } from '@/lib/ga4';
+import { trackPageView, trackDashboardFirstView } from '@/lib/ga4';
 import PaymentProcessingBanner from '@/components/PaymentProcessingBanner';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
@@ -140,6 +140,11 @@ export default function DashboardPage() {
         return sum + (servicePrices[appt.service] || 0);
       }, 0);
       setWeekRevenue(revenue);
+
+      // Track first dashboard view (localStorage-guarded, fires only once per user)
+      if (session?.user?.id) {
+        trackDashboardFirstView(session.user.id);
+      }
 
     } catch (err: any) {
       console.error('Failed to fetch dashboard data:', err);

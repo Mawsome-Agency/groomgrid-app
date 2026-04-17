@@ -8,7 +8,7 @@ import Step1AddClient from '@/components/onboarding/Step1AddClient';
 import Step2Appointment from '@/components/onboarding/Step2Appointment';
 import Step3BusinessHours, { BusinessHoursForm } from '@/components/onboarding/Step3BusinessHours';
 import CompletionScreen from '@/components/onboarding/CompletionScreen';
-import { trackOnboardingStep, trackOnboardingSkipped, trackPageView } from '@/lib/ga4';
+import { trackOnboardingStep, trackOnboardingCompleted, trackOnboardingSkipped, trackPageView } from '@/lib/ga4';
 
 // Days in the order the business-hours API expects (index 0 = Sunday)
 const DAYS_API_ORDER = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'] as const;
@@ -213,6 +213,9 @@ export default function OnboardingPage() {
       // Mark onboarding complete
       await updateProfileStep(3, true);
       trackOnboardingStep(3);
+      if (session?.user?.id) {
+        trackOnboardingCompleted(session.user.id);
+      }
       setStep(4);
     } catch (err) {
       console.error('Step 3 failed:', err);
