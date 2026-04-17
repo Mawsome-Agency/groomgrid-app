@@ -396,20 +396,24 @@ describe('ga4-server.ts', () => {
       (global as any).fetch = jest.fn().mockResolvedValue({ ok: true });
 
       await trackPaymentInitiatedServer('user_123', 'sess_456', 'solo');
-      expect((fetch as jest.Mock).mock.calls[0][1].events[0].name).toBe('payment_initiated');
+      const body1 = JSON.parse((fetch as jest.Mock).mock.calls[0][1].body);
+      expect(body1.events[0].name).toBe('payment_initiated');
 
       await trackPaymentSuccessServer('user_123', 'inv_456', 2999);
-      expect((fetch as jest.Mock).mock.calls[1][1].events[0].name).toBe('payment_success');
+      const body2 = JSON.parse((fetch as jest.Mock).mock.calls[1][1].body);
+      expect(body2.events[0].name).toBe('payment_success');
     });
 
     it('should track payment initiated followed by failure', async () => {
       (global as any).fetch = jest.fn().mockResolvedValue({ ok: true });
 
       await trackPaymentInitiatedServer('user_123', 'sess_456', 'solo');
-      expect((fetch as jest.Mock).mock.calls[0][1].events[0].name).toBe('payment_initiated');
+      const body1 = JSON.parse((fetch as jest.Mock).mock.calls[0][1].body);
+      expect(body1.events[0].name).toBe('payment_initiated');
 
       await trackPaymentFailedServer('user_123', 'inv_456', 'insufficient_funds');
-      expect((fetch as jest.Mock).mock.calls[1][1].events[0].name).toBe('payment_failed');
+      const body2 = JSON.parse((fetch as jest.Mock).mock.calls[1][1].body);
+      expect(body2.events[0].name).toBe('payment_failed');
     });
   });
 });

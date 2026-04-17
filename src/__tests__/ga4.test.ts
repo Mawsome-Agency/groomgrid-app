@@ -45,14 +45,12 @@ describe('ga4.ts', () => {
       const { initGA4 } = loadGA4('G-TEST123');
       initGA4();
 
-      // initGA4 replaces window.gtag with its own function and calls it
-      // verify through dataLayer which receives the arguments pushed by the internal gtag
+      // initGA4 preserves the existing window.gtag (jest.fn() set in beforeEach)
+      // and calls it with 'js' and 'config' args
       expect(window.gtag).toBeDefined();
       expect(typeof window.gtag).toBe('function');
-      // dataLayer should have received 'js' call and 'config' call
-      const dataLayerEntries = Array.from(window.dataLayer as ArrayLike<any>[]);
-      expect(dataLayerEntries.some((e) => e[0] === 'js')).toBe(true);
-      expect(dataLayerEntries.some((e) => e[0] === 'config' && e[1] === 'G-TEST123')).toBe(true);
+      expect(window.gtag).toHaveBeenCalledWith('js', expect.any(Date));
+      expect(window.gtag).toHaveBeenCalledWith('config', 'G-TEST123');
     });
 
     it('should initialize dataLayer if not exists', () => {
