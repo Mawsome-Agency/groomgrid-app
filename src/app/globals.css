@@ -35,3 +35,41 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* ── Scroll-reveal animation system ──────────────────────────────────────── */
+/*
+ * Elements start invisible and slightly shifted down.
+ * The `.revealed` class (toggled by useScrollReveal) transitions them in.
+ * Only applied to elements below the fold — hero section is excluded.
+ */
+@layer utilities {
+  .scroll-reveal {
+    opacity: 0;
+    transform: translateY(1rem); /* 16px shift */
+    transition: opacity 500ms ease-out, transform 500ms ease-out;
+    will-change: transform, opacity;
+  }
+
+  .scroll-reveal.revealed {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Respect user preference: disable ALL animations for reduced-motion users */
+@media (prefers-reduced-motion: reduce) {
+  .scroll-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+    will-change: auto;
+  }
+
+  /* Also suppress feature-card hover lift and CTA press transform */
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
