@@ -13,8 +13,9 @@ export function initGA4() {
   if (!GA4_MEASUREMENT_ID) return;
 
   window.dataLayer = window.dataLayer || [];
-  
-  window.gtag = function gtag() {
+
+  // Preserve existing gtag (e.g. jest.fn() in tests, or real GA snippet in prod)
+  window.gtag = window.gtag || function gtag() {
     window.dataLayer?.push(arguments);
   };
   
