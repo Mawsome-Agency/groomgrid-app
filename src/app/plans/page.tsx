@@ -6,7 +6,8 @@ import PlanCard from '@/components/funnel/PlanCard';
 import Testimonial from '@/components/funnel/Testimonial';
 import ValueProp from '@/components/funnel/ValueProp';
 import TrustSignals from '@/components/trust/TrustSignals';
-import { PLANS, TESTIMONIALS, FAQ_ITEMS } from '@/pricing/pricing-data';
+import type { Plan } from '@/types';
+import { PLANS, TESTIMONIALS, FAQ_ITEMS } from '@/app/pricing/pricing-data';
 
 const pricingSchema = {
   '@context': 'https://schema.org',
@@ -23,8 +24,8 @@ const pricingSchema = {
 };
 
 export default function PublicPricingPage() {
-  const handleSelectPlan = () => {
-    // For the marketing page, we just redirect to signup
+  const handleSelectPlan = (_plan: Plan) => {
+    // For the marketing page, we just redirect to signup regardless of which plan is clicked
     window.location.href = '/signup';
   };
 
