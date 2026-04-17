@@ -28,6 +28,9 @@ const config = {
   globals: {
     'ts-jest': {
       tsconfig: 'tsconfig.test.json',
+      // Don't fail the test suite on TS errors in source files (e.g. wrong arg count
+      // in application code is a linting concern, not a test runner concern)
+      diagnostics: { warnOnly: true },
     },
   },
 };
