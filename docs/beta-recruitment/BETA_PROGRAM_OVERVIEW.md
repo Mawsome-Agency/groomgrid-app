@@ -106,3 +106,25 @@ Update after each signup. Fields: name, groomer type, channel, date, status, fee
 - [ ] Each tester contacted within 24h of signup
 - [ ] 7-day feedback form completed by at least 7 of 10
 - [ ] Pricing feedback captured (would they pay? at what price?)
+
+---
+
+## Human Action Required (Cannot Be Automated)
+
+The following steps require a real social media presence:
+
+| Action | Channel | When | Who |
+|--------|---------|------|-----|
+| Join and post in Dog Groomers Only Forum | Facebook | Day 1 (Apr 17) | Matt / team member with FB account |
+| Join and post in The Daily Groomer | Facebook | Day 2 (Apr 18) | Same |
+| Join and post in The Everyday Pet Groomer | Facebook | Day 3 (Apr 19) | Same |
+| Post in r/doggrooming | Reddit | Day 1 (Apr 17) | Account with some karma (new accounts get filtered) |
+| Post in PetGroomer.com Software forum | Forum | Day 3 (Apr 19) | Register + post |
+| Create Google Form for feedback | Google | Before Day 7 | Anyone with Google account |
+| Update tracker CSV after each signup | GitHub | Rolling | Whoever is doing outreach |
+
+**All templates are ready to use in:** `docs/beta-recruitment/OUTREACH_TEMPLATES.md`
+
+**Feedback collection:** Create a free Google Form using the 8 questions at the bottom of OUTREACH_TEMPLATES.md. Share that link when doing day-7 check-ins.
+
+**Week 1 check-in reminder:** On April 24, DM every signed-up tester via their original channel with the day-7 feedback template.
