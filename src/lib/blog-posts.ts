@@ -7,6 +7,12 @@ export interface BlogPost {
 
 export const blogPosts: BlogPost[] = [
   {
+    slug: 'dog-grooming-waiver-template',
+    title: 'Dog Grooming Waiver Template: Free Liability Waiver for Professional Groomers',
+    description: 'Protect your grooming business with a free dog grooming waiver template. Covers senior dogs, matting, medical emergencies, and behavioral risks — ready to customize and use.',
+    publishedAt: '2026-04-17',
+  },
+  {
     slug: 'dog-grooming-software',
     title: 'Dog Grooming Software: The 2026 Buyer\'s Guide for Professional Groomers',
     description: 'Compare the best dog grooming software for 2026. Covers scheduling, client records, automated reminders, payments, and what to look for before you buy.',
