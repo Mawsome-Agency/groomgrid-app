@@ -135,7 +135,9 @@ Both prod and staging have their own `.env.local` at the app root.
 | `STRIPE_PRICE_SALON` | price_ ID for Salon $79/mo plan |
 | `STRIPE_PRICE_ENTERPRISE` | price_ ID for Enterprise $149/mo plan |
 | `NEXT_PUBLIC_APP_URL` | https://app.getgroomgrid.com (for app) or https://getgroomgrid.com (for landing) |
-| `RESEND_API_KEY` | re_ key for transactional email |
+| `MAILGUN_API_KEY` | Mailgun API key for transactional email |
+| `MAILGUN_DOMAIN` | Verified Mailgun sending domain (e.g. email.mawsome.agency) |
+| `MAILGUN_FROM_EMAIL` | (Optional) Override sender address — defaults to GroomGrid &lt;hello@email.mawsome.agency&gt; |
 | `CRON_SECRET` | Secret token for cron job auth |
 | `NEXT_PUBLIC_GA4_MEASUREMENT_ID` | G-XXXXXXXXXX |
 

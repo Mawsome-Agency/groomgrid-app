@@ -66,6 +66,10 @@ export function checkEnvironmentVars(): HealthCheckResult[] {
     { name: 'NEXTAUTH_URL', label: 'NextAuth URL' },
     { name: 'NEXTAUTH_SECRET', label: 'NextAuth secret' },
     { name: 'NEXT_PUBLIC_APP_URL', label: 'Public app URL' },
+    { name: 'MAILGUN_API_KEY', label: 'Mailgun API key' },
+    { name: 'MAILGUN_DOMAIN', label: 'Mailgun sending domain' },
+    // NOTE: MAILGUN_FROM_EMAIL is intentionally omitted — it's optional,
+    // defaults to hello@email.mawsome.agency
   ];
 
   for (const { name, label } of criticalVars) {

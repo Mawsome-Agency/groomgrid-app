@@ -73,6 +73,7 @@ function createMailgunClient(): MailgunClient {
             method: 'POST',
             headers: { Authorization: `Basic ${credentials}` },
             body: formData,
+            signal: AbortSignal.timeout(10_000), // abort after 10s — protects awaited callers
           })
 
           if (!response.ok) {

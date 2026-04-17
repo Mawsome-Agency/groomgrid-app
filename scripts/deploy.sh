@@ -23,7 +23,7 @@ pm2 stop "$PM2_NAME" 2>/dev/null || true
 
 # 3. Install deps (with app stopped, full RAM available for npm)
 echo "[3/5] Installing dependencies..."
-npm ci --omit=dev
+npm ci --production=false  # devDeps required: Tailwind/PostCSS/autoprefixer needed for next build
 
 # 4. Build
 echo "[4/5] Building..."
