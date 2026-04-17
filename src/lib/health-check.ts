@@ -1,0 +1,122 @@
+/**
+ * Health Check Utilities
+ *
+ * Provides functions to verify system connectivity — database reachability,
+ * environment variable presence, and overall service health.
+ * Follows the analytics-verification pattern of individual check results
+ * with an aggregate status.
+ */
+
+export interface HealthCheckResult {
+  name: string;
+  status: 'pass' | 'fail';
+  message: string;
+  latencyMs?: number;
+  details?: Record<string, unknown>;
+}
+
+export interface HealthReport {
+  status: 'healthy' | 'degraded' | 'critical';
+  timestamp: string;
+  version: string;
+  environment: string;
+  uptimeSeconds: number;
+  checks: HealthCheckResult[];
+}
+
+/**
+ * Check database connectivity by running a lightweight query.
+ * Uses the existing prisma singleton — no side effects.
+ */
+export async function checkDatabase(): Promise<HealthCheckResult> {
+  const start = Date.now();
+  try {
+    // Dynamic import to avoid crashes if prisma module is misconfigured.
+    // The prisma singleton is cached so this doesn't create new connections.
+    const { default: prisma } = await import('@/lib/prisma');
+    await prisma.$queryRaw`SELECT 1`;
+    const latencyMs = Date.now() - start;
+    return {
+      name: 'database',
+      status: 'pass',
+      message: 'PostgreSQL is reachable',
+      latencyMs,
+    };
+  } catch (error) {
+    const latencyMs = Date.now() - start;
+    return {
+      name: 'database',
+      status: 'fail',
+      message: `Database unreachable: ${error instanceof Error ? error.message : String(error)}`,
+      latencyMs,
+    };
+  }
+}
+
+/**
+ * Check that required environment variables for core app modules are present.
+ * This checks the 'app' module vars (NEXTAUTH_URL, NEXTAUTH_SECRET, NEXT_PUBLIC_APP_URL)
+ * plus DATABASE_URL since the health endpoint depends on DB connectivity.
+ */
+export function checkEnvironmentVars(): HealthCheckResult[] {
+  const checks: HealthCheckResult[] = [];
+
+  const criticalVars: Array<{ name: string; label: string }> = [
+    { name: 'DATABASE_URL', label: 'Database connection string' },
+    { name: 'NEXTAUTH_URL', label: 'NextAuth URL' },
+    { name: 'NEXTAUTH_SECRET', label: 'NextAuth secret' },
+    { name: 'NEXT_PUBLIC_APP_URL', label: 'Public app URL' },
+  ];
+
+  for (const { name, label } of criticalVars) {
+    const value = process.env[name];
+    if (!value) {
+      checks.push({
+        name: `env:${name}`,
+        status: 'fail',
+        message: `${label} (${name}) is not set`,
+      });
+    } else {
+      checks.push({
+        name: `env:${name}`,
+        status: 'pass',
+        message: `${label} is configured`,
+      });
+    }
+  }
+
+  return checks;
+}
+
+/**
+ * Compute aggregate status from individual check results.
+ * - All pass → healthy
+ * - Any fail → critical (for MVP, degraded is unused but reserved)
+ */
+export function computeStatus(checks: HealthCheckResult[]): 'healthy' | 'degraded' | 'critical' {
+  const failures = checks.filter((c) => c.status === 'fail').length;
+  if (failures > 0) return 'critical';
+  return 'healthy';
+}
+
+/**
+ * Build a complete health report.
+ */
+export async function buildHealthReport(): Promise<HealthReport> {
+  const checks: HealthCheckResult[] = [];
+
+  // Database check (async)
+  checks.push(await checkDatabase());
+
+  // Environment variable checks (sync)
+  checks.push(...checkEnvironmentVars());
+
+  return {
+    status: computeStatus(checks),
+    timestamp: new Date().toISOString(),
+    version: process.env.APP_VERSION || 'unknown',
+    environment: process.env.NODE_ENV || 'unknown',
+    uptimeSeconds: Math.floor(process.uptime()),
+    checks,
+  };
+}
