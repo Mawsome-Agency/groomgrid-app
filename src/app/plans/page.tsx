@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
 import Script from 'next/script';
 import { Plan } from '@/types';
+import { PLANS } from '@/app/pricing/pricing-data';
 import PlanCard from '@/components/funnel/PlanCard';
 import Testimonial from '@/components/funnel/Testimonial';
 import ValueProp from '@/components/funnel/ValueProp';
@@ -12,55 +13,6 @@ import TrustSignals from '@/components/trust/TrustSignals';
 import StickyPlanBar from '@/components/funnel/StickyPlanBar';
 import { BillingSummaryData } from '@/components/trust/BillingSummary';
 import { trackPageView, trackPlanSelected, trackBillingSummaryViewed } from '@/lib/ga4';
-
-const PLANS: Plan[] = [
-  {
-    id: 'solo',
-    name: 'Solo',
-    type: 'solo',
-    price: 29,
-    interval: 'monthly',
-    stripe_price_id: '', // resolved server-side via STRIPE_PRICE_SOLO env var
-    features: [
-      '1 groomer account',
-      'Unlimited clients & appointments',
-      'Automated reminders',
-      'Revenue tracking',
-      'Mobile app access',
-    ],
-  },
-  {
-    id: 'salon',
-    name: 'Salon',
-    type: 'salon',
-    price: 79,
-    interval: 'monthly',
-    stripe_price_id: '', // resolved server-side via STRIPE_PRICE_SALON env var
-    popular: true,
-    features: [
-      'Everything in Solo',
-      'Up to 5 groomer accounts',
-      'Team scheduling',
-      'Staff performance metrics',
-      'Priority support',
-    ],
-  },
-  {
-    id: 'enterprise',
-    name: 'Enterprise',
-    type: 'enterprise',
-    price: 149,
-    interval: 'monthly',
-    stripe_price_id: '', // resolved server-side via STRIPE_PRICE_ENTERPRISE env var
-    features: [
-      'Everything in Salon',
-      'Unlimited groomers',
-      'Custom branding',
-      'API access',
-      'Dedicated account manager',
-    ],
-  },
-];
 
 const TESTIMONIALS = [
   {
