@@ -31,6 +31,7 @@ describe('Sitemap Generation', () => {
     expect(urls).toContain('https://getgroomgrid.com/blog/is-dog-grooming-a-profitable-business');
     expect(urls).toContain('https://getgroomgrid.com/blog/mobile-dog-grooming-business-plan');
     expect(urls).toContain('https://getgroomgrid.com/blog/reduce-no-shows-dog-grooming');
+    expect(urls).toContain('https://getgroomgrid.com/blog/dog-grooming-software');
   });
 
   it('should have correct priority for homepage', () => {
@@ -116,7 +117,7 @@ describe('Sitemap Generation', () => {
   it('should have total entries matching static pages plus blog posts', () => {
     const result = sitemap();
 
-    // 4 static pages + 6 blog posts = 10 total
-    expect(result.length).toBe(10);
+    // 4 static pages + 7 blog posts = 11 total
+    expect(result.length).toBe(11);
   });
 });
