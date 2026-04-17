@@ -37,8 +37,10 @@ export default function Step1AddClient({
 
       <div className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-stone-700 mb-1">Client Name *</label>
+          <label htmlFor="name" className="block text-sm font-medium text-stone-700 mb-1">Client Name *</label>
           <input
+            id="name"
+            name="name"
             type="text"
             value={client.name}
             onChange={(e) => setClient({ ...client, name: e.target.value })}
@@ -50,10 +52,12 @@ export default function Step1AddClient({
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-stone-700 mb-1">Phone</label>
+            <label htmlFor="phone" className="block text-sm font-medium text-stone-700 mb-1">Phone</label>
             <div className="relative">
               <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-stone-400" />
               <input
+                id="phone"
+                name="phone"
                 type="tel"
                 value={client.phone}
                 onChange={(e) => setClient({ ...client, phone: e.target.value })}
@@ -64,10 +68,12 @@ export default function Step1AddClient({
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-stone-700 mb-1">Email</label>
+            <label htmlFor="clientEmail" className="block text-sm font-medium text-stone-700 mb-1">Email</label>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-stone-400" />
               <input
+                id="clientEmail"
+                name="email"
                 type="email"
                 value={client.email}
                 onChange={(e) => setClient({ ...client, email: e.target.value })}
@@ -83,8 +89,10 @@ export default function Step1AddClient({
           <label className="block text-sm font-medium text-stone-700 mb-2">Pet Information</label>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-stone-700 mb-1">Pet Name *</label>
+              <label htmlFor="petName" className="block text-sm font-medium text-stone-700 mb-1">Pet Name *</label>
               <input
+                id="petName"
+                name="petName"
                 type="text"
                 value={client.petName}
                 onChange={(e) => setClient({ ...client, petName: e.target.value })}
@@ -94,8 +102,10 @@ export default function Step1AddClient({
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-stone-700 mb-1">Breed</label>
+              <label htmlFor="breed" className="block text-sm font-medium text-stone-700 mb-1">Breed</label>
               <input
+                id="breed"
+                name="breed"
                 type="text"
                 value={client.breed}
                 onChange={(e) => setClient({ ...client, breed: e.target.value })}
@@ -128,7 +138,7 @@ export default function Step1AddClient({
             </>
           ) : (
             <>
-              Add Client <ArrowRight className="w-5 h-5" />
+              Next <ArrowRight className="w-5 h-5" />
             </>
           )}
         </button>

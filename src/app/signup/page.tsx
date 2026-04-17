@@ -142,10 +142,12 @@ export default function SignupPage() {
         <form onSubmit={handleSubmit} className="space-y-4" noValidate>
           {/* Business Name */}
           <div>
-            <label className="block text-sm font-medium text-stone-700 mb-1">Business Name</label>
+            <label htmlFor="businessName" className="block text-sm font-medium text-stone-700 mb-1">Business Name</label>
             <div className="relative">
               <Building className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-stone-400" />
               <input
+                id="businessName"
+                name="businessName"
                 type="text"
                 value={formData.businessName}
                 onChange={(e) => handleFieldChange('businessName', e.target.value)}
@@ -167,10 +169,11 @@ export default function SignupPage() {
 
           {/* Email */}
           <div>
-            <label className="block text-sm font-medium text-stone-700 mb-1">Email Address</label>
+            <label htmlFor="email" className="block text-sm font-medium text-stone-700 mb-1">Email Address</label>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-stone-400" />
               <input
+                id="email"
                 type="email"
                 value={formData.email}
                 onChange={(e) => handleFieldChange('email', e.target.value)}
@@ -193,10 +196,11 @@ export default function SignupPage() {
 
           {/* Password */}
           <div>
-            <label className="block text-sm font-medium text-stone-700 mb-1">Password</label>
+            <label htmlFor="password" className="block text-sm font-medium text-stone-700 mb-1">Password</label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-stone-400" />
               <input
+                id="password"
                 type={showPassword ? 'text' : 'password'}
                 value={formData.password}
                 onChange={(e) => handleFieldChange('password', e.target.value)}
