@@ -1,3 +1,12 @@
+// Ensure React loads its development build with act() support regardless of system NODE_ENV.
+// MUST be set before any require() that could load React.
+process.env.NODE_ENV = 'test'
+
+// Expose Node 18+ Web API globals to jest workers (needed for next/server imports)
+if (typeof global.Request === 'undefined') global.Request = globalThis.Request
+if (typeof global.Response === 'undefined') global.Response = globalThis.Response
+if (typeof global.Headers === 'undefined') global.Headers = globalThis.Headers
+
 require('@testing-library/jest-dom')
 
 // Polyfill TextEncoder/TextDecoder for Prisma in jsdom environment
@@ -8,6 +17,11 @@ if (typeof global.TextEncoder === 'undefined') {
 if (typeof global.TextDecoder === 'undefined') {
   global.TextDecoder = TextDecoder;
 }
+
+// Mock requestAnimationFrame to run synchronously so scroll/animation hooks
+// don't require async flushing in tests.
+global.requestAnimationFrame = (callback) => { callback(0); return 0; };
+global.cancelAnimationFrame = () => {};
 
 // Mock environment variables
 process.env.DATABASE_URL = 'postgresql://test:test@localhost:5432/groomgrid_test'
@@ -21,34 +35,37 @@ process.env.STRIPE_PRICE_SOLO = 'price_solo'
 process.env.STRIPE_PRICE_SALON = 'price_salon'
 process.env.STRIPE_PRICE_ENTERPRISE = 'price_enterprise'
 
-// Mock window.matchMedia for reduced motion tests
-Object.defineProperty(window, 'matchMedia', {
-  writable: true,
-  value: jest.fn().mockImplementation(query => ({
-    matches: false,
-    media: query,
-    onchange: null,
-    addListener: jest.fn(),
-    removeListener: jest.fn(),
-    addEventListener: jest.fn(),
-    removeEventListener: jest.fn(),
-    dispatchEvent: jest.fn(),
-  })),
-})
+// DOM-dependent globals — only set up in jsdom environment
+if (typeof window !== 'undefined') {
+  // Mock window.matchMedia for reduced motion tests
+  Object.defineProperty(window, 'matchMedia', {
+    writable: true,
+    value: jest.fn().mockImplementation(query => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addListener: jest.fn(),
+      removeListener: jest.fn(),
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+      dispatchEvent: jest.fn(),
+    })),
+  })
 
-// Mock IntersectionObserver
-global.IntersectionObserver = class IntersectionObserver {
-  constructor() {}
-  disconnect() {}
-  observe() {}
-  takeRecords() { return [] }
-  unobserve() {}
-}
+  // Mock IntersectionObserver
+  global.IntersectionObserver = class IntersectionObserver {
+    constructor() {}
+    disconnect() {}
+    observe() {}
+    takeRecords() { return [] }
+    unobserve() {}
+  }
 
-// Mock ResizeObserver
-global.ResizeObserver = class ResizeObserver {
-  constructor() {}
-  disconnect() {}
-  observe() {}
-  unobserve() {}
+  // Mock ResizeObserver
+  global.ResizeObserver = class ResizeObserver {
+    constructor() {}
+    disconnect() {}
+    observe() {}
+    unobserve() {}
+  }
 }
