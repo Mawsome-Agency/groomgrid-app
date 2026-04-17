@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { signIn } from 'next-auth/react';
 import { AlertCircle, ArrowRight, Lock, Mail } from 'lucide-react';
+import TrustSignals from '@/components/trust/TrustSignals';
 
 function LoginForm() {
   const router = useRouter();
@@ -135,6 +136,10 @@ function LoginForm() {
             Start free trial
           </Link>
         </p>
+
+        <div className="mt-6 pt-6 border-t border-stone-100">
+          <TrustSignals location="login" compact={true} />
+        </div>
       </div>
     </div>
   );
