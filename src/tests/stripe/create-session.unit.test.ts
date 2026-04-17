@@ -304,4 +304,149 @@ describe('createCheckoutSession — request validation', () => {
     const res = await POST(makeReq({ userId: 'user-123', planType: 'solo' }));
     expect(res.status).toBe(500);
   });
+
+  it('returns 400 when both userId and planType are missing', async () => {
+    const res = await POST(makeReq({}));
+    expect(res.status).toBe(400);
+    expect(mockCreateCheckoutSession).not.toHaveBeenCalled();
+  });
+
+  it('returns 400 when userId is empty string', async () => {
+    const res = await POST(makeReq({ userId: '', planType: 'solo' }));
+    expect(res.status).toBe(400);
+    expect(mockCreateCheckoutSession).not.toHaveBeenCalled();
+  });
+
+  it('returns 400 when planType is empty string', async () => {
+    const res = await POST(makeReq({ userId: 'user-123', planType: '' }));
+    expect(res.status).toBe(400);
+    expect(mockCreateCheckoutSession).not.toHaveBeenCalled();
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// validatePlan — exported pure function, direct unit tests
+// ─────────────────────────────────────────────────────────────────────────────
+import { validatePlan, ensureIdempotentLockout } from '@/app/api/checkout/route';
+
+describe('validatePlan — direct unit tests', () => {
+  it.each(['solo', 'salon', 'enterprise'])('returns true for valid plan "%s"', (plan) => {
+    expect(validatePlan(plan)).toBe(true);
+  });
+
+  it.each([
+    'unlimited',
+    'free',
+    'SOLO',          // case-sensitive
+    'Solo',
+    'pro',
+    '',
+    '   ',
+    'solo ',         // trailing space
+    ' solo',         // leading space
+  ])('returns false for invalid plan "%s"', (plan) => {
+    expect(validatePlan(plan)).toBe(false);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ensureIdempotentLockout — exported async helper, direct unit tests
+// ─────────────────────────────────────────────────────────────────────────────
+describe('ensureIdempotentLockout — direct unit tests', () => {
+  beforeEach(() => jest.clearAllMocks());
+
+  it('returns null when no existing lockout is found', async () => {
+    mockFindFirstLockout.mockResolvedValueOnce(null);
+    const result = await ensureIdempotentLockout('user-1', 'solo');
+    expect(result).toBeNull();
+    expect(mockFindFirstLockout).toHaveBeenCalledWith({ where: { userId: 'user-1', paymentId: 'solo' } });
+  });
+
+  it('returns sessionId when an existing lockout exists', async () => {
+    mockFindFirstLockout.mockResolvedValueOnce({
+      id: 'lock-x',
+      userId: 'user-1',
+      paymentId: 'salon',
+      sessionId: 'cs_existing_99',
+      status: 'processing',
+      errorMessage: null,
+      retryCount: 0,
+      lastRetryAt: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+    const result = await ensureIdempotentLockout('user-1', 'salon');
+    expect(result).toBe('cs_existing_99');
+  });
+
+  it('queries with exact userId + paymentId so lockout is plan-scoped (not user-wide)', async () => {
+    mockFindFirstLockout.mockResolvedValueOnce(null);
+    await ensureIdempotentLockout('user-42', 'enterprise');
+    expect(mockFindFirstLockout).toHaveBeenCalledWith({
+      where: { userId: 'user-42', paymentId: 'enterprise' },
+    });
+  });
+
+  it('propagates DB errors — does not swallow exceptions', async () => {
+    mockFindFirstLockout.mockRejectedValueOnce(new Error('DB timeout'));
+    await expect(ensureIdempotentLockout('user-1', 'solo')).rejects.toThrow('DB timeout');
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// customerEmail fallback — undocumented but critical branch
+// ─────────────────────────────────────────────────────────────────────────────
+describe('customerEmail fallback', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockFindFirstLockout.mockResolvedValue(null);
+    mockFindUniqueProfile.mockResolvedValue(MOCK_PROFILE as any);
+    mockCreateCheckoutSession.mockResolvedValue(MOCK_SESSION as any);
+    mockGetStripeErrorMessage.mockReturnValue({ message: 'Error', type: 'generic', declineCode: undefined });
+  });
+
+  it('falls back to {userId}@groomgrid.app when customerEmail is absent', async () => {
+    const req = makeReq({ userId: 'user-fallback', planType: 'solo' });
+    await POST(req);
+
+    const [args] = mockCreateCheckoutSession.mock.calls[0];
+    expect(args.customerEmail).toBe('user-fallback@groomgrid.app');
+  });
+
+  it('uses provided customerEmail when present, does not fall back', async () => {
+    const req = makeReq({ userId: 'user-123', planType: 'solo', customerEmail: 'real@example.com' });
+    await POST(req);
+
+    const [args] = mockCreateCheckoutSession.mock.calls[0];
+    expect(args.customerEmail).toBe('real@example.com');
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// clientId optional passthrough
+// ─────────────────────────────────────────────────────────────────────────────
+describe('clientId optional passthrough', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockFindFirstLockout.mockResolvedValue(null);
+    mockFindUniqueProfile.mockResolvedValue(MOCK_PROFILE as any);
+    mockCreateCheckoutSession.mockResolvedValue(MOCK_SESSION as any);
+    mockGetStripeErrorMessage.mockReturnValue({ message: 'Error', type: 'generic', declineCode: undefined });
+  });
+
+  it('passes undefined clientId when not provided in body', async () => {
+    const req = makeReq({ userId: 'user-123', planType: 'solo' });
+    await POST(req);
+
+    const [args] = mockCreateCheckoutSession.mock.calls[0];
+    expect(args.clientId).toBeUndefined();
+  });
+
+  it('passes clientId through when provided', async () => {
+    const req = makeReq({ userId: 'user-123', planType: 'solo', clientId: 'GA4-abc-123' });
+    await POST(req);
+
+    const [args] = mockCreateCheckoutSession.mock.calls[0];
+    expect(args.clientId).toBe('GA4-abc-123');
+  });
 });
