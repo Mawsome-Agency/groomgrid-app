@@ -11,7 +11,7 @@ import BillingSummary from "./BillingSummary";
 interface TrustSignalsProps {
   showBillingSummary?: boolean;
   billingData?: BillingSummaryData;
-  location?: "plans" | "success" | "billing";
+  location?: "plans" | "success" | "billing" | "signup";
   compact?: boolean;
 }
 
@@ -22,10 +22,10 @@ export default function TrustSignals({
   compact = false 
 }: TrustSignalsProps) {
   return (
-    <div className="space-y-6">
+    <div className={location === "signup" ? "space-y-3" : "space-y-6"}>
       {/* Top row: Secure Header + PCI Badge */}
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-        <SecureHeader />
+        <SecureHeader location={location} />
         <PciBadge location={location} />
       </div>
 

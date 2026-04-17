@@ -1,38 +1,177 @@
+/**
+ * @jest-environment node
+ */
+
+// ── Inline mock data (defined BEFORE jest.mock hoisting, inside factory scope) ──
+// We mock @/lib/stripe to avoid loading the Stripe SDK at module init time
+// (it calls new Stripe(requireEnvVar(...)) which crashes in test environment).
+
+jest.mock('@/lib/stripe', () => {
+  const now = Math.floor(Date.now() / 1000);
+
+  const baseCheckoutSession = {
+    id: 'cs_test_checkout',
+    object: 'checkout.session',
+    payment_status: 'paid',
+    status: 'complete',
+    customer: 'cus_test_789',
+    metadata: { userId: 'test_user_id', planType: 'solo' },
+    subscription: 'sub_test_abc',
+    amount_total: 2900,
+    currency: 'usd',
+  };
+
+  const baseEvent = {
+    id: 'evt_test_checkout_session_completed',
+    object: 'event',
+    api_version: '2024-08-15',
+    created: now,
+    data: { object: baseCheckoutSession },
+    livemode: false,
+    pending_webhooks: 0,
+    type: 'checkout.session.completed',
+    request: null,
+  };
+
+  const mockStripeEvents = {
+    checkoutSessionCompleted: baseEvent,
+
+    subscriptionUpdated: {
+      ...baseEvent,
+      id: 'evt_test_subscription_updated',
+      type: 'customer.subscription.updated',
+      data: {
+        object: {
+          id: 'sub_test_abc',
+          object: 'subscription',
+          status: 'active',
+          metadata: { userId: 'test_user_id', planType: 'solo' },
+          customer: 'cus_test_789',
+          current_period_start: now,
+          current_period_end: now + 30 * 24 * 60 * 60,
+        },
+      },
+    },
+
+    subscriptionDeleted: {
+      ...baseEvent,
+      id: 'evt_test_subscription_deleted',
+      type: 'customer.subscription.deleted',
+      data: {
+        object: {
+          id: 'sub_test_abc',
+          object: 'subscription',
+          status: 'canceled',
+          metadata: { userId: 'test_user_id' },
+          customer: 'cus_test_789',
+        },
+      },
+    },
+
+    invoicePaymentSucceeded: {
+      ...baseEvent,
+      id: 'evt_test_invoice_succeeded',
+      type: 'invoice.payment_succeeded',
+      data: {
+        object: {
+          id: 'in_test_123',
+          object: 'invoice',
+          amount_paid: 2900,
+          customer: 'cus_test_789',
+          status: 'paid',
+        },
+      },
+    },
+
+    invoicePaymentFailed: {
+      ...baseEvent,
+      id: 'evt_test_invoice_failed',
+      type: 'invoice.payment_failed',
+      data: {
+        object: {
+          id: 'in_test_123',
+          object: 'invoice',
+          amount_paid: 0,
+          customer: 'cus_test_789',
+          status: 'open',
+          last_payment_error: { message: 'Card declined' },
+        },
+      },
+    },
+  };
+
+  function createMockStripeEvent(overrides: any = {}) {
+    return {
+      ...baseEvent,
+      ...overrides,
+      data: {
+        ...baseEvent.data,
+        object: {
+          ...baseEvent.data.object,
+          ...(overrides?.data?.object || {}),
+        },
+      },
+    };
+  }
+
+  return { mockStripeEvents, createMockStripeEvent, stripe: {} };
+});
+
+jest.mock('@/lib/payment-completion');
+// Explicit factory so every export is a proper jest.fn() (auto-mock doesn't reliably
+// create jest spies for async functions in the node test environment)
+jest.mock('@/lib/ga4-server', () => ({
+  trackServerEvent: jest.fn(),
+  trackCheckoutCompletedServer: jest.fn(),
+  trackSubscriptionCreatedServer: jest.fn(),
+  trackSubscriptionUpdatedServer: jest.fn(),
+  trackSubscriptionCancelledServer: jest.fn(),
+  trackSubscriptionStartedServer: jest.fn(),
+  trackPaymentInitiatedServer: jest.fn(),
+  trackPaymentSuccessServer: jest.fn(),
+  trackPaymentFailedServer: jest.fn(),
+  trackABTestAssignedServer: jest.fn(),
+  trackABTestConvertedServer: jest.fn(),
+}));
+jest.mock('@/lib/payment-lockout', () => ({
+  updatePaymentLockoutStatus: jest.fn(),
+}));
+
+// Define mock inline so it's available when jest.mock() factory runs (avoids TDZ).
+// Access the live mock after setup via jest.requireMock().
+jest.mock('@/lib/prisma', () => ({
+  prisma: {
+    paymentEvent: {
+      create: jest.fn().mockResolvedValue({}),
+      findFirst: jest.fn().mockResolvedValue(null),
+      findUnique: jest.fn().mockResolvedValue(null),
+    },
+    profile: {
+      update: jest.fn().mockResolvedValue({}),
+      findFirst: jest.fn().mockResolvedValue(null),
+    },
+    paymentLockout: {
+      findFirst: jest.fn().mockResolvedValue(null),
+      update: jest.fn().mockResolvedValue({}),
+    },
+    $transaction: jest.fn(),
+  },
+}));
+
 import { handleStripeEvent } from '../_handler';
 import { mockStripeEvents, createMockStripeEvent } from '@/lib/stripe';
 import { triggerPaymentCompletionHandler } from '@/lib/payment-completion';
 import * as ga4 from '@/lib/ga4-server';
 
-// Mock dependencies
-jest.mock('@/lib/payment-completion');
-jest.mock('@/lib/ga4-server');
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const mockPrisma: Record<string, any> = {
-  paymentEvent: {
-    create: jest.fn().mockResolvedValue({}),
-    findFirst: jest.fn().mockResolvedValue(null),
-    findUnique: jest.fn().mockResolvedValue(null),
-  },
-  profile: {
-    update: jest.fn().mockResolvedValue({}),
-    findFirst: jest.fn().mockResolvedValue(null),
-  },
-  paymentLockout: {
-    findFirst: jest.fn().mockResolvedValue(null),
-    update: jest.fn().mockResolvedValue({}),
-  },
-  $transaction: jest.fn((fn: Function) => fn(mockPrisma)),
-};
-
-jest.mock('@/lib/prisma', () => ({
-  prisma: mockPrisma,
-}));
-
 describe('handleStripeEvent', () => {
+  // Access the mock after jest.mock() is fully set up
+  const mockPrisma = jest.requireMock('@/lib/prisma').prisma as Record<string, any>;
+
   beforeEach(() => {
     jest.clearAllMocks();
     mockPrisma.paymentEvent.findFirst.mockResolvedValue(null);
+    // Re-wire $transaction after clearAllMocks resets its implementation
+    mockPrisma.$transaction.mockImplementation((fn: Function) => fn(mockPrisma));
   });
 
   describe('idempotency', () => {

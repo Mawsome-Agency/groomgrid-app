@@ -3,7 +3,8 @@
   "compilerOptions": {
     "moduleResolution": "node",
     "module": "commonjs",
-    "jsx": "react",
-    "isolatedModules": false
+    "jsx": "react-jsx",
+    "isolatedModules": false,
+    "types": ["jest", "@testing-library/jest-dom", "node"]
   }
 }

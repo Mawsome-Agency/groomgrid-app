@@ -8,6 +8,8 @@ import { AlertCircle, ArrowRight, Lock, Building, Mail, Eye, EyeOff, Check } fro
 import { trackSignupStarted, trackAccountCreated, trackSignupError } from '@/lib/ga4';
 import { useFormValidation } from '@/hooks/use-form-validation';
 import PasswordStrengthMeter from '@/components/auth/PasswordStrengthMeter';
+import TrustSignals from '@/components/trust/TrustSignals';
+import './signup.css';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -116,7 +118,7 @@ export default function SignupPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-stone-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full">
+      <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full signup-card">
         <div className="text-center mb-8">
           <Link href="/" className="inline-block mb-4">
             <span className="text-2xl font-bold text-green-600">GroomGrid</span>
@@ -132,7 +134,7 @@ export default function SignupPage() {
           }`}
         >
           {error && (
-            <div className="flex items-start gap-2 p-3 rounded-lg bg-red-50 text-red-700 text-sm mb-4">
+            <div className="flex items-start gap-2 p-3 rounded-lg bg-red-50 text-red-700 text-sm mb-4 error-flash">
               <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
               <span>{error}</span>
             </div>
@@ -235,11 +237,16 @@ export default function SignupPage() {
           <button
             type="submit"
             disabled={loading || submitSuccess}
-            className={`w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold transition-colors ${
-              submitSuccess
-                ? 'bg-green-500 text-white'
-                : 'bg-green-500 text-white hover:bg-green-600 disabled:bg-stone-300 disabled:cursor-not-allowed'
-            }`}
+            className={`w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold
+  transition-[transform,box-shadow,background-color] duration-150 ease-out
+  hover:scale-[1.02] hover:shadow-md
+  active:scale-[0.98]
+  motion-reduce:hover:scale-100 motion-reduce:active:scale-100 motion-reduce:hover:shadow-none
+  ${
+    submitSuccess
+      ? "bg-green-500 text-white"
+      : "bg-green-500 text-white hover:bg-green-600 disabled:bg-stone-300 disabled:cursor-not-allowed"
+  }`}
           >
             {submitSuccess ? (
               <>
@@ -258,6 +265,10 @@ export default function SignupPage() {
             )}
           </button>
         </form>
+
+        <div className="mt-6">
+          <TrustSignals location="signup" compact={true} />
+        </div>
 
         <p className="text-center text-sm text-stone-600 mt-6">
           Already have an account?{' '}

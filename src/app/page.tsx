@@ -1,9 +1,16 @@
 'use client';
 
 import Link from 'next/link';
+import { useEffect, useRef } from 'react';
+import { cn } from '@/lib/utils';
+import { useScrollReveal } from '@/hooks/use-scroll-reveal';
 
 const SIGNUP_URL = '/signup';
 
+/**
+ * CTA link wrapper. Adds tactile press feedback (scale-down on active)
+ * to every call-to-action button on the page.
+ */
 function CtaLink({
   href,
   className,
@@ -14,15 +21,58 @@ function CtaLink({
   children: React.ReactNode;
 }) {
   return (
-    <Link href={href} className={className}>
+    <Link href={href} className={cn(className, 'active:scale-[0.97]')}>
       {children}
     </Link>
   );
 }
 
 export default function HomePage() {
+  const { revealRef } = useScrollReveal();
+
+  // Refs for testimonial cards — used by the parallax scroll effect below
+  const testimonialEls = useRef<(HTMLElement | null)[]>([]);
+
+  /**
+   * Subtle parallax on testimonial cards — desktop only (≥768 px).
+   * Cards shift up to ±8px depending on their distance from the viewport centre.
+   * Disabled for users who prefer reduced motion.
+   */
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    let rafId: number | null = null;
+
+    const onScroll = () => {
+      if (rafId !== null) return; // Throttle via requestAnimationFrame
+      rafId = requestAnimationFrame(() => {
+        rafId = null;
+        if (window.innerWidth < 768) return; // Mobile: no parallax
+
+        testimonialEls.current.forEach((el) => {
+          if (!el) return;
+          const rect = el.getBoundingClientRect();
+          const elCenter = rect.top + rect.height / 2;
+          const viewCenter = window.innerHeight / 2;
+          // progress ∈ [-0.5, 0.5] — negative = above centre, positive = below
+          const progress = (elCenter - viewCenter) / window.innerHeight;
+          const offset = Math.max(-8, Math.min(8, progress * 16)); // cap at ±8px
+          el.style.transform = `translateY(${offset}px)`;
+        });
+      });
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      if (rafId !== null) cancelAnimationFrame(rafId);
+    };
+  }, []);
+
   return (
     <div className="min-h-screen bg-white text-stone-900">
+
       {/* ── Nav ── */}
       <nav className="flex items-center justify-between px-6 py-4 max-w-5xl mx-auto border-b border-stone-100">
         <span className="text-xl font-bold text-green-600">GroomGrid 🐾</span>
@@ -42,7 +92,7 @@ export default function HomePage() {
         </div>
       </nav>
 
-      {/* ── Hero ── */}
+      {/* ── Hero — above the fold, no scroll-reveal ── */}
       <section className="px-6 pt-14 pb-16 max-w-3xl mx-auto text-center">
         <p className="text-green-600 font-semibold text-sm uppercase tracking-widest mb-4">
           Built for busy groomers
@@ -68,15 +118,19 @@ export default function HomePage() {
         </p>
       </section>
 
-      {/* ── Pain → Solution ── */}
+      {/* ── Pain → Solution — staggered card entrance ── */}
       <section className="px-6 py-14 bg-green-50">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-2xl font-bold text-center text-stone-800 mb-2">
-            Sound familiar?
-          </h2>
-          <p className="text-center text-stone-500 mb-10">
-            Every groomer hits these walls. GroomGrid knocks them down.
-          </p>
+          {/* Section header fades in first */}
+          <div ref={revealRef(0)} className="scroll-reveal text-center mb-10">
+            <h2 className="text-2xl font-bold text-stone-800 mb-2">
+              Sound familiar?
+            </h2>
+            <p className="text-stone-500">
+              Every groomer hits these walls. GroomGrid knocks them down.
+            </p>
+          </div>
+          {/* Cards stagger in: 0 / 100 / 200ms */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             {[
               {
@@ -91,8 +145,12 @@ export default function HomePage() {
                 pain: '💸 \u201cStill chasing that invoice.\u201d',
                 fix: 'Collect payment at booking time. No awkward follow-ups. Money hits your account, done.',
               },
-            ].map(({ pain, fix }) => (
-              <div key={pain} className="bg-white rounded-2xl p-6 shadow-sm border border-green-100">
+            ].map(({ pain, fix }, index) => (
+              <div
+                key={pain}
+                ref={revealRef(index * 100)}
+                className="scroll-reveal bg-white rounded-2xl p-6 shadow-sm border border-green-100"
+              >
                 <p className="font-semibold text-stone-700 mb-3 text-base">{pain}</p>
                 <p className="text-stone-600 text-sm leading-relaxed">{fix}</p>
               </div>
@@ -101,8 +159,11 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Features ── */}
-      <section className="px-6 py-14 max-w-4xl mx-auto">
+      {/* ── Features — section fades in, cards have hover lift ── */}
+      <section
+        ref={revealRef(0)}
+        className="scroll-reveal px-6 py-14 max-w-4xl mx-auto"
+      >
         <h2 className="text-2xl font-bold text-center text-stone-800 mb-2">
           Everything you need. Nothing you don&apos;t.
         </h2>
@@ -134,7 +195,7 @@ export default function HomePage() {
           ].map(({ emoji, title, desc }) => (
             <div
               key={title}
-              className="flex gap-4 p-5 rounded-xl border border-stone-100 hover:border-green-200 transition-colors"
+              className="flex gap-4 p-5 rounded-xl border border-stone-100 hover:border-green-200 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 ease-out"
             >
               <span className="text-2xl flex-shrink-0 mt-0.5">{emoji}</span>
               <div>
@@ -146,19 +207,22 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Social Proof ── */}
+      {/* ── Social Proof — header fades in, testimonials get parallax ── */}
       <section className="px-6 py-14 bg-stone-50">
         <div className="max-w-3xl mx-auto text-center">
-          <p className="text-green-600 font-semibold text-sm uppercase tracking-widest mb-2">
-            Early access
-          </p>
-          <h2 className="text-2xl font-bold text-stone-800 mb-2">
-            Join 50+ groomers on the waitlist
-          </h2>
-          <p className="text-stone-500 mb-10">
-            Independent groomers, mobile pros, and salon owners are already lined up.
-            Don&apos;t let them get a head start.
-          </p>
+          <div ref={revealRef(0)} className="scroll-reveal mb-10">
+            <p className="text-green-600 font-semibold text-sm uppercase tracking-widest mb-2">
+              Early access
+            </p>
+            <h2 className="text-2xl font-bold text-stone-800 mb-2">
+              Join 50+ groomers on the waitlist
+            </h2>
+            <p className="text-stone-500">
+              Independent groomers, mobile pros, and salon owners are already lined up.
+              Don&apos;t let them get a head start.
+            </p>
+          </div>
+          {/* Testimonial cards — parallax applied via JS ref, no scroll-reveal class */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-left">
             {[
               {
@@ -173,8 +237,12 @@ export default function HomePage() {
                 name: 'James Rodriguez',
                 business: 'Fur Perfect Salon · 3 Groomers',
               },
-            ].map(({ quote, name, business }) => (
-              <div key={name} className="bg-white rounded-2xl p-6 shadow-sm border border-stone-100">
+            ].map(({ quote, name, business }, index) => (
+              <div
+                key={name}
+                ref={(el: HTMLDivElement | null) => { testimonialEls.current[index] = el; }}
+                className="bg-white rounded-2xl p-6 shadow-sm border border-stone-100"
+              >
                 <p className="text-stone-700 text-sm leading-relaxed mb-4">&ldquo;{quote}&rdquo;</p>
                 <p className="font-semibold text-stone-800 text-sm">{name}</p>
                 <p className="text-stone-500 text-xs">{business}</p>
@@ -184,8 +252,11 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Pricing Teaser ── */}
-      <section className="px-6 py-14 max-w-2xl mx-auto text-center">
+      {/* ── Pricing Teaser — section fades in ── */}
+      <section
+        ref={revealRef(0)}
+        className="scroll-reveal px-6 py-14 max-w-2xl mx-auto text-center"
+      >
         <h2 className="text-2xl font-bold text-stone-800 mb-2">Simple pricing. No surprises.</h2>
         <p className="text-stone-500 mb-8">Cheaper than one no-show a month.</p>
         <div className="bg-green-50 border border-green-200 rounded-2xl p-8 mb-6">
@@ -229,8 +300,11 @@ export default function HomePage() {
         </p>
       </section>
 
-      {/* ── Final CTA Banner ── */}
-      <section className="px-6 py-16 bg-green-600 text-white text-center">
+      {/* ── Final CTA Banner — section fades in ── */}
+      <section
+        ref={revealRef(0)}
+        className="scroll-reveal px-6 py-16 bg-green-600 text-white text-center"
+      >
         <h2 className="text-3xl font-bold mb-3">Ready to stop the chaos?</h2>
         <p className="text-green-100 mb-8 max-w-md mx-auto leading-relaxed">
           Join the groomers who are done with scheduling headaches. Your first 14
