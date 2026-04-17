@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
+import crypto from 'crypto'
 import prisma from '@/lib/prisma'
 import { sendWelcomeEmail } from '@/lib/email/welcome'
+import { sendVerificationEmail } from '@/lib/email/verify-email'
+
+// Verification token expires in 24 hours
+const VERIFICATION_TOKEN_EXPIRY_MS = 24 * 60 * 60 * 1000
 
 // Simple in-memory rate limiter for signup attempts
 // For production, use @upstash/ratelimit with Redis
@@ -91,7 +96,25 @@ export async function POST(req: NextRequest) {
       },
     })
 
+    // Generate and store an email verification token
+    const verificationToken = crypto.randomBytes(32).toString('hex')
+    const verificationExpiresAt = new Date(Date.now() + VERIFICATION_TOKEN_EXPIRY_MS)
+
+    await prisma.emailVerificationToken.create({
+      data: {
+        userId: user.id,
+        token: verificationToken,
+        expiresAt: verificationExpiresAt,
+      },
+    })
+
     // Non-blocking — fire and forget so signup response is never delayed
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://getgroomgrid.com'
+    const verifyUrl = `${appUrl}/api/auth/verify-email?token=${verificationToken}`
+
+    sendVerificationEmail(user.email, verifyUrl).catch(err =>
+      console.error('Verification email failed:', err)
+    )
     sendWelcomeEmail(user.email, businessName).catch(err =>
       console.error('Welcome email failed:', err)
     )
