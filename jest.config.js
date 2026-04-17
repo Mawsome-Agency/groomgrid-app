@@ -24,8 +24,6 @@ const config = {
     '<rootDir>/src/app/api/stripe/webhook/__tests__/route.test.ts',
     // Loads native Prisma bindings that cause SIGTRAP worker crash in jest-worker
     '<rootDir>/src/lib/__tests__/stripe.test.ts',
-    // Mock in test file covers stripe SDK but native bindings still cause SIGTRAP in jest-worker
-    '<rootDir>/src/tests/stripe/create-session.unit.test.ts',
   ],
   globals: {
     'ts-jest': {
