@@ -12,8 +12,7 @@
  * If GA4_API_SECRET is not set, events are logged to console (no-op in prod).
  */
 
-const MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID;
-const API_SECRET = process.env.GA4_API_SECRET;
+// Read env vars dynamically so per-test overrides take effect at call time
 const MP_ENDPOINT = 'https://www.google-analytics.com/mp/collect';
 
 interface GA4ServerEvent {
@@ -31,12 +30,15 @@ export async function trackServerEvent(
   events: GA4ServerEvent | GA4ServerEvent[],
   userId?: string
 ): Promise<void> {
-  if (!MEASUREMENT_ID) {
+  const measurementId = process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID;
+  const apiSecret = process.env.GA4_API_SECRET;
+
+  if (!measurementId) {
     console.warn('[GA4 Server] NEXT_PUBLIC_GA4_MEASUREMENT_ID not set — skipping event');
     return;
   }
 
-  if (!API_SECRET) {
+  if (!apiSecret) {
     // Log in development so the gap is visible; don't throw in production
     if (process.env.NODE_ENV !== 'production') {
       console.warn('[GA4 Server] GA4_API_SECRET not set — event not sent:', events);
@@ -64,7 +66,7 @@ export async function trackServerEvent(
   }
 
   try {
-    const url = `${MP_ENDPOINT}?measurement_id=${MEASUREMENT_ID}&api_secret=${API_SECRET}`;
+    const url = `${MP_ENDPOINT}?measurement_id=${measurementId}&api_secret=${apiSecret}`;
     const res = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

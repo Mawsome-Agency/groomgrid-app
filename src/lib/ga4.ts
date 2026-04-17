@@ -6,11 +6,15 @@ declare global {
   }
 }
 
-const GA4_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID;
+// Read measurement ID dynamically so per-test env var overrides take effect
+function getMeasurementId() {
+  return process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID;
+}
 
 // Initialize GA4
 export function initGA4() {
-  if (!GA4_MEASUREMENT_ID) return;
+  const measurementId = getMeasurementId();
+  if (!measurementId) return;
 
   window.dataLayer = window.dataLayer || [];
 
@@ -18,14 +22,14 @@ export function initGA4() {
   window.gtag = window.gtag || function gtag() {
     window.dataLayer?.push(arguments);
   };
-  
+
   window.gtag('js', new Date());
-  window.gtag('config', GA4_MEASUREMENT_ID);
+  window.gtag('config', measurementId);
 }
 
 // Track event
 export function trackEvent(eventName: string, params: Record<string, any> = {}) {
-  if (typeof window !== 'undefined' && window.gtag && GA4_MEASUREMENT_ID) {
+  if (typeof window !== 'undefined' && window.gtag && getMeasurementId()) {
     window.gtag('event', eventName, params);
   }
 }
@@ -147,10 +151,11 @@ export function trackOnboardingCompleted(userId: string) {
 // Dashboard first view event - one-time event when user first sees dashboard
 // Uses localStorage to prevent re-fires (key is userId-prefixed)
 export function trackDashboardFirstView(userId: string) {
+  if (!getMeasurementId()) return;
+
   const storageKey = `dashboard_first_view_seen_${userId}`;
-  const alreadySeen = typeof window !== 'undefined'
-    ? localStorage.getItem(storageKey)
-    : false;
+  const hasStorage = typeof window !== 'undefined' && typeof localStorage !== 'undefined';
+  const alreadySeen = hasStorage ? localStorage.getItem(storageKey) : false;
 
   if (!alreadySeen) {
     trackEvent('dashboard_first_view', {
@@ -158,7 +163,7 @@ export function trackDashboardFirstView(userId: string) {
       timestamp: new Date().toISOString(),
     });
 
-    if (typeof window !== 'undefined') {
+    if (hasStorage) {
       localStorage.setItem(storageKey, 'true');
     }
   }
