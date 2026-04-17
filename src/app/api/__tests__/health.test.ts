@@ -72,12 +72,10 @@ describe('health-check utilities', () => {
       process.env.NEXTAUTH_URL = 'http://localhost:3000';
       process.env.NEXTAUTH_SECRET = 'test-secret';
       process.env.NEXT_PUBLIC_APP_URL = 'http://localhost:3000';
-      process.env.MAILGUN_API_KEY = 'test-mailgun-key';
-      process.env.MAILGUN_DOMAIN = 'test.mailgun.domain';
 
       const results = checkEnvironmentVars();
 
-      expect(results).toHaveLength(6);
+      expect(results).toHaveLength(4);
       for (const result of results) {
         expect(result.status).toBe('pass');
       }
@@ -88,8 +86,6 @@ describe('health-check utilities', () => {
       process.env.NEXTAUTH_URL = 'http://localhost:3000';
       process.env.NEXTAUTH_SECRET = 'test-secret';
       process.env.NEXT_PUBLIC_APP_URL = 'http://localhost:3000';
-      process.env.MAILGUN_API_KEY = 'test-mailgun-key';
-      process.env.MAILGUN_DOMAIN = 'test.mailgun.domain';
 
       const results = checkEnvironmentVars();
       const dbCheck = results.find((r) => r.name === 'env:DATABASE_URL');
@@ -99,29 +95,11 @@ describe('health-check utilities', () => {
       expect(dbCheck!.message).toContain('DATABASE_URL');
     });
 
-    it('returns fail for missing MAILGUN_API_KEY', () => {
-      process.env.DATABASE_URL = 'postgresql://test:test@localhost:5432/test';
-      process.env.NEXTAUTH_URL = 'http://localhost:3000';
-      process.env.NEXTAUTH_SECRET = 'test-secret';
-      process.env.NEXT_PUBLIC_APP_URL = 'http://localhost:3000';
-      delete process.env.MAILGUN_API_KEY;
-      process.env.MAILGUN_DOMAIN = 'test.mailgun.domain';
-
-      const results = checkEnvironmentVars();
-      const mailgunCheck = results.find((r) => r.name === 'env:MAILGUN_API_KEY');
-
-      expect(mailgunCheck).toBeDefined();
-      expect(mailgunCheck!.status).toBe('fail');
-      expect(mailgunCheck!.message).toContain('MAILGUN_API_KEY');
-    });
-
     it('returns fail for multiple missing vars', () => {
       delete process.env.DATABASE_URL;
       delete process.env.NEXTAUTH_SECRET;
       process.env.NEXTAUTH_URL = 'http://localhost:3000';
       process.env.NEXT_PUBLIC_APP_URL = 'http://localhost:3000';
-      process.env.MAILGUN_API_KEY = 'test-mailgun-key';
-      process.env.MAILGUN_DOMAIN = 'test.mailgun.domain';
 
       const results = checkEnvironmentVars();
       const failures = results.filter((r) => r.status === 'fail');
@@ -129,6 +107,22 @@ describe('health-check utilities', () => {
       expect(failures).toHaveLength(2);
       expect(failures.map((r) => r.name)).toContain('env:DATABASE_URL');
       expect(failures.map((r) => r.name)).toContain('env:NEXTAUTH_SECRET');
+    });
+
+    it('does not check Mailgun vars (email failure is non-critical)', () => {
+      process.env.DATABASE_URL = 'postgresql://test:test@localhost:5432/test';
+      process.env.NEXTAUTH_URL = 'http://localhost:3000';
+      process.env.NEXTAUTH_SECRET = 'test-secret';
+      process.env.NEXT_PUBLIC_APP_URL = 'http://localhost:3000';
+      delete process.env.MAILGUN_API_KEY;
+      delete process.env.MAILGUN_DOMAIN;
+
+      const results = checkEnvironmentVars();
+
+      // All 4 critical vars pass; Mailgun absence doesn't create a check
+      expect(results).toHaveLength(4);
+      expect(results.every((r) => r.status === 'pass')).toBe(true);
+      expect(results.find((r) => r.name.includes('MAILGUN'))).toBeUndefined();
     });
   });
 
@@ -172,8 +166,6 @@ describe('health-check utilities', () => {
       process.env.NEXTAUTH_URL = 'http://localhost:3000';
       process.env.NEXTAUTH_SECRET = 'test-secret';
       process.env.NEXT_PUBLIC_APP_URL = 'http://localhost:3000';
-      process.env.MAILGUN_API_KEY = 'test-mailgun-key';
-      process.env.MAILGUN_DOMAIN = 'test.mailgun.domain';
 
       const report = await buildHealthReport();
 
@@ -192,8 +184,6 @@ describe('health-check utilities', () => {
       process.env.NEXTAUTH_URL = 'http://localhost:3000';
       process.env.NEXTAUTH_SECRET = 'test-secret';
       process.env.NEXT_PUBLIC_APP_URL = 'http://localhost:3000';
-      process.env.MAILGUN_API_KEY = 'test-mailgun-key';
-      process.env.MAILGUN_DOMAIN = 'test.mailgun.domain';
 
       const report = await buildHealthReport();
 
@@ -208,28 +198,25 @@ describe('health-check utilities', () => {
       process.env.NEXTAUTH_URL = 'http://localhost:3000';
       process.env.NEXTAUTH_SECRET = 'test-secret';
       process.env.NEXT_PUBLIC_APP_URL = 'http://localhost:3000';
-      process.env.MAILGUN_API_KEY = 'test-mailgun-key';
-      process.env.MAILGUN_DOMAIN = 'test.mailgun.domain';
 
       const report = await buildHealthReport();
 
       expect(report.status).toBe('critical');
     });
 
-    it('reports critical when MAILGUN_API_KEY is missing', async () => {
+    it('reports healthy when Mailgun vars are absent (email is non-critical)', async () => {
       mockQueryRaw.mockResolvedValueOnce([{ '?column?': 1 }]);
       process.env.DATABASE_URL = 'postgresql://test:test@localhost:5432/test';
       process.env.NEXTAUTH_URL = 'http://localhost:3000';
       process.env.NEXTAUTH_SECRET = 'test-secret';
       process.env.NEXT_PUBLIC_APP_URL = 'http://localhost:3000';
       delete process.env.MAILGUN_API_KEY;
-      process.env.MAILGUN_DOMAIN = 'test.mailgun.domain';
+      delete process.env.MAILGUN_DOMAIN;
 
       const report = await buildHealthReport();
 
-      expect(report.status).toBe('critical');
-      const mailgunCheck = report.checks.find((c) => c.name === 'env:MAILGUN_API_KEY');
-      expect(mailgunCheck!.status).toBe('fail');
+      // Site is healthy even without email config — email fails gracefully
+      expect(report.status).toBe('healthy');
     });
 
     it('reports healthy when everything is configured', async () => {
@@ -238,8 +225,6 @@ describe('health-check utilities', () => {
       process.env.NEXTAUTH_URL = 'http://localhost:3000';
       process.env.NEXTAUTH_SECRET = 'test-secret';
       process.env.NEXT_PUBLIC_APP_URL = 'http://localhost:3000';
-      process.env.MAILGUN_API_KEY = 'test-mailgun-key';
-      process.env.MAILGUN_DOMAIN = 'test.mailgun.domain';
 
       const report = await buildHealthReport();
 

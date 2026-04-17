@@ -55,8 +55,9 @@ export async function checkDatabase(): Promise<HealthCheckResult> {
 
 /**
  * Check that required environment variables for core app modules are present.
- * Checks auth/DB vars plus Mailgun email config (required for password reset,
- * welcome emails, and booking confirmations).
+ * Only includes vars whose absence would prevent the site from functioning
+ * (auth, DB, public URL). Email config (Mailgun) is handled gracefully by
+ * the adapter and does not warrant a 503 if missing.
  */
 export function checkEnvironmentVars(): HealthCheckResult[] {
   const checks: HealthCheckResult[] = [];
@@ -66,8 +67,6 @@ export function checkEnvironmentVars(): HealthCheckResult[] {
     { name: 'NEXTAUTH_URL', label: 'NextAuth URL' },
     { name: 'NEXTAUTH_SECRET', label: 'NextAuth secret' },
     { name: 'NEXT_PUBLIC_APP_URL', label: 'Public app URL' },
-    { name: 'MAILGUN_API_KEY', label: 'Mailgun API key' },
-    { name: 'MAILGUN_DOMAIN', label: 'Mailgun sending domain' },
   ];
 
   for (const { name, label } of criticalVars) {
