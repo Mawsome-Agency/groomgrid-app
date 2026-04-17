@@ -203,12 +203,11 @@ test.describe('Full signup-to-dashboard journey', () => {
   // ── Step 12: Onboarding page accessible ──────────────────────────────────
 
   test('step 12: onboarding page loads for authenticated user', async ({ page }) => {
-    const freshEmail = generateTestEmail();
-    await page.request.post('/api/auth/signup', {
-      data: { email: freshEmail, password, businessName },
-    });
+    // Reuse shared user from beforeAll (created via step 4-5 form submit).
+    // Avoids exhausting the signup rate limit (MAX 5/15 min) — steps 6-9 already
+    // consume 4 of those slots; creating a fresh user here would push us over.
     await page.goto('/login');
-    await page.getByLabel(/Email Address/i).fill(freshEmail);
+    await page.getByLabel(/Email Address/i).fill(email);
     await page.getByLabel(/Password/i).fill(password);
     await page.getByRole('button', { name: /Sign In/i }).click();
     await expect(page).toHaveURL(/\/(welcome|plans|dashboard|onboarding)/, { timeout: 30_000 });
@@ -220,12 +219,10 @@ test.describe('Full signup-to-dashboard journey', () => {
   // ── Step 13: Onboarding step 1 renders client form ───────────────────────
 
   test('step 13: onboarding step 1 shows client name and pet name fields', async ({ page }) => {
-    const freshEmail = generateTestEmail();
-    await page.request.post('/api/auth/signup', {
-      data: { email: freshEmail, password, businessName },
-    });
+    // Reuse shared user — no fresh signup needed (see step 12 comment).
+    // Runs before step 14 so onboarding_completed is still false here.
     await page.goto('/login');
-    await page.getByLabel(/Email Address/i).fill(freshEmail);
+    await page.getByLabel(/Email Address/i).fill(email);
     await page.getByLabel(/Password/i).fill(password);
     await page.getByRole('button', { name: /Sign In/i }).click();
     await expect(page).toHaveURL(/\/(welcome|plans|dashboard|onboarding)/, { timeout: 30_000 });
@@ -244,12 +241,11 @@ test.describe('Full signup-to-dashboard journey', () => {
   // ── Step 14: Skip onboarding tutorial ────────────────────────────────────
 
   test('step 14: skip tutorial button navigates to dashboard', async ({ page }) => {
-    const freshEmail = generateTestEmail();
-    await page.request.post('/api/auth/signup', {
-      data: { email: freshEmail, password, businessName },
-    });
+    // Reuse shared user — no fresh signup needed (see step 12 comment).
+    // This test intentionally mutates state (skips onboarding) — step 15 is
+    // designed to work with onboarding already completed.
     await page.goto('/login');
-    await page.getByLabel(/Email Address/i).fill(freshEmail);
+    await page.getByLabel(/Email Address/i).fill(email);
     await page.getByLabel(/Password/i).fill(password);
     await page.getByRole('button', { name: /Sign In/i }).click();
     await expect(page).toHaveURL(/\/(welcome|plans|dashboard|onboarding)/, { timeout: 30_000 });
@@ -267,12 +263,11 @@ test.describe('Full signup-to-dashboard journey', () => {
   // ── Step 15: Dashboard renders with welcome card ──────────────────────────
 
   test('step 15: dashboard renders welcome card for new users', async ({ page }) => {
-    const freshEmail = generateTestEmail();
-    await page.request.post('/api/auth/signup', {
-      data: { email: freshEmail, password, businessName },
-    });
+    // Reuse shared user — no fresh signup needed (see step 12 comment).
+    // Note: step 14 may have set onboarding_completed=true; the welcome-card
+    // assertion below is conditional (if isVisible) so this is safe either way.
     await page.goto('/login');
-    await page.getByLabel(/Email Address/i).fill(freshEmail);
+    await page.getByLabel(/Email Address/i).fill(email);
     await page.getByLabel(/Password/i).fill(password);
     await page.getByRole('button', { name: /Sign In/i }).click();
     await expect(page).toHaveURL(/\/(welcome|plans|dashboard|onboarding)/, { timeout: 30_000 });
