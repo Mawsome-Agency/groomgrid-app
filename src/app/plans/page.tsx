@@ -1,11 +1,12 @@
 'use client';
 
 import Link from 'next/link';
+import Script from 'next/script';
 import PlanCard from '@/components/funnel/PlanCard';
 import Testimonial from '@/components/funnel/Testimonial';
 import ValueProp from '@/components/funnel/ValueProp';
 import TrustSignals from '@/components/trust/TrustSignals';
-import { PLANS, TESTIMONIALS, FAQ_ITEMS } from '../pricing/pricing-data';
+import { PLANS, TESTIMONIALS, FAQ_ITEMS } from '@/pricing/pricing-data';
 
 const pricingSchema = {
   '@context': 'https://schema.org',
@@ -128,7 +129,8 @@ export default function PublicPricingPage() {
       </footer>
 
       {/* Schema.org structured data */}
-      <script
+      <Script
+        id="pricing-schema"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(pricingSchema) }}
       />
