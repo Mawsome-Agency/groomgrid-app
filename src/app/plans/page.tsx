@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
+import Script from 'next/script';
 import { Plan } from '@/types';
 import PlanCard from '@/components/funnel/PlanCard';
 import Testimonial from '@/components/funnel/Testimonial';
@@ -233,6 +234,27 @@ function PlansPageInner() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 py-12">
+        {/* Schema.org OfferCatalog structured data for rich results */}
+        <Script
+          id="pricing-schema"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "OfferCatalog",
+              "name": "GroomGrid Pricing Plans",
+              "itemListElement": PLANS.map((plan, i) => ({
+                "@type": "Offer",
+                "position": i + 1,
+                "name": plan.name,
+                "price": plan.price,
+                "priceCurrency": "USD",
+                "description": plan.features.join(', '),
+              })),
+            }),
+          }}
+        />
+
         {/* Hero Section */}
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold text-stone-900 mb-4">Choose Your Plan</h2>
