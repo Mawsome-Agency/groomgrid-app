@@ -1039,7 +1039,7 @@ describe('ga4.ts', () => {
       expect(localStorage.getItem('dashboard_first_view_seen_user_12345')).toBe('true');
 
       // Call again - should not fire event
-      window.gtag.mockClear();
+      (window.gtag as jest.Mock).mockClear();
       trackDashboardFirstView('user_12345');
 
       expect(window.gtag).not.toHaveBeenCalled();
@@ -1053,7 +1053,7 @@ describe('ga4.ts', () => {
 
     it('should not fire if already seen in localStorage', () => {
       localStorage.setItem('dashboard_first_view_seen_user_12345', 'true');
-      window.gtag.mockClear();
+      (window.gtag as jest.Mock).mockClear();
 
       trackDashboardFirstView('user_12345');
 

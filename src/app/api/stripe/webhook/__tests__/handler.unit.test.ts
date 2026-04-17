@@ -7,7 +7,8 @@ import * as ga4 from '@/lib/ga4-server';
 jest.mock('@/lib/payment-completion');
 jest.mock('@/lib/ga4-server');
 
-const mockPrisma = {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const mockPrisma: Record<string, any> = {
   paymentEvent: {
     create: jest.fn().mockResolvedValue({}),
     findFirst: jest.fn().mockResolvedValue(null),

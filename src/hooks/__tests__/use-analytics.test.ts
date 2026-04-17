@@ -71,7 +71,7 @@ describe('useAnalytics', () => {
 
     it('should generate session ID with timestamp', () => {
       const sessionId = useAnalytics().sessionId;
-      const timestampMatch = sessionId.match(/sess_(\d+)_/);
+      const timestampMatch = sessionId().match(/sess_(\d+)_/);
 
       expect(timestampMatch).toBeTruthy();
       expect(parseInt(timestampMatch![1])).toBeLessThanOrEqual(Date.now());
@@ -83,8 +83,8 @@ describe('useAnalytics', () => {
       sessionStorage.clear();
       const sessionId2 = useAnalytics().sessionId;
 
-      const random1 = sessionId1.split('_')[2];
-      const random2 = sessionId2.split('_')[2];
+      const random1 = sessionId1().split('_')[2];
+      const random2 = sessionId2().split('_')[2];
 
       expect(random1).not.toBe(random2);
       expect(random1).toMatch(/^[a-z0-9]+$/);
@@ -119,10 +119,10 @@ describe('useAnalytics', () => {
     });
 
     it('should persist sessionId across re-renders', () => {
-      const { result } = renderHook(() => useAnalytics());
+      const { result, rerender } = renderHook(() => useAnalytics());
 
       const sessionId1 = result.current.sessionId;
-      result.rerender();
+      rerender();
       const sessionId2 = result.current.sessionId;
 
       expect(sessionId2).toBe(sessionId1);
