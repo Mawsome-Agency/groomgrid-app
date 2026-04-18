@@ -2,9 +2,26 @@ import Stripe from 'stripe';
 import { requireEnvVar } from './validation';
 import crypto from 'crypto';
 
-const stripe = new Stripe(requireEnvVar('STRIPE_SECRET_KEY'), {
-  apiVersion: "2023-10-16",
-});
+// Lazy Stripe initialization — avoids crashing at module-eval time when
+// STRIPE_SECRET_KEY is absent (e.g. staging builds, test environments).
+let _stripe: Stripe | null = null;
+function getStripe(): Stripe {
+  if (!_stripe) {
+    _stripe = new Stripe(requireEnvVar('STRIPE_SECRET_KEY'), {
+      apiVersion: "2023-10-16",
+    });
+  }
+  return _stripe;
+}
+
+// Lazy PRICE_IDS — same reason: don't throw at import time.
+function getPriceIds() {
+  return {
+    solo: requireEnvVar('STRIPE_PRICE_SOLO'),
+    salon: requireEnvVar('STRIPE_PRICE_SALON'),
+    enterprise: requireEnvVar('STRIPE_PRICE_ENTERPRISE'),
+  } as const;
+}
 
 export interface CreateCheckoutSessionParams {
   userId: string;
@@ -15,12 +32,6 @@ export interface CreateCheckoutSessionParams {
   clientId?: string;
 }
 
-const PRICE_IDS = {
-  solo: requireEnvVar('STRIPE_PRICE_SOLO'),
-  salon: requireEnvVar('STRIPE_PRICE_SALON'),
-  enterprise: requireEnvVar('STRIPE_PRICE_ENTERPRISE'),
-} as const;
-
 export async function createCheckoutSession({
   userId,
   planType,
@@ -29,7 +40,8 @@ export async function createCheckoutSession({
   planData,
   clientId,
 }: CreateCheckoutSessionParams) {
-  const priceId = PRICE_IDS[planType];
+  const stripe = getStripe();
+  const priceId = getPriceIds()[planType];
 
   const session = await stripe.checkout.sessions.create({
     customer_email: customerEmail,
@@ -68,12 +80,12 @@ export async function createCheckoutSession({
 }
 
 export async function getCheckoutSession(sessionId: string) {
-  const session = await stripe.checkout.sessions.retrieve(sessionId);
+  const session = await getStripe().checkout.sessions.retrieve(sessionId);
   return session;
 }
 
 export async function createCustomerPortalSession(customerId: string) {
-  const session = await stripe.billingPortal.sessions.create({
+  const session = await getStripe().billingPortal.sessions.create({
     customer: customerId,
     return_url: `${process.env.NEXT_PUBLIC_APP_URL}/settings`,
   });
@@ -151,7 +163,12 @@ export function getStripeErrorMessage(error: any): { type: string; message: stri
   };
 }
 
-export { stripe };
+/** @deprecated Use getStripe() for lazy initialization */
+export const stripe = new Proxy({} as Stripe, {
+  get(_target, prop) {
+    return (getStripe() as any)[prop];
+  },
+});
 
 /**
  * Base mock checkout session object matching Stripe.Checkout.Session shape
