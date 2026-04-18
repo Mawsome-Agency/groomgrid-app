@@ -35,6 +35,32 @@ export function trackEvent(eventName: string, params: Record<string, any> = {}) 
 }
 
 // Funnel events
+
+// Fires when user lands on /signup page (page load, not form submit)
+export function trackSignupViewed() {
+  trackEvent('signup_started');
+}
+
+// Fires on successful POST /api/auth/signup response
+export function trackSignupCompleted(userId: string) {
+  trackEvent('signup_completed', {
+    user_id: userId,
+  });
+}
+
+// Fires when user lands on /plans page (once per mount)
+export function trackPlanViewed() {
+  trackEvent('plan_viewed');
+}
+
+// Fires when user clicks a paid plan CTA
+export function trackCheckoutStarted(planName: string, planPrice: number) {
+  trackEvent('checkout_started', {
+    plan_name: planName,
+    plan_price: planPrice,
+  });
+}
+
 export function trackSignupStarted(businessName: string) {
   trackEvent('signup_started', {
     business_name: businessName,

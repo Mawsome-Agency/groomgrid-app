@@ -19,7 +19,7 @@ import {
   Users,
   Shield,
 } from 'lucide-react';
-import { trackSignupStarted, trackAccountCreated, trackSignupError } from '@/lib/ga4';
+import { trackSignupViewed, trackSignupCompleted, trackSignupStarted, trackAccountCreated, trackSignupError } from '@/lib/ga4';
 import { useFormValidation } from '@/hooks/use-form-validation';
 import PasswordStrengthMeter from '@/components/auth/PasswordStrengthMeter';
 import './signup.css';
@@ -71,6 +71,15 @@ function SignupPageInner() {
   const groomerCount = useCountUp(BASE_COUNT);
 
   const { errors, validateField, clearFieldError } = useFormValidation();
+
+  // Fire signup_viewed once on mount (useRef guard prevents StrictMode double-fire)
+  const signupViewedFiredRef = useRef(false);
+  useEffect(() => {
+    if (!signupViewedFiredRef.current) {
+      signupViewedFiredRef.current = true;
+      trackSignupViewed();
+    }
+  }, []);
 
   // Show sticky mobile CTA when form scrolls out of view
   useEffect(() => {
@@ -135,6 +144,7 @@ function SignupPageInner() {
         return;
       }
 
+      trackSignupCompleted(data.userId);
       trackAccountCreated(data.userId, formData.businessName);
 
       const result = await signIn('credentials', {

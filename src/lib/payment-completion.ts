@@ -14,7 +14,7 @@
 
 import Stripe from 'stripe';
 import prisma from '@/lib/prisma';
-import { trackCheckoutCompletedServer, trackSubscriptionStartedServer } from '@/lib/ga4-server';
+import { trackCheckoutCompletedServer, trackSubscriptionStartedServer, trackPurchaseCompletedServer } from '@/lib/ga4-server';
 import type { Prisma } from '@prisma/client';
 
 export type PaymentEventType = 'PAYMENT_INITIATED' | 'PAYMENT_CONFIRMED' | 'COMPLETION_PROCESSED';
@@ -121,21 +121,29 @@ export async function triggerPaymentCompletionHandler(
     // Order matters for funnel tracking
     await trackCheckoutCompletedServer(clientId || userId, userId, session.id, planType, true);
 
-    if (stripeSubscriptionId) {
-      // Map planType to price
-      const planPriceMap: Record<string, number> = {
-        solo: 29,
-        salon: 79,
-        enterprise: 149,
-      };
-      const price = planPriceMap[planType] ?? 0;
+    // Map planType to price and display name
+    const planPriceMap: Record<string, number> = {
+      solo: 29,
+      salon: 79,
+      enterprise: 149,
+    };
+    const planNameMap: Record<string, string> = {
+      solo: 'Solo',
+      salon: 'Salon',
+      enterprise: 'Enterprise',
+    };
+    const planPrice = planPriceMap[planType] ?? 0;
+    const planName = planNameMap[planType] ?? planType;
 
+    await trackPurchaseCompletedServer(clientId || userId, userId, session.id, planName, planPrice);
+
+    if (stripeSubscriptionId) {
       await trackSubscriptionStartedServer(
         userId,
         stripeSubscriptionId,
         planType,
         'trial',
-        price
+        planPrice
       );
     }
   } catch (error) {

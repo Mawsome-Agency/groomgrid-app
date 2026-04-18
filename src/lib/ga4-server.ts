@@ -241,6 +241,28 @@ export async function trackPaymentFailedServer(
   );
 }
 
+export async function trackPurchaseCompletedServer(
+  clientId: string,
+  userId: string,
+  sessionId: string,
+  planName: string,
+  planPrice: number
+): Promise<void> {
+  const effectiveClientId = clientId || userId;
+  await trackServerEvent(
+    effectiveClientId,
+    {
+      name: 'purchase_completed',
+      params: {
+        plan_name: planName,
+        plan_price: planPrice,
+        session_id: sessionId,
+      },
+    },
+    userId
+  );
+}
+
 export async function trackABTestAssignedServer(
   userId: string,
   testName: string,

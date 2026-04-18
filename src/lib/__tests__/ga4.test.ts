@@ -11,6 +11,10 @@
 import {
   initGA4,
   trackEvent,
+  trackSignupViewed,
+  trackSignupCompleted,
+  trackPlanViewed,
+  trackCheckoutStarted,
   trackSignupStarted,
   trackEmailVerified,
   trackPlanSelected,
@@ -1234,6 +1238,121 @@ describe('ga4.ts', () => {
       // Should also track completion if skipped is considered "done"
       trackOnboardingCompleted('user_123');
       expect((window.gtag as jest.Mock).mock.calls[1][1]).toBe('onboarding_completed');
+    });
+  });
+
+  // ─── trackSignupViewed ──────────────────────────────────────────────────────
+
+  describe('trackSignupViewed', () => {
+    beforeEach(() => {
+      process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID = 'G-TEST123';
+    });
+
+    it('should fire signup_started event with no extra params', () => {
+      trackSignupViewed();
+
+      expect(window.gtag).toHaveBeenCalledWith('event', 'signup_started', {});
+    });
+
+    it('should not fire if analytics disabled', () => {
+      delete process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID;
+      trackSignupViewed();
+
+      expect(window.gtag).not.toHaveBeenCalled();
+    });
+  });
+
+  // ─── trackSignupCompleted ───────────────────────────────────────────────────
+
+  describe('trackSignupCompleted', () => {
+    beforeEach(() => {
+      process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID = 'G-TEST123';
+    });
+
+    it('should fire signup_completed event with user_id', () => {
+      trackSignupCompleted('user_12345');
+
+      expect(window.gtag).toHaveBeenCalledWith('event', 'signup_completed', {
+        user_id: 'user_12345',
+      });
+    });
+
+    it('should handle empty user ID', () => {
+      trackSignupCompleted('');
+
+      expect(window.gtag).toHaveBeenCalledWith('event', 'signup_completed', {
+        user_id: '',
+      });
+    });
+
+    it('should not fire if analytics disabled', () => {
+      delete process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID;
+      trackSignupCompleted('user_12345');
+
+      expect(window.gtag).not.toHaveBeenCalled();
+    });
+  });
+
+  // ─── trackPlanViewed ────────────────────────────────────────────────────────
+
+  describe('trackPlanViewed', () => {
+    beforeEach(() => {
+      process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID = 'G-TEST123';
+    });
+
+    it('should fire plan_viewed event with no extra params', () => {
+      trackPlanViewed();
+
+      expect(window.gtag).toHaveBeenCalledWith('event', 'plan_viewed', {});
+    });
+
+    it('should not fire if analytics disabled', () => {
+      delete process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID;
+      trackPlanViewed();
+
+      expect(window.gtag).not.toHaveBeenCalled();
+    });
+  });
+
+  // ─── trackCheckoutStarted ───────────────────────────────────────────────────
+
+  describe('trackCheckoutStarted', () => {
+    beforeEach(() => {
+      process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID = 'G-TEST123';
+    });
+
+    it('should fire checkout_started event with plan_name and plan_price', () => {
+      trackCheckoutStarted('Solo', 29);
+
+      expect(window.gtag).toHaveBeenCalledWith('event', 'checkout_started', {
+        plan_name: 'Solo',
+        plan_price: 29,
+      });
+    });
+
+    it('should handle float plan price', () => {
+      trackCheckoutStarted('Enterprise', 149.99);
+
+      expect(window.gtag).toHaveBeenCalledWith('event', 'checkout_started', {
+        plan_name: 'Enterprise',
+        plan_price: 149.99,
+      });
+    });
+
+    it('should handle zero plan price', () => {
+      trackCheckoutStarted('Free', 0);
+
+      expect(window.gtag).toHaveBeenCalledWith('event', 'checkout_started', {
+        plan_name: 'Free',
+        plan_price: 0,
+      });
+    });
+
+    it('should not fire if analytics disabled', () => {
+      delete process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID;
+      trackCheckoutStarted('Solo', 29);
+
+      expect(window.gtag).not.toHaveBeenCalled();
     });
   });
 });

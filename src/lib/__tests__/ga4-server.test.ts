@@ -17,6 +17,7 @@ import {
   trackPaymentInitiatedServer,
   trackPaymentSuccessServer,
   trackPaymentFailedServer,
+  trackPurchaseCompletedServer,
 } from '../ga4-server';
 
 describe('ga4-server.ts', () => {
@@ -388,6 +389,40 @@ describe('ga4-server.ts', () => {
 
       const fetchBody = JSON.parse((fetch as jest.Mock).mock.calls[0][1].body);
       expect(fetchBody.events[0].params.reason).toHaveLength(500);
+    });
+  });
+
+  describe('trackPurchaseCompletedServer', () => {
+    it('should call trackServerEvent with correct params', async () => {
+      (global as any).fetch = jest.fn().mockResolvedValue({ ok: true });
+
+      await trackPurchaseCompletedServer('client_123', 'user_123', 'sess_456', 'Solo', 29);
+
+      const fetchBody = JSON.parse((fetch as jest.Mock).mock.calls[0][1].body);
+      expect(fetchBody.client_id).toBe('client_123');
+      expect(fetchBody.user_id).toBe('user_123');
+      expect(fetchBody.events[0].name).toBe('purchase_completed');
+      expect(fetchBody.events[0].params.plan_name).toBe('Solo');
+      expect(fetchBody.events[0].params.plan_price).toBe(29);
+      expect(fetchBody.events[0].params.session_id).toBe('sess_456');
+    });
+
+    it('should fall back to userId as clientId when clientId is empty', async () => {
+      (global as any).fetch = jest.fn().mockResolvedValue({ ok: true });
+
+      await trackPurchaseCompletedServer('', 'user_123', 'sess_456', 'Salon', 79);
+
+      const fetchBody = JSON.parse((fetch as jest.Mock).mock.calls[0][1].body);
+      expect(fetchBody.client_id).toBe('user_123');
+    });
+
+    it('should handle float plan price', async () => {
+      (global as any).fetch = jest.fn().mockResolvedValue({ ok: true });
+
+      await trackPurchaseCompletedServer('client_123', 'user_123', 'sess_456', 'Enterprise', 149.99);
+
+      const fetchBody = JSON.parse((fetch as jest.Mock).mock.calls[0][1].body);
+      expect(fetchBody.events[0].params.plan_price).toBe(149.99);
     });
   });
 

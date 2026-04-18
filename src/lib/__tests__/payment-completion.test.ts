@@ -27,16 +27,18 @@ jest.mock('@/lib/ga4-server', () => ({
   __esModule: true,
   trackCheckoutCompletedServer: jest.fn(),
   trackSubscriptionStartedServer: jest.fn(),
+  trackPurchaseCompletedServer: jest.fn(),
 }));
 
 import prisma from '@/lib/prisma';
-import { trackCheckoutCompletedServer, trackSubscriptionStartedServer } from '@/lib/ga4-server';
+import { trackCheckoutCompletedServer, trackSubscriptionStartedServer, trackPurchaseCompletedServer } from '@/lib/ga4-server';
 import { triggerPaymentCompletionHandler } from '../payment-completion';
 
 const mockFindUnique = prisma.paymentEvent.findUnique as jest.MockedFunction<typeof prisma.paymentEvent.findUnique>;
 const mockTransaction = prisma.$transaction as jest.MockedFunction<typeof prisma.$transaction>;
 const mockTrackCheckout = trackCheckoutCompletedServer as jest.MockedFunction<typeof trackCheckoutCompletedServer>;
 const mockTrackSubscription = trackSubscriptionStartedServer as jest.MockedFunction<typeof trackSubscriptionStartedServer>;
+const mockTrackPurchase = trackPurchaseCompletedServer as jest.MockedFunction<typeof trackPurchaseCompletedServer>;
 
 const BASE_SESSION = {
   id: 'cs_test_abc',
@@ -63,6 +65,7 @@ beforeEach(() => {
   });
   mockTrackCheckout.mockResolvedValue(undefined);
   mockTrackSubscription.mockResolvedValue(undefined);
+  mockTrackPurchase.mockResolvedValue(undefined);
 });
 
 // ─────────────────────────────────────────────
@@ -386,6 +389,61 @@ describe('triggerPaymentCompletionHandler — plan price in GA4', () => {
       'trial',
       0
     );
+  });
+});
+
+// ─────────────────────────────────────────────
+// purchase_completed GA4 event
+// ─────────────────────────────────────────────
+describe('triggerPaymentCompletionHandler — purchase_completed event', () => {
+  it('fires purchase_completed GA4 event after transaction', async () => {
+    await triggerPaymentCompletionHandler(BASE_SESSION);
+
+    expect(mockTrackPurchase).toHaveBeenCalledWith(
+      'ga4-client-id',
+      'user-abc',
+      'cs_test_abc',
+      'Solo',
+      29
+    );
+  });
+
+  it('uses correct plan name for salon planType', async () => {
+    await triggerPaymentCompletionHandler({
+      ...BASE_SESSION,
+      metadata: { userId: 'user-abc', planType: 'salon', clientId: 'ga4-client-id' },
+    });
+
+    expect(mockTrackPurchase).toHaveBeenCalledWith(
+      'ga4-client-id',
+      'user-abc',
+      'cs_test_abc',
+      'Salon',
+      79
+    );
+  });
+
+  it('uses planType as planName fallback for unknown plan', async () => {
+    await triggerPaymentCompletionHandler({
+      ...BASE_SESSION,
+      metadata: { userId: 'user-abc', planType: 'custom', clientId: 'ga4-client-id' },
+    });
+
+    expect(mockTrackPurchase).toHaveBeenCalledWith(
+      'ga4-client-id',
+      'user-abc',
+      'cs_test_abc',
+      'custom',
+      0
+    );
+  });
+
+  it('does not fire purchase_completed when already processed', async () => {
+    mockFindUnique.mockResolvedValueOnce({ id: 'event-1' } as any);
+
+    await triggerPaymentCompletionHandler(BASE_SESSION);
+
+    expect(mockTrackPurchase).not.toHaveBeenCalled();
   });
 });
 
