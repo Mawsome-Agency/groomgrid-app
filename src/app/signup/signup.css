@@ -37,3 +37,25 @@
     border-left: 4px solid #f87171;
   }
 }
+
+/* Sticky mobile CTA — slides up from bottom */
+@keyframes slideUpIn {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.sticky-cta-bar {
+  animation: slideUpIn 250ms ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sticky-cta-bar {
+    animation: none;
+  }
+}
