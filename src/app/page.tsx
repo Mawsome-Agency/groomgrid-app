@@ -5,7 +5,7 @@ import { useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { useScrollReveal } from '@/hooks/use-scroll-reveal';
 
-const SIGNUP_URL = '/signup';
+const SIGNUP_URL = '/signup?coupon=BETA50';
 
 /**
  * CTA link wrapper. Adds tactile press feedback (scale-down on active)

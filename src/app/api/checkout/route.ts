@@ -28,7 +28,12 @@ export async function POST(req: NextRequest) {
     ensureEnv('stripe');
     ensureEnv('app');
 
-    const { userId, planType, customerEmail, clientId } = await req.json();
+    const { userId, planType, customerEmail, clientId, coupon: rawCoupon } = await req.json();
+
+    // Sanitize coupon: uppercase, alphanumeric only, max 20 chars
+    const coupon = rawCoupon
+      ? String(rawCoupon).toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 20) || undefined
+      : undefined;
 
     if (!userId || !planType) {
       return NextResponse.json({ error: 'Missing required fields', errorType: 'generic' }, { status: 400 });
@@ -58,6 +63,7 @@ export async function POST(req: NextRequest) {
       businessName: profile.businessName,
       planData: PLAN_DATA[planType as keyof typeof PLAN_DATA],
       clientId,
+      couponCode: coupon,
     });
 
     await trackPaymentInitiatedServer(userId, session.id, planType);

@@ -37,6 +37,7 @@ function WelcomePageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { data: session, status } = useSession();
+  const couponParam = searchParams.get('coupon');
   const [loading, setLoading] = useState(true);
   const [businessName, setBusinessName] = useState<string>('');
   const [isRedirecting, setIsRedirecting] = useState(false);
@@ -57,7 +58,8 @@ function WelcomePageInner() {
 
         // Check if welcome was already shown - if so, redirect to plans
         if (data.welcomeShown) {
-          router.replace('/plans');
+          const plansUrl = couponParam ? `/plans?coupon=${encodeURIComponent(couponParam)}` : '/plans';
+          router.replace(plansUrl);
           return;
         }
 
@@ -99,8 +101,9 @@ function WelcomePageInner() {
     const handlePopState = (event: PopStateEvent) => {
       event.preventDefault();
       event.stopImmediatePropagation();
-      // Redirect to plans instead of going back
-      router.replace('/plans');
+      // Redirect to plans instead of going back (preserve coupon if present)
+      const plansUrl = couponParam ? `/plans?coupon=${encodeURIComponent(couponParam)}` : '/plans';
+      router.replace(plansUrl);
     };
 
     window.addEventListener('popstate', handlePopState);
@@ -127,7 +130,8 @@ function WelcomePageInner() {
   const handleContinue = () => {
     if (isRedirecting) return;
     setIsRedirecting(true);
-    router.push('/plans');
+    const plansUrl = couponParam ? `/plans?coupon=${encodeURIComponent(couponParam)}` : '/plans';
+    router.push(plansUrl);
   };
 
   // Handle keyboard navigation

@@ -30,6 +30,7 @@ export interface CreateCheckoutSessionParams {
   businessName: string;
   planData?: { name: string; price: number };
   clientId?: string;
+  couponCode?: string;
 }
 
 export async function createCheckoutSession({
@@ -39,9 +40,16 @@ export async function createCheckoutSession({
   businessName,
   planData,
   clientId,
+  couponCode,
 }: CreateCheckoutSessionParams) {
   const stripe = getStripe();
   const priceId = getPriceIds()[planType];
+
+  // When a coupon is provided, apply it directly (fixed discount) instead of
+  // allowing the user to enter a promo code at checkout.
+  const discountFields: Partial<Stripe.Checkout.SessionCreateParams> = couponCode
+    ? { discounts: [{ coupon: couponCode }] }
+    : { allow_promotion_codes: true };
 
   const session = await stripe.checkout.sessions.create({
     customer_email: customerEmail,
@@ -70,8 +78,8 @@ export async function createCheckoutSession({
     },
     success_url: `${process.env.NEXT_PUBLIC_APP_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/checkout/cancel?plan=${planType}`,
-    allow_promotion_codes: true,
     billing_address_collection: 'required',
+    ...discountFields,
     // Note: customer_update requires an existing Stripe customer ID.
     // New users don't have one yet — add to billing portal flow instead.
   });

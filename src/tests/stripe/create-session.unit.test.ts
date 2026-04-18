@@ -142,7 +142,7 @@ describe('createCheckoutSession params — Bug 1 & 2 interface contract', () => 
 
     const [args] = mockCreateCheckoutSession.mock.calls[0];
     // Only these fields are valid in CreateCheckoutSessionParams
-    const knownFields = ['userId', 'planType', 'customerEmail', 'businessName', 'planData', 'clientId'];
+    const knownFields = ['userId', 'planType', 'customerEmail', 'businessName', 'planData', 'clientId', 'couponCode'];
     const actualFields = Object.keys(args);
     const unknownFields = actualFields.filter(f => !knownFields.includes(f));
     expect(unknownFields).toHaveLength(0);
