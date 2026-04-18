@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, useRef, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { signIn } from 'next-auth/react';
 import {
@@ -52,8 +52,10 @@ function useCountUp(end: number, durationMs = 800) {
   return count;
 }
 
-export default function SignupPage() {
+function SignupPageInner() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const couponParam = searchParams.get('coupon');
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -151,7 +153,12 @@ export default function SignupPage() {
 
       setSubmitSuccess(true);
       setTimeout(() => {
-        router.push('/welcome');
+        // When a coupon param is present, skip welcome and go straight to plans
+        if (couponParam) {
+          router.push(`/plans?coupon=${encodeURIComponent(couponParam)}`);
+        } else {
+          router.push('/welcome');
+        }
       }, 400);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Failed to create account';
@@ -435,5 +442,25 @@ export default function SignupPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function SignupPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-stone-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full animate-pulse">
+          <div className="h-8 bg-stone-200 rounded w-1/2 mx-auto mb-8" />
+          <div className="space-y-4">
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="h-12 bg-stone-200 rounded-xl" />
+            ))}
+            <div className="h-12 bg-stone-200 rounded-xl mt-2" />
+          </div>
+        </div>
+      </div>
+    }>
+      <SignupPageInner />
+    </Suspense>
   );
 }

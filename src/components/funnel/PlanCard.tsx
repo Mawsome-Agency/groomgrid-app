@@ -11,9 +11,10 @@ interface PlanCardProps {
   isLoading?: boolean;
   isDimmed?: boolean;
   hasError?: boolean;
+  discountedPrice?: number;
 }
 
-export default function PlanCard({ plan, selected, onSelect, isLoading, isDimmed, hasError }: PlanCardProps) {
+export default function PlanCard({ plan, selected, onSelect, isLoading, isDimmed, hasError, discountedPrice }: PlanCardProps) {
   return (
     <div
       onClick={() => !isLoading && onSelect(plan)}
@@ -45,10 +46,18 @@ export default function PlanCard({ plan, selected, onSelect, isLoading, isDimmed
 
       <div className="text-center mb-4">
         <h3 className="text-xl font-bold text-stone-900 mb-1">{plan.name}</h3>
-        <div className="flex items-baseline justify-center gap-1">
-          <span className="text-4xl font-bold text-green-600">${plan.price}</span>
-          <span className="text-stone-500">/mo</span>
-        </div>
+        {discountedPrice !== undefined ? (
+          <div className="flex items-baseline justify-center gap-1">
+            <span className="text-2xl font-bold text-stone-400 line-through">${plan.price}</span>
+            <span className="text-4xl font-bold text-green-600">${discountedPrice}</span>
+            <span className="text-stone-500">/mo</span>
+          </div>
+        ) : (
+          <div className="flex items-baseline justify-center gap-1">
+            <span className="text-4xl font-bold text-green-600">${plan.price}</span>
+            <span className="text-stone-500">/mo</span>
+          </div>
+        )}
         <p className="text-xs text-green-600 mt-2">14-day free trial</p>
       </div>
 

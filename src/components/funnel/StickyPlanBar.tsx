@@ -7,9 +7,10 @@ interface StickyPlanBarProps {
   selectedPlan: Plan | null;
   onSelectPlan: (plan: Plan) => void;
   planGridRef: RefObject<HTMLDivElement>;
+  discountedPrice?: number;
 }
 
-export default function StickyPlanBar({ selectedPlan, onSelectPlan, planGridRef }: StickyPlanBarProps) {
+export default function StickyPlanBar({ selectedPlan, onSelectPlan, planGridRef, discountedPrice }: StickyPlanBarProps) {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -42,7 +43,15 @@ export default function StickyPlanBar({ selectedPlan, onSelectPlan, planGridRef 
             <>
               <p className="text-xs text-stone-500">Selected plan</p>
               <p className="font-semibold text-stone-900 truncate">
-                {selectedPlan.name} — ${selectedPlan.price}/mo
+                {selectedPlan.name} —{' '}
+                {discountedPrice !== undefined ? (
+                  <>
+                    <span className="line-through text-stone-400">${selectedPlan.price}</span>{' '}
+                    <span className="text-green-600">${discountedPrice}</span>/mo
+                  </>
+                ) : (
+                  <>${selectedPlan.price}/mo</>
+                )}
               </p>
             </>
           ) : (
