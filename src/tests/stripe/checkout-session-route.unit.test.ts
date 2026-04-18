@@ -9,7 +9,7 @@
  * Coverage:
  *  - Valid plan param creates checkout session and redirects
  *  - BETA50 coupon is always pre-applied (discounts param)
- *  - allow_promotion_codes is false when coupon is pre-applied
+ *  - allow_promotion_codes is omitted (Stripe mutual exclusivity with discounts)
  *  - Invalid plan param → 400
  *  - Missing plan param → 400
  *  - Stripe error → 500
@@ -121,12 +121,14 @@ describe('GET /api/checkout/session — BETA50 coupon', () => {
     expect(params.discounts).toEqual([{ coupon: 'BETA50' }]);
   });
 
-  it('sets allow_promotion_codes to false (coupon is pre-applied)', async () => {
+  it('does not set allow_promotion_codes when coupon is pre-applied (Stripe mutual exclusivity)', async () => {
     const req = makeRequest('http://localhost:3000/api/checkout/session?plan=solo');
     await GET(req);
 
     const [params] = getMockCreate().mock.calls[0];
-    expect(params.allow_promotion_codes).toBe(false);
+    // Stripe requires discounts and allow_promotion_codes to be mutually exclusive.
+    // When discounts is specified, allow_promotion_codes must be omitted entirely.
+    expect(params.allow_promotion_codes).toBeUndefined();
   });
 
   it('uses subscription mode', async () => {
