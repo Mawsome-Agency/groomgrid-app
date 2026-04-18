@@ -174,7 +174,15 @@ function SignupPageInner() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-stone-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-stone-50 flex flex-col items-center justify-center p-4">
+      {/* BETA50 Promo Banner */}
+      <div className="w-full max-w-3xl mb-3 bg-green-600 text-white text-center py-2.5 px-4 rounded-xl text-sm font-semibold">
+        🎉 Launch Special — use code <span className="font-bold underline">BETA50</span> for 50% off your first month!{' '}
+        <Link href="/plans" className="underline hover:text-green-100 transition-colors">
+          View plans →
+        </Link>
+      </div>
+
       {/* Card — single column on mobile, two columns on md+ */}
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-3xl signup-card overflow-hidden grid md:grid-cols-[1fr_1.1fr]">
 

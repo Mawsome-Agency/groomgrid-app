@@ -73,6 +73,14 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-white text-stone-900">
 
+      {/* ── Promo Banner ── */}
+      <div className="bg-green-600 text-white text-center py-2.5 px-4 text-sm font-semibold">
+        🎉 Launch Special — <span className="font-bold underline">BETA50</span>: 50% off for first 100 subscribers. No waitlist.{' '}
+        <Link href="/plans" className="underline hover:text-green-100 transition-colors">
+          See plans →
+        </Link>
+      </div>
+
       {/* ── Nav ── */}
       <nav className="flex items-center justify-between px-6 py-4 max-w-5xl mx-auto border-b border-stone-100">
         <span className="text-xl font-bold text-green-600">GroomGrid 🐾</span>
