@@ -50,8 +50,9 @@ export async function GET(req: NextRequest) {
       mode: 'subscription',
       payment_method_types: ['card'],
       line_items: [{ price: priceId, quantity: 1 }],
+      // Pre-apply BETA50 coupon. Note: allow_promotion_codes cannot be set when
+      // discounts is specified — Stripe enforces mutual exclusivity.
       discounts: [{ coupon: 'BETA50' }],
-      allow_promotion_codes: false,
       success_url: `${appUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${appUrl}/plans`,
     });
