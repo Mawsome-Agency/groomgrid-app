@@ -12,7 +12,7 @@ import ValueProp from '@/components/funnel/ValueProp';
 import TrustSignals from '@/components/trust/TrustSignals';
 import StickyPlanBar from '@/components/funnel/StickyPlanBar';
 import { BillingSummaryData } from '@/components/trust/BillingSummary';
-import { trackPageView, trackPlanSelected, trackBillingSummaryViewed } from '@/lib/ga4';
+import { trackPageView, trackPlanViewed, trackPlanSelected, trackCheckoutStarted, trackBillingSummaryViewed } from '@/lib/ga4';
 
 const TESTIMONIALS = [
   {
@@ -53,13 +53,6 @@ function PlansSkeleton() {
   );
 }
 
-// BETA50 gives 50% off — discounted prices keyed by plan type
-const BETA50_PRICES: Record<string, number> = {
-  solo: 14.50,
-  salon: 39.50,
-  enterprise: 74.50,
-};
-
 function PlansPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -68,13 +61,8 @@ function PlansPageInner() {
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
   // useState (not useRef) so mutations trigger re-renders and the loading UI actually shows
   const [isCheckoutInFlight, setIsCheckoutInFlight] = useState<boolean>(false);
-  const [coupon, setCoupon] = useState<string>('');
-  const [showPromoInput, setShowPromoInput] = useState<boolean>(false);
   const planGridRef = useRef<HTMLDivElement>(null);
-
-  // Normalized applied coupon (uppercase) — non-empty means it's active
-  const appliedCoupon = coupon.trim().toUpperCase();
-  const isBeta50 = appliedCoupon === 'BETA50';
+  const planViewedFiredRef = useRef(false);
 
   // Get billing summary data for selected plan
   const getBillingData = (): BillingSummaryData | null => {
@@ -93,17 +81,16 @@ function PlansPageInner() {
   useEffect(() => {
     trackPageView('/plans', 'Plan Selection');
 
+    // Fire plan_viewed once per mount (ref guard prevents StrictMode double-fire)
+    if (!planViewedFiredRef.current) {
+      planViewedFiredRef.current = true;
+      trackPlanViewed();
+    }
+
     // Check for previously selected plan from URL
     const planParam = searchParams.get('selected');
     if (planParam && PLANS.find(p => p.id === planParam)) {
       setSelectedPlan(PLANS.find(p => p.id === planParam) || null);
-    }
-
-    // Pre-fill coupon from URL param and show the promo input
-    const couponParam = searchParams.get('coupon');
-    if (couponParam) {
-      setCoupon(couponParam.toUpperCase());
-      setShowPromoInput(true);
     }
   }, [searchParams]);
 
@@ -113,17 +100,13 @@ function PlansPageInner() {
       return;
     }
 
-    // Skip welcome redirect when a coupon is present — go straight to checkout
-    const couponParam = searchParams.get('coupon');
-
     // Check if welcome screen has been shown
     if (status === 'authenticated' && session?.user?.id) {
       fetch('/api/profile')
         .then((res) => res.json())
         .then((data) => {
           // If welcome hasn't been shown and user hasn't selected a plan yet, redirect to welcome
-          // BUT skip this when a coupon param is present (direct paid signup path)
-          if (!data.welcomeShown && !data.stripeSubscriptionId && !couponParam) {
+          if (!data.welcomeShown && !data.stripeSubscriptionId) {
             router.replace('/welcome');
           }
         })
@@ -132,7 +115,7 @@ function PlansPageInner() {
           // Don't block page if check fails
         });
     }
-  }, [status, session, router, searchParams]);
+  }, [status, session, router]);
 
   const handleSelectPlan = async (plan: Plan) => {
     if (!session?.user?.id) return;
@@ -142,8 +125,9 @@ function PlansPageInner() {
     setCheckoutError(null);
     setIsCheckoutInFlight(true);
 
-    // Fire client-side GA4 event before redirect — window.gtag is available here
+    // Fire client-side GA4 events before redirect — window.gtag is available here
     trackPlanSelected(plan.type, plan.price);
+    trackCheckoutStarted(plan.name, plan.price);
 
     // Track billing summary viewed
     trackBillingSummaryViewed(plan.name, plan.price * 100, true);
@@ -156,7 +140,6 @@ function PlansPageInner() {
           userId: session.user.id,
           planType: plan.type,
           customerEmail: session.user.email,
-          ...(isBeta50 ? { coupon: 'BETA50' } : {}),
         }),
       });
 
@@ -243,33 +226,6 @@ function PlansPageInner() {
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold text-stone-900 mb-4">Choose Your Plan</h2>
           <p className="text-xl text-stone-600">All plans include a 14-day free trial</p>
-
-          {/* Promo code section */}
-          <div className="mt-6">
-            {!showPromoInput ? (
-              <button
-                onClick={() => setShowPromoInput(true)}
-                className="text-sm text-green-600 hover:underline"
-              >
-                Have a promo code?
-              </button>
-            ) : (
-              <div className="flex items-center justify-center gap-2 mt-2">
-                <input
-                  type="text"
-                  value={coupon}
-                  onChange={(e) => setCoupon(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''))}
-                  placeholder="Enter promo code"
-                  maxLength={20}
-                  className="px-4 py-2 border border-stone-300 rounded-xl text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none w-44"
-                  aria-label="Promo code"
-                />
-                {isBeta50 && (
-                  <span className="text-sm text-green-600 font-semibold">50% off applied!</span>
-                )}
-              </div>
-            )}
-          </div>
         </div>
 
         {/* Checkout Error Alert */}
@@ -309,7 +265,6 @@ function PlansPageInner() {
               isLoading={selectedPlan?.id === plan.id && isCheckoutInFlight}
               isDimmed={isCheckoutInFlight && selectedPlan?.id !== plan.id}
               hasError={!!checkoutError && selectedPlan?.id === plan.id}
-              discountedPrice={isBeta50 ? BETA50_PRICES[plan.type] : undefined}
             />
           ))}
         </div>
@@ -377,7 +332,6 @@ function PlansPageInner() {
         selectedPlan={selectedPlan}
         onSelectPlan={handleSelectPlan}
         planGridRef={planGridRef}
-        discountedPrice={isBeta50 && selectedPlan ? BETA50_PRICES[selectedPlan.type] : undefined}
       />
     </div>
   );

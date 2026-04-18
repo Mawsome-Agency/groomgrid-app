@@ -1019,4 +1019,110 @@ describe('ga4.ts', () => {
       expect(skippedCall[2].reason).toBe('user_choice');
     });
   });
+
+  // ─── trackSignupViewed ──────────────────────────────────────────────────────
+
+  describe('trackSignupViewed', () => {
+    it('should fire signup_started event with no params', () => {
+      const { trackSignupViewed } = loadGA4('G-TEST123');
+      trackSignupViewed();
+
+      expect(window.gtag).toHaveBeenCalledWith('event', 'signup_started', {});
+    });
+
+    it('should not fire if analytics disabled', () => {
+      const { trackSignupViewed } = loadGA4(undefined);
+      trackSignupViewed();
+
+      expect(window.gtag).not.toHaveBeenCalled();
+    });
+  });
+
+  // ─── trackSignupCompleted ───────────────────────────────────────────────────
+
+  describe('trackSignupCompleted', () => {
+    it('should fire signup_completed event with user_id', () => {
+      const { trackSignupCompleted } = loadGA4('G-TEST123');
+      trackSignupCompleted('user_12345');
+
+      expect(window.gtag).toHaveBeenCalledWith('event', 'signup_completed', {
+        user_id: 'user_12345',
+      });
+    });
+
+    it('should handle empty user ID', () => {
+      const { trackSignupCompleted } = loadGA4('G-TEST123');
+      trackSignupCompleted('');
+
+      expect(window.gtag).toHaveBeenCalledWith('event', 'signup_completed', {
+        user_id: '',
+      });
+    });
+
+    it('should not fire if analytics disabled', () => {
+      const { trackSignupCompleted } = loadGA4(undefined);
+      trackSignupCompleted('user_12345');
+
+      expect(window.gtag).not.toHaveBeenCalled();
+    });
+  });
+
+  // ─── trackPlanViewed ────────────────────────────────────────────────────────
+
+  describe('trackPlanViewed', () => {
+    it('should fire plan_viewed event with no params', () => {
+      const { trackPlanViewed } = loadGA4('G-TEST123');
+      trackPlanViewed();
+
+      expect(window.gtag).toHaveBeenCalledWith('event', 'plan_viewed', {});
+    });
+
+    it('should not fire if analytics disabled', () => {
+      const { trackPlanViewed } = loadGA4(undefined);
+      trackPlanViewed();
+
+      expect(window.gtag).not.toHaveBeenCalled();
+    });
+  });
+
+  // ─── trackCheckoutStarted ───────────────────────────────────────────────────
+
+  describe('trackCheckoutStarted', () => {
+    it('should fire checkout_started event with plan_name and plan_price', () => {
+      const { trackCheckoutStarted } = loadGA4('G-TEST123');
+      trackCheckoutStarted('Solo', 29);
+
+      expect(window.gtag).toHaveBeenCalledWith('event', 'checkout_started', {
+        plan_name: 'Solo',
+        plan_price: 29,
+      });
+    });
+
+    it('should handle float plan price', () => {
+      const { trackCheckoutStarted } = loadGA4('G-TEST123');
+      trackCheckoutStarted('Enterprise', 149.99);
+
+      expect(window.gtag).toHaveBeenCalledWith('event', 'checkout_started', {
+        plan_name: 'Enterprise',
+        plan_price: 149.99,
+      });
+    });
+
+    it('should handle zero plan price', () => {
+      const { trackCheckoutStarted } = loadGA4('G-TEST123');
+      trackCheckoutStarted('Free', 0);
+
+      expect(window.gtag).toHaveBeenCalledWith('event', 'checkout_started', {
+        plan_name: 'Free',
+        plan_price: 0,
+      });
+    });
+
+    it('should not fire if analytics disabled', () => {
+      const { trackCheckoutStarted } = loadGA4(undefined);
+      trackCheckoutStarted('Solo', 29);
+
+      expect(window.gtag).not.toHaveBeenCalled();
+    });
+  });
 });

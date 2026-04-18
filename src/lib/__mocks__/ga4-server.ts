@@ -88,6 +88,16 @@ export async function trackPaymentFailedServer(
   return;
 }
 
+export async function trackPurchaseCompletedServer(
+  _clientId: string,
+  _userId: string,
+  _sessionId: string,
+  _planName: string,
+  _planPrice: number
+): Promise<void> {
+  return;
+}
+
 export async function trackABTestAssignedServer(
   _userId: string,
   _testName: string,
