@@ -210,6 +210,13 @@ function PlansPageInner() {
         </div>
       </header>
 
+      {/* BETA50 Promo Banner */}
+      <div className="bg-green-600 text-white text-center py-3 px-4">
+        <p className="text-sm font-semibold">
+          🎉 Launch Special: Use code <span className="font-bold underline">BETA50</span> for 50% off your first month! Limited to first 100 users.
+        </p>
+      </div>
+
       <main className="max-w-7xl mx-auto px-4 py-12">
         {/* Schema.org OfferCatalog structured data for rich results */}
         <Script
