@@ -7,13 +7,13 @@ export const metadata: Metadata = {
   description:
     'Build a profitable mobile dog grooming business with this complete business plan guide — covering pricing, routes, equipment, and client acquisition.',
   alternates: {
-    canonical: 'https://getgroomgrid.com/blog/mobile-dog-grooming-business-plan/',
+    canonical: 'https://getgroomgrid.com/blog/mobile-dog-grooming-business-plan',
   },
   openGraph: {
     title: 'Mobile Dog Grooming Business Plan: The Complete Template',
     description:
       'Build a profitable mobile dog grooming business with this complete business plan guide — pricing, routes, equipment, and client acquisition.',
-    url: 'https://getgroomgrid.com/blog/mobile-dog-grooming-business-plan/',
+    url: 'https://getgroomgrid.com/blog/mobile-dog-grooming-business-plan',
     type: 'article',
   },
 };
@@ -32,13 +32,13 @@ const breadcrumbSchema = {
       '@type': 'ListItem',
       position: 2,
       name: 'Mobile Grooming',
-      item: 'https://getgroomgrid.com/mobile-grooming-business/',
+      item: 'https://getgroomgrid.com/mobile-grooming-business',
     },
     {
       '@type': 'ListItem',
       position: 3,
       name: 'Mobile Dog Grooming Business Plan',
-      item: 'https://getgroomgrid.com/blog/mobile-dog-grooming-business-plan/',
+      item: 'https://getgroomgrid.com/blog/mobile-dog-grooming-business-plan',
     },
   ],
 };
@@ -49,7 +49,7 @@ const articleSchema = {
   headline: 'Mobile Dog Grooming Business Plan: The Complete Template',
   description:
     'Build a profitable mobile dog grooming business with this complete business plan guide — pricing, routes, equipment, and client acquisition.',
-  url: 'https://getgroomgrid.com/blog/mobile-dog-grooming-business-plan/',
+  url: 'https://getgroomgrid.com/blog/mobile-dog-grooming-business-plan',
   publisher: {
     '@type': 'Organization',
     name: 'GroomGrid',
@@ -61,7 +61,7 @@ const articleSchema = {
   },
   mainEntityOfPage: {
     '@type': 'WebPage',
-    '@id': 'https://getgroomgrid.com/blog/mobile-dog-grooming-business-plan/',
+    '@id': 'https://getgroomgrid.com/blog/mobile-dog-grooming-business-plan',
   },
 };
 

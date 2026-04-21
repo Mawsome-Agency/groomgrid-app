@@ -14,6 +14,16 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata: Metadata = {
   title: 'GroomGrid - Pet Grooming Business Management',
   description: 'AI-powered pet grooming business management platform',
+  alternates: {
+    canonical: 'https://getgroomgrid.com',
+  },
+  openGraph: {
+    title: 'GroomGrid - Pet Grooming Business Management',
+    description: 'AI-powered pet grooming business management platform',
+    url: 'https://getgroomgrid.com',
+    siteName: 'GroomGrid',
+    type: 'website',
+  },
 };
 
 export default function RootLayout({

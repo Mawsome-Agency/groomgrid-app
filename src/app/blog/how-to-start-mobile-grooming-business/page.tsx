@@ -7,13 +7,13 @@ export const metadata: Metadata = {
   description:
     'Everything you need to launch a mobile dog grooming business — licensing, equipment, pricing, finding first clients, and the tools that run it all.',
   alternates: {
-    canonical: 'https://getgroomgrid.com/blog/how-to-start-mobile-grooming-business/',
+    canonical: 'https://getgroomgrid.com/blog/how-to-start-mobile-grooming-business',
   },
   openGraph: {
     title: 'How to Start a Mobile Dog Grooming Business: Step-by-Step Guide',
     description:
       'Everything you need to launch a mobile dog grooming business — licensing, equipment, pricing, and finding your first clients.',
-    url: 'https://getgroomgrid.com/blog/how-to-start-mobile-grooming-business/',
+    url: 'https://getgroomgrid.com/blog/how-to-start-mobile-grooming-business',
     type: 'article',
   },
 };
@@ -32,13 +32,13 @@ const breadcrumbSchema = {
       '@type': 'ListItem',
       position: 2,
       name: 'Mobile Grooming',
-      item: 'https://getgroomgrid.com/mobile-grooming-business/',
+      item: 'https://getgroomgrid.com/mobile-grooming-business',
     },
     {
       '@type': 'ListItem',
       position: 3,
       name: 'How to Start a Mobile Grooming Business',
-      item: 'https://getgroomgrid.com/blog/how-to-start-mobile-grooming-business/',
+      item: 'https://getgroomgrid.com/blog/how-to-start-mobile-grooming-business',
     },
   ],
 };
@@ -49,7 +49,7 @@ const articleSchema = {
   headline: 'How to Start a Mobile Dog Grooming Business: Step-by-Step Guide',
   description:
     'Everything you need to launch a mobile dog grooming business — licensing, equipment, pricing, and finding your first clients.',
-  url: 'https://getgroomgrid.com/blog/how-to-start-mobile-grooming-business/',
+  url: 'https://getgroomgrid.com/blog/how-to-start-mobile-grooming-business',
   publisher: {
     '@type': 'Organization',
     name: 'GroomGrid',
@@ -61,7 +61,7 @@ const articleSchema = {
   },
   mainEntityOfPage: {
     '@type': 'WebPage',
-    '@id': 'https://getgroomgrid.com/blog/how-to-start-mobile-grooming-business/',
+    '@id': 'https://getgroomgrid.com/blog/how-to-start-mobile-grooming-business',
   },
 };
 

@@ -1,11 +1,11 @@
-import sitemap from '../app/sitemap.xml';
+import sitemap from '../app/sitemap';
 
 describe('Sitemap Generation', () => {
   it('should generate sitemap with all static pages', () => {
     const result = sitemap();
 
     // Check that we have the expected number of static pages
-    const staticPages = result.filter(page => !page.url.includes('/blog/'));
+    const staticPages = result.filter(page => !page.url.includes('/blog/') && !page.url.includes('/best-') && !page.url.includes('/grooming-') && !page.url.includes('/mobile-') && !page.url.includes('/moego-'));
     expect(staticPages.length).toBeGreaterThan(0);
 
     // Check for required static pages
@@ -34,6 +34,17 @@ describe('Sitemap Generation', () => {
     expect(urls).toContain('https://getgroomgrid.com/blog/dog-grooming-software');
   });
 
+  it('should include SEO landing pages', () => {
+    const result = sitemap();
+    const urls = result.map(page => page.url);
+
+    expect(urls).toContain('https://getgroomgrid.com/best-dog-grooming-software');
+    expect(urls).toContain('https://getgroomgrid.com/grooming-business-operations');
+    expect(urls).toContain('https://getgroomgrid.com/mobile-grooming-business');
+    expect(urls).toContain('https://getgroomgrid.com/mobile-grooming-software');
+    expect(urls).toContain('https://getgroomgrid.com/moego-alternatives');
+  });
+
   it('should have correct priority for homepage', () => {
     const result = sitemap();
     const homepage = result.find(page => page.url === 'https://getgroomgrid.com');
@@ -46,15 +57,15 @@ describe('Sitemap Generation', () => {
     const result = sitemap();
 
     // Check signup page priority
-    const signupPage = result.find(page => page.url === 'https://getgroomgrid.com/signup');
+    const signupPage = result.find(p => p.url === 'https://getgroomgrid.com/signup');
     expect(signupPage?.priority).toBe(0.8);
 
     // Check plans page priority
-    const plansPage = result.find(page => page.url === 'https://getgroomgrid.com/plans');
+    const plansPage = result.find(p => p.url === 'https://getgroomgrid.com/plans');
     expect(plansPage?.priority).toBe(0.8);
 
     // Check blog index page priority
-    const blogPage = result.find(page => page.url === 'https://getgroomgrid.com/blog');
+    const blogPage = result.find(p => p.url === 'https://getgroomgrid.com/blog');
     expect(blogPage?.priority).toBe(0.9);
   });
 
@@ -64,6 +75,16 @@ describe('Sitemap Generation', () => {
 
     blogPosts.forEach(post => {
       expect(post.priority).toBe(0.7);
+    });
+  });
+
+  it('should have appropriate priorities for landing pages', () => {
+    const result = sitemap();
+    const landingSlugs = ['best-dog-grooming-software', 'grooming-business-operations', 'mobile-grooming-business', 'mobile-grooming-software', 'moego-alternatives'];
+    
+    landingSlugs.forEach(slug => {
+      const page = result.find(p => p.url === `https://getgroomgrid.com/${slug}`);
+      expect(page?.priority).toBe(0.8);
     });
   });
 
@@ -94,30 +115,15 @@ describe('Sitemap Generation', () => {
     result.forEach(page => {
       expect(page.url).toBeDefined();
       expect(page.url).toMatch(/^https:\/\/getgroomgrid\.com/);
+      // No trailing slashes in URLs
+      expect(page.url).not.toMatch(/\/$/);
     });
   });
 
-  it('should include all expected static pages', () => {
-    const result = sitemap();
-    const urls = result.map(page => page.url);
-
-    // Check for the static pages that are currently in the sitemap
-    const expectedPages = [
-      'https://getgroomgrid.com',
-      'https://getgroomgrid.com/signup',
-      'https://getgroomgrid.com/plans',
-      'https://getgroomgrid.com/blog',
-    ];
-
-    expectedPages.forEach(expectedUrl => {
-      expect(urls).toContain(expectedUrl);
-    });
-  });
-
-  it('should have total entries matching static pages plus blog posts', () => {
+  it('should have total entries matching all pages', () => {
     const result = sitemap();
 
-    // 4 static pages + 8 blog posts = 12 total
-    expect(result.length).toBe(12);
+    // 4 static pages + 5 landing pages + 8 blog posts = 17 total
+    expect(result.length).toBe(17);
   });
 });

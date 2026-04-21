@@ -7,13 +7,13 @@ export const metadata: Metadata = {
   description:
     'Learn how to manage your dog grooming business like a pro — scheduling, client retention, deposits, payments, and the tools that make it all click.',
   alternates: {
-    canonical: 'https://getgroomgrid.com/blog/dog-grooming-business-management/',
+    canonical: 'https://getgroomgrid.com/blog/dog-grooming-business-management',
   },
   openGraph: {
     title: 'Dog Grooming Business Management: The Complete Guide',
     description:
       'Learn how to manage your dog grooming business like a pro — scheduling, client retention, deposits, payments, and the tools that make it all click.',
-    url: 'https://getgroomgrid.com/blog/dog-grooming-business-management/',
+    url: 'https://getgroomgrid.com/blog/dog-grooming-business-management',
     type: 'article',
   },
 };
@@ -32,13 +32,13 @@ const breadcrumbSchema = {
       '@type': 'ListItem',
       position: 2,
       name: 'Blog',
-      item: 'https://getgroomgrid.com/blog/',
+      item: 'https://getgroomgrid.com/blog',
     },
     {
       '@type': 'ListItem',
       position: 3,
       name: 'Dog Grooming Business Management',
-      item: 'https://getgroomgrid.com/blog/dog-grooming-business-management/',
+      item: 'https://getgroomgrid.com/blog/dog-grooming-business-management',
     },
   ],
 };
@@ -49,7 +49,7 @@ const articleSchema = {
   headline: 'Dog Grooming Business Management: The Complete Guide',
   description:
     'Learn how to manage your dog grooming business like a pro — scheduling, client retention, deposits, payments, and the tools that make it all click.',
-  url: 'https://getgroomgrid.com/blog/dog-grooming-business-management/',
+  url: 'https://getgroomgrid.com/blog/dog-grooming-business-management',
   publisher: {
     '@type': 'Organization',
     name: 'GroomGrid',
@@ -61,7 +61,7 @@ const articleSchema = {
   },
   mainEntityOfPage: {
     '@type': 'WebPage',
-    '@id': 'https://getgroomgrid.com/blog/dog-grooming-business-management/',
+    '@id': 'https://getgroomgrid.com/blog/dog-grooming-business-management',
   },
 };
 

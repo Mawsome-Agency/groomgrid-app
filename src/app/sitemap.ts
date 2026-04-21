@@ -32,13 +32,27 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ];
 
+  // SEO landing pages (root-level)
+  const landingPages: MetadataRoute.Sitemap = [
+    'best-dog-grooming-software',
+    'grooming-business-operations',
+    'mobile-grooming-business',
+    'mobile-grooming-software',
+    'moego-alternatives',
+  ].map((slug) => ({
+    url: `${baseUrl}/${slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly' as const,
+    priority: 0.8,
+  }));
+
   // Blog post pages
-  const blogPages: MetadataRoute.Sitemap = blogPosts.map(post => ({
+  const blogPages: MetadataRoute.Sitemap = blogPosts.map((post) => ({
     url: `${baseUrl}/blog/${post.slug}`,
     lastModified: new Date(post.publishedAt),
-    changeFrequency: 'monthly',
+    changeFrequency: 'monthly' as const,
     priority: 0.7,
   }));
 
-  return [...staticPages, ...blogPages];
+  return [...staticPages, ...landingPages, ...blogPages];
 }

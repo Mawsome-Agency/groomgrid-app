@@ -7,13 +7,13 @@ export const metadata: Metadata = {
   description:
     'Expert tips and resources for pet grooming business owners. Learn about scheduling, client management, pricing, and growing your grooming business.',
   alternates: {
-    canonical: 'https://getgroomgrid.com/blog/',
+    canonical: 'https://getgroomgrid.com/blog',
   },
   openGraph: {
     title: 'Blog | GroomGrid - Pet Grooming Business Tips & Resources',
     description:
       'Expert tips and resources for pet grooming business owners. Learn about scheduling, client management, pricing, and growing your grooming business.',
-    url: 'https://getgroomgrid.com/blog/',
+    url: 'https://getgroomgrid.com/blog',
     type: 'website',
   },
 };
@@ -24,7 +24,7 @@ const blogSchema = {
   name: 'GroomGrid Blog',
   description:
     'Expert tips and resources for pet grooming business owners. Learn about scheduling, client management, pricing, and growing your grooming business.',
-  url: 'https://getgroomgrid.com/blog/',
+  url: 'https://getgroomgrid.com/blog',
   blogPost: blogPosts.map(post => ({
     '@type': 'BlogPosting',
     headline: post.title,

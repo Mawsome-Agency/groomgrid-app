@@ -8,13 +8,13 @@ export const metadata: Metadata = {
   description:
     'Master your grooming business operations — from appointment scheduling and no-show prevention to deposit policies and client retention. Built for busy groomers.',
   alternates: {
-    canonical: 'https://getgroomgrid.com/grooming-business-operations/',
+    canonical: 'https://getgroomgrid.com/grooming-business-operations',
   },
   openGraph: {
     title: 'Grooming Business Operations: The Complete Guide for Pet Groomers',
     description:
       'Master your grooming business operations — from appointment scheduling and no-show prevention to deposit policies and client retention.',
-    url: 'https://getgroomgrid.com/grooming-business-operations/',
+    url: 'https://getgroomgrid.com/grooming-business-operations',
     type: 'article',
   },
 };
@@ -33,7 +33,7 @@ const breadcrumbSchema = {
       '@type': 'ListItem',
       position: 2,
       name: 'Grooming Business Operations',
-      item: 'https://getgroomgrid.com/grooming-business-operations/',
+      item: 'https://getgroomgrid.com/grooming-business-operations',
     },
   ],
 };
@@ -44,7 +44,7 @@ const articleSchema = {
   headline: 'Grooming Business Operations: The Complete Guide for Pet Groomers',
   description:
     'Master your grooming business operations — from appointment scheduling and no-show prevention to deposit policies and client retention.',
-  url: 'https://getgroomgrid.com/grooming-business-operations/',
+  url: 'https://getgroomgrid.com/grooming-business-operations',
   publisher: {
     '@type': 'Organization',
     name: 'GroomGrid',
@@ -56,7 +56,7 @@ const articleSchema = {
   },
   mainEntityOfPage: {
     '@type': 'WebPage',
-    '@id': 'https://getgroomgrid.com/grooming-business-operations/',
+    '@id': 'https://getgroomgrid.com/grooming-business-operations',
   },
 };
 

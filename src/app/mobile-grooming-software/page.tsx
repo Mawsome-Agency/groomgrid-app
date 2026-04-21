@@ -4,7 +4,15 @@ import { BOFUAnalyticsWrapper } from '@/components/analytics';
 
 export const metadata: Metadata = {
   title: 'Mobile Grooming Software | GroomGrid',
-  description: 'Best software for mobile dog groomers.',
+  description: 'The best mobile grooming software for dog groomers on the go. Scheduling, routing, reminders, and payments — all from your phone.',
+  alternates: {
+    canonical: 'https://getgroomgrid.com/mobile-grooming-software',
+  },
+  openGraph: {
+    title: 'Mobile Grooming Software | GroomGrid',
+    description: 'The best mobile grooming software for dog groomers on the go. Scheduling, routing, reminders, and payments — all from your phone.',
+    url: 'https://getgroomgrid.com/mobile-grooming-software',
+  },
 };
 
 export default function MobileGroomingSoftwarePage() {

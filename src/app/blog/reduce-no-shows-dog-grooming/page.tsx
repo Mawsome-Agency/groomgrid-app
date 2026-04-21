@@ -7,13 +7,13 @@ export const metadata: Metadata = {
   description:
     'Cut grooming no-shows by 60% with automated reminders, deposit policies, and a multi-touch follow-up strategy. Real tactics groomers use every day.',
   alternates: {
-    canonical: 'https://getgroomgrid.com/blog/reduce-no-shows-dog-grooming/',
+    canonical: 'https://getgroomgrid.com/blog/reduce-no-shows-dog-grooming',
   },
   openGraph: {
     title: 'How to Reduce No-Shows in Your Dog Grooming Business',
     description:
       'Cut grooming no-shows by 60% with automated reminders, deposit policies, and a multi-touch follow-up strategy.',
-    url: 'https://getgroomgrid.com/blog/reduce-no-shows-dog-grooming/',
+    url: 'https://getgroomgrid.com/blog/reduce-no-shows-dog-grooming',
     type: 'article',
   },
 };
@@ -32,13 +32,13 @@ const breadcrumbSchema = {
       '@type': 'ListItem',
       position: 2,
       name: 'Blog',
-      item: 'https://getgroomgrid.com/blog/',
+      item: 'https://getgroomgrid.com/blog',
     },
     {
       '@type': 'ListItem',
       position: 3,
       name: 'Reduce No-Shows in Dog Grooming',
-      item: 'https://getgroomgrid.com/blog/reduce-no-shows-dog-grooming/',
+      item: 'https://getgroomgrid.com/blog/reduce-no-shows-dog-grooming',
     },
   ],
 };
@@ -49,7 +49,7 @@ const articleSchema = {
   headline: 'How to Reduce No-Shows in Your Dog Grooming Business',
   description:
     'Cut grooming no-shows by 60% with automated reminders, deposit policies, and a multi-touch follow-up strategy.',
-  url: 'https://getgroomgrid.com/blog/reduce-no-shows-dog-grooming/',
+  url: 'https://getgroomgrid.com/blog/reduce-no-shows-dog-grooming',
   publisher: {
     '@type': 'Organization',
     name: 'GroomGrid',
@@ -61,7 +61,7 @@ const articleSchema = {
   },
   mainEntityOfPage: {
     '@type': 'WebPage',
-    '@id': 'https://getgroomgrid.com/blog/reduce-no-shows-dog-grooming/',
+    '@id': 'https://getgroomgrid.com/blog/reduce-no-shows-dog-grooming',
   },
 };
 

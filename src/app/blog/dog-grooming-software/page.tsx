@@ -7,13 +7,13 @@ export const metadata: Metadata = {
   description:
     'Compare the best dog grooming software for 2026. Covers scheduling, client records, automated reminders, payments, and what to look for before you buy.',
   alternates: {
-    canonical: 'https://getgroomgrid.com/blog/dog-grooming-software/',
+    canonical: 'https://getgroomgrid.com/blog/dog-grooming-software',
   },
   openGraph: {
     title: 'Dog Grooming Software: The 2026 Buyer\'s Guide for Professional Groomers',
     description:
       'Compare the best dog grooming software for 2026. Covers scheduling, client records, automated reminders, and payments.',
-    url: 'https://getgroomgrid.com/blog/dog-grooming-software/',
+    url: 'https://getgroomgrid.com/blog/dog-grooming-software',
     type: 'article',
   },
 };
@@ -32,13 +32,13 @@ const breadcrumbSchema = {
       '@type': 'ListItem',
       position: 2,
       name: 'Blog',
-      item: 'https://getgroomgrid.com/blog/',
+      item: 'https://getgroomgrid.com/blog',
     },
     {
       '@type': 'ListItem',
       position: 3,
       name: 'Dog Grooming Software',
-      item: 'https://getgroomgrid.com/blog/dog-grooming-software/',
+      item: 'https://getgroomgrid.com/blog/dog-grooming-software',
     },
   ],
 };
@@ -49,7 +49,7 @@ const articleSchema = {
   headline: 'Dog Grooming Software: The 2026 Buyer\'s Guide for Professional Groomers',
   description:
     'Compare the best dog grooming software for 2026. Covers scheduling, client records, automated reminders, payments, and what to look for before you buy.',
-  url: 'https://getgroomgrid.com/blog/dog-grooming-software/',
+  url: 'https://getgroomgrid.com/blog/dog-grooming-software',
   datePublished: '2026-04-17',
   dateModified: '2026-04-17',
   publisher: {
@@ -63,7 +63,7 @@ const articleSchema = {
   },
   mainEntityOfPage: {
     '@type': 'WebPage',
-    '@id': 'https://getgroomgrid.com/blog/dog-grooming-software/',
+    '@id': 'https://getgroomgrid.com/blog/dog-grooming-software',
   },
 };
 

@@ -7,13 +7,13 @@ export const metadata: Metadata = {
   description:
     'Dog grooming can be highly profitable — but only if the numbers work. Here\'s the real breakdown: revenue potential, expenses, margins, and what it takes to actually make money grooming dogs.',
   alternates: {
-    canonical: 'https://getgroomgrid.com/blog/is-dog-grooming-a-profitable-business/',
+    canonical: 'https://getgroomgrid.com/blog/is-dog-grooming-a-profitable-business',
   },
   openGraph: {
     title: 'Is Dog Grooming a Profitable Business? Real Numbers, Real Talk',
     description:
       'Dog grooming can be highly profitable — but only if the numbers work. Here\'s the real breakdown: revenue potential, expenses, margins, and what it takes to actually make money grooming dogs.',
-    url: 'https://getgroomgrid.com/blog/is-dog-grooming-a-profitable-business/',
+    url: 'https://getgroomgrid.com/blog/is-dog-grooming-a-profitable-business',
     type: 'article',
   },
 };
@@ -32,13 +32,13 @@ const breadcrumbSchema = {
       '@type': 'ListItem',
       position: 2,
       name: 'Blog',
-      item: 'https://getgroomgrid.com/blog/',
+      item: 'https://getgroomgrid.com/blog',
     },
     {
       '@type': 'ListItem',
       position: 3,
       name: 'Is Dog Grooming a Profitable Business?',
-      item: 'https://getgroomgrid.com/blog/is-dog-grooming-a-profitable-business/',
+      item: 'https://getgroomgrid.com/blog/is-dog-grooming-a-profitable-business',
     },
   ],
 };
@@ -49,7 +49,7 @@ const articleSchema = {
   headline: 'Is Dog Grooming a Profitable Business? Real Numbers, Real Talk',
   description:
     'Dog grooming can be highly profitable — but only if the numbers work. Here\'s the real breakdown: revenue potential, expenses, margins, and what it takes to actually make money grooming dogs.',
-  url: 'https://getgroomgrid.com/blog/is-dog-grooming-a-profitable-business/',
+  url: 'https://getgroomgrid.com/blog/is-dog-grooming-a-profitable-business',
   publisher: {
     '@type': 'Organization',
     name: 'GroomGrid',
@@ -61,7 +61,7 @@ const articleSchema = {
   },
   mainEntityOfPage: {
     '@type': 'WebPage',
-    '@id': 'https://getgroomgrid.com/blog/is-dog-grooming-a-profitable-business/',
+    '@id': 'https://getgroomgrid.com/blog/is-dog-grooming-a-profitable-business',
   },
 };
 

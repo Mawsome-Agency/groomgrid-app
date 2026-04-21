@@ -7,13 +7,13 @@ export const metadata: Metadata = {
   description:
     'Protect your grooming business with a free dog grooming waiver template. Covers senior dogs, matting, medical emergencies, and behavioral risks — ready to customize and use.',
   alternates: {
-    canonical: 'https://getgroomgrid.com/blog/dog-grooming-waiver-template/',
+    canonical: 'https://getgroomgrid.com/blog/dog-grooming-waiver-template',
   },
   openGraph: {
     title: 'Dog Grooming Waiver Template: Free Liability Waiver for Professional Groomers',
     description:
       'Free dog grooming waiver template covering senior dogs, matting, medical emergencies, and liability — ready to customize.',
-    url: 'https://getgroomgrid.com/blog/dog-grooming-waiver-template/',
+    url: 'https://getgroomgrid.com/blog/dog-grooming-waiver-template',
     type: 'article',
   },
 };
@@ -32,13 +32,13 @@ const breadcrumbSchema = {
       '@type': 'ListItem',
       position: 2,
       name: 'Blog',
-      item: 'https://getgroomgrid.com/blog/',
+      item: 'https://getgroomgrid.com/blog',
     },
     {
       '@type': 'ListItem',
       position: 3,
       name: 'Dog Grooming Waiver Template',
-      item: 'https://getgroomgrid.com/blog/dog-grooming-waiver-template/',
+      item: 'https://getgroomgrid.com/blog/dog-grooming-waiver-template',
     },
   ],
 };
@@ -49,7 +49,7 @@ const articleSchema = {
   headline: 'Dog Grooming Waiver Template: Free Liability Waiver for Professional Groomers',
   description:
     'Free dog grooming waiver template covering senior dogs, matting, medical emergencies, and liability — ready to customize.',
-  url: 'https://getgroomgrid.com/blog/dog-grooming-waiver-template/',
+  url: 'https://getgroomgrid.com/blog/dog-grooming-waiver-template',
   datePublished: '2026-04-17',
   dateModified: '2026-04-17',
   publisher: {
@@ -63,7 +63,7 @@ const articleSchema = {
   },
   mainEntityOfPage: {
     '@type': 'WebPage',
-    '@id': 'https://getgroomgrid.com/blog/dog-grooming-waiver-template/',
+    '@id': 'https://getgroomgrid.com/blog/dog-grooming-waiver-template',
   },
 };
 

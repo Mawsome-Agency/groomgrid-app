@@ -3,8 +3,16 @@ import Link from 'next/link';
 import { BOFUAnalyticsWrapper } from '@/components/analytics';
 
 export const metadata: Metadata = {
-  title: 'Best Dog Grooming Software 2025 | GroomGrid',
-  description: 'Compare top grooming software options for your business.',
+  title: 'Best Dog Grooming Software 2026 | GroomGrid',
+  description: 'Compare the top dog grooming software platforms of 2026. Scheduling, client records, payments, reminders — see which tool fits your grooming business.',
+  alternates: {
+    canonical: 'https://getgroomgrid.com/best-dog-grooming-software',
+  },
+  openGraph: {
+    title: 'Best Dog Grooming Software 2026',
+    description: 'Compare the top dog grooming software platforms of 2026. Scheduling, client records, payments, reminders — see which fits your grooming business.',
+    url: 'https://getgroomgrid.com/best-dog-grooming-software',
+  },
 };
 
 export default function BestDogGroomingSoftwarePage() {

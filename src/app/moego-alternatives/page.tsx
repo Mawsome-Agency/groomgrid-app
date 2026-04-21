@@ -5,6 +5,14 @@ import { BOFUAnalyticsWrapper } from '@/components/analytics';
 export const metadata: Metadata = {
   title: 'MoeGo Alternatives | GroomGrid',
   description: 'See why groomers are switching from MoeGo to GroomGrid.',
+  alternates: {
+    canonical: 'https://getgroomgrid.com/moego-alternatives',
+  },
+  openGraph: {
+    title: 'MoeGo Alternatives | GroomGrid',
+    description: 'See why groomers are switching from MoeGo to GroomGrid.',
+    url: 'https://getgroomgrid.com/moego-alternatives',
+  },
 };
 
 export default function MoeGoAlternativesPage() {

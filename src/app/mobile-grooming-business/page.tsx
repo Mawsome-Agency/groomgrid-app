@@ -8,13 +8,13 @@ export const metadata: Metadata = {
   description:
     'Everything you need to start, run, and grow a mobile dog grooming business — business plan, route optimization, pricing strategy, and the tools that make it work.',
   alternates: {
-    canonical: 'https://getgroomgrid.com/mobile-grooming-business/',
+    canonical: 'https://getgroomgrid.com/mobile-grooming-business',
   },
   openGraph: {
     title: 'Mobile Grooming Business: Complete Guide to Starting & Growing',
     description:
       'Everything you need to start, run, and grow a mobile dog grooming business — business plan, route optimization, pricing strategy, and the tools that make it work.',
-    url: 'https://getgroomgrid.com/mobile-grooming-business/',
+    url: 'https://getgroomgrid.com/mobile-grooming-business',
     type: 'article',
   },
 };
@@ -33,7 +33,7 @@ const breadcrumbSchema = {
       '@type': 'ListItem',
       position: 2,
       name: 'Mobile Grooming Business',
-      item: 'https://getgroomgrid.com/mobile-grooming-business/',
+      item: 'https://getgroomgrid.com/mobile-grooming-business',
     },
   ],
 };
@@ -44,7 +44,7 @@ const articleSchema = {
   headline: 'Mobile Grooming Business: Complete Guide to Starting & Growing',
   description:
     'Everything you need to start, run, and grow a mobile dog grooming business — business plan, route optimization, pricing strategy, and the tools that make it work.',
-  url: 'https://getgroomgrid.com/mobile-grooming-business/',
+  url: 'https://getgroomgrid.com/mobile-grooming-business',
   publisher: {
     '@type': 'Organization',
     name: 'GroomGrid',
@@ -56,7 +56,7 @@ const articleSchema = {
   },
   mainEntityOfPage: {
     '@type': 'WebPage',
-    '@id': 'https://getgroomgrid.com/mobile-grooming-business/',
+    '@id': 'https://getgroomgrid.com/mobile-grooming-business',
   },
 };
 

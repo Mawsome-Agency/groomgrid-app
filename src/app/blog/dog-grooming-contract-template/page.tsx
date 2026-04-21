@@ -7,13 +7,13 @@ export const metadata: Metadata = {
   description:
     'Protect your grooming business with a solid client contract. Here\'s exactly what to include, plus a ready-to-use dog grooming contract template.',
   alternates: {
-    canonical: 'https://getgroomgrid.com/blog/dog-grooming-contract-template/',
+    canonical: 'https://getgroomgrid.com/blog/dog-grooming-contract-template',
   },
   openGraph: {
     title: 'Dog Grooming Contract Template: What to Include and Why',
     description:
       'Protect your grooming business with a solid client contract. Here\'s exactly what to include, plus a ready-to-use dog grooming contract template.',
-    url: 'https://getgroomgrid.com/blog/dog-grooming-contract-template/',
+    url: 'https://getgroomgrid.com/blog/dog-grooming-contract-template',
     type: 'article',
   },
 };
@@ -32,13 +32,13 @@ const breadcrumbSchema = {
       '@type': 'ListItem',
       position: 2,
       name: 'Blog',
-      item: 'https://getgroomgrid.com/blog/',
+      item: 'https://getgroomgrid.com/blog',
     },
     {
       '@type': 'ListItem',
       position: 3,
       name: 'Dog Grooming Contract Template',
-      item: 'https://getgroomgrid.com/blog/dog-grooming-contract-template/',
+      item: 'https://getgroomgrid.com/blog/dog-grooming-contract-template',
     },
   ],
 };
@@ -49,7 +49,7 @@ const articleSchema = {
   headline: 'Dog Grooming Contract Template: What to Include and Why',
   description:
     'Protect your grooming business with a solid client contract. Here\'s exactly what to include, plus a ready-to-use dog grooming contract template.',
-  url: 'https://getgroomgrid.com/blog/dog-grooming-contract-template/',
+  url: 'https://getgroomgrid.com/blog/dog-grooming-contract-template',
   publisher: {
     '@type': 'Organization',
     name: 'GroomGrid',
@@ -61,7 +61,7 @@ const articleSchema = {
   },
   mainEntityOfPage: {
     '@type': 'WebPage',
-    '@id': 'https://getgroomgrid.com/blog/dog-grooming-contract-template/',
+    '@id': 'https://getgroomgrid.com/blog/dog-grooming-contract-template',
   },
 };
 
