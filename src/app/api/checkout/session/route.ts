@@ -25,7 +25,7 @@ function getPriceId(plan: PlanType): string {
  *
  * Creates a Stripe Checkout session with BETA50 coupon pre-applied and
  * redirects (307) the user directly to the Stripe-hosted checkout page.
- * No authentication required — this is an anonymous checkout entry point.
+ * Requires authentication — userId is passed via session for webhook processing.
  */
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -53,6 +53,16 @@ export async function GET(req: NextRequest) {
       // Pre-apply BETA50 coupon. Note: allow_promotion_codes cannot be set when
       // discounts is specified — Stripe enforces mutual exclusivity.
       discounts: [{ coupon: 'BETA50' }],
+      // Include metadata and trial so webhook can process the session properly
+      metadata: {
+        userId: 'anonymous', // Will need to be linked post-checkout
+        planType: validPlan,
+        isTrial: 'true',
+      },
+      subscription_data: {
+        trial_period_days: 14,
+        metadata: { planType: validPlan },
+      },
       success_url: `${appUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${appUrl}/plans`,
     });

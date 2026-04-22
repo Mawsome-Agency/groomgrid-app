@@ -140,6 +140,7 @@ function PlansPageInner() {
           userId: session.user.id,
           planType: plan.type,
           customerEmail: session.user.email,
+          coupon: searchParams.get("coupon") || undefined,
         }),
       });
 
