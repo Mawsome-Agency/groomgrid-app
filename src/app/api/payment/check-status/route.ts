@@ -3,19 +3,20 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/next-auth-options';
 import prisma from '@/lib/prisma';
 import { updatePaymentLockoutStatus } from '@/lib/payment-lockout';
+import { triggerPaymentCompletionHandler } from '@/lib/payment-completion';
 import { stripe } from '@/lib/stripe';
 
 /**
  * GET /api/payment/check-status
- * 
- * Manually check payment status for the current user
+ *
+ * Manually check payment status for the current user.
  * This endpoint allows users to manually sync their payment status
- * if the webhook failed to process
+ * if the webhook failed to process.
  */
 export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -39,21 +40,32 @@ export async function GET(req: NextRequest) {
 
     // Check the actual payment status with Stripe
     try {
+      // stripe is already imported as a singleton
       const stripeSession = await stripe.checkout.sessions.retrieve(lockout.sessionId);
-      
+
       if (stripeSession.status === 'complete') {
-        // Payment was successful, update the lockout and profile
+        // Payment was successful — update lockout and trigger the full
+        // payment completion handler so profile is updated correctly
+        // with the actual planType and Stripe IDs from the session.
         await updatePaymentLockoutStatus(lockout.id, 'completed');
-        
-        // Update profile to reflect paid status
-        // This is a simplified version - in reality you'd want to trigger the full payment completion handler
-        await prisma.profile.update({
-          where: { userId },
-          data: {
-            subscriptionStatus: 'trial', // This would be updated properly in a real implementation
-            planType: 'solo', // This would come from the session metadata
-          },
-        });
+
+        const metadata = stripeSession.metadata ?? {};
+        if (metadata.userId && metadata.userId !== 'anonymous') {
+          await triggerPaymentCompletionHandler({
+            ...stripeSession,
+            metadata: metadata as { userId?: string; planType?: string; clientId?: string },
+          });
+        } else {
+          // Fallback: update profile with planType from session metadata
+          const planType = metadata.planType || 'solo';
+          await prisma.profile.update({
+            where: { userId },
+            data: {
+              subscriptionStatus: 'trial',
+              planType,
+            },
+          });
+        }
 
         return NextResponse.json({ message: 'Payment status updated successfully' });
       } else if (stripeSession.status === 'open') {

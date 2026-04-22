@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/next-auth-options';
 import { createCheckoutSession, getCheckoutSession, getStripeErrorMessage } from '@/lib/stripe';
 import prisma from '@/lib/prisma';
 import { trackPaymentInitiatedServer } from '@/lib/ga4-server';
@@ -28,16 +30,27 @@ export async function POST(req: NextRequest) {
     ensureEnv('stripe');
     ensureEnv('app');
 
+    // ── Authentication check ──────────────────────────────────────────
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: 'Authentication required', errorType: 'generic' }, { status: 401 });
+    }
+
     const { userId, planType, customerEmail, clientId, coupon: rawCoupon } = await req.json();
+
+    if (!userId || !planType) {
+      return NextResponse.json({ error: 'Missing required fields', errorType: 'generic' }, { status: 400 });
+    }
+
+    // Verify that the authenticated user matches the requested userId
+    if (session.user.id !== userId) {
+      return NextResponse.json({ error: 'User ID mismatch', errorType: 'generic' }, { status: 403 });
+    }
 
     // Sanitize coupon: uppercase, alphanumeric only, max 20 chars
     const coupon = rawCoupon
       ? String(rawCoupon).toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 20) || undefined
       : undefined;
-
-    if (!userId || !planType) {
-      return NextResponse.json({ error: 'Missing required fields', errorType: 'generic' }, { status: 400 });
-    }
 
     if (!validatePlan(planType)) {
       return NextResponse.json({ error: 'Invalid plan type', errorType: 'generic' }, { status: 400 });
@@ -56,7 +69,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Profile not found', errorType: 'generic' }, { status: 404 });
     }
 
-    const session = await createCheckoutSession({
+    const checkoutSession = await createCheckoutSession({
       userId,
       planType: planType as keyof typeof PLAN_DATA,
       customerEmail: customerEmail || `${userId}@groomgrid.app`,
@@ -66,9 +79,9 @@ export async function POST(req: NextRequest) {
       couponCode: coupon,
     });
 
-    await trackPaymentInitiatedServer(userId, session.id, planType);
+    await trackPaymentInitiatedServer(userId, checkoutSession.id, planType);
 
-    return NextResponse.json({ url: session.url, sessionId: session.id });
+    return NextResponse.json({ url: checkoutSession.url, sessionId: checkoutSession.id });
   } catch (error: any) {
     console.error('Checkout error:', error);
     const errorDetails = getStripeErrorMessage(error);

@@ -1,33 +1,36 @@
 import { NextRequest, NextResponse } from 'next/server';
-import Stripe from 'stripe';
-import { requireEnvVar } from '@/lib/validation';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/next-auth-options';
+import { createCheckoutSession } from '@/lib/stripe';
+import prisma from '@/lib/prisma';
+import { ensureEnv } from '@/lib/validation';
 
 const VALID_PLANS = ['solo', 'salon', 'enterprise'] as const;
 type PlanType = typeof VALID_PLANS[number];
 
-function getStripe(): Stripe {
-  return new Stripe(requireEnvVar('STRIPE_SECRET_KEY'), {
-    apiVersion: '2023-10-16',
-  });
-}
-
-function getPriceId(plan: PlanType): string {
-  const priceMap: Record<PlanType, string> = {
-    solo: requireEnvVar('STRIPE_PRICE_SOLO'),
-    salon: requireEnvVar('STRIPE_PRICE_SALON'),
-    enterprise: requireEnvVar('STRIPE_PRICE_ENTERPRISE'),
-  };
-  return priceMap[plan];
-}
+const PLAN_DATA: Record<PlanType, { name: string; price: number }> = {
+  solo: { name: 'Solo', price: 2900 },
+  salon: { name: 'Salon', price: 7900 },
+  enterprise: { name: 'Enterprise', price: 14900 },
+};
 
 /**
  * GET /api/checkout/session?plan=solo|salon|enterprise
  *
  * Creates a Stripe Checkout session with BETA50 coupon pre-applied and
  * redirects (307) the user directly to the Stripe-hosted checkout page.
- * Requires authentication — userId is passed via session for webhook processing.
+ * Requires authentication — userId from session is embedded in metadata
+ * so the webhook can link the payment to a real user.
  */
 export async function GET(req: NextRequest) {
+  // ── Authentication check ──────────────────────────────────────────
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) {
+    const loginUrl = new URL('/login', req.url);
+    loginUrl.searchParams.set('next', '/plans');
+    return NextResponse.redirect(loginUrl, 302);
+  }
+
   const { searchParams } = new URL(req.url);
   const plan = searchParams.get('plan');
 
@@ -40,38 +43,33 @@ export async function GET(req: NextRequest) {
   }
 
   const validPlan = plan as PlanType;
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://getgroomgrid.com';
 
   try {
-    const stripe = getStripe();
-    const priceId = getPriceId(validPlan);
+    ensureEnv('stripe');
+    ensureEnv('app');
 
-    const session = await stripe.checkout.sessions.create({
-      mode: 'subscription',
-      payment_method_types: ['card'],
-      line_items: [{ price: priceId, quantity: 1 }],
-      // Pre-apply BETA50 coupon. Note: allow_promotion_codes cannot be set when
-      // discounts is specified — Stripe enforces mutual exclusivity.
-      discounts: [{ coupon: 'BETA50' }],
-      // Include metadata and trial so webhook can process the session properly
-      metadata: {
-        userId: 'anonymous', // Will need to be linked post-checkout
-        planType: validPlan,
-        isTrial: 'true',
-      },
-      subscription_data: {
-        trial_period_days: 14,
-        metadata: { planType: validPlan },
-      },
-      success_url: `${appUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${appUrl}/plans`,
+    // Look up profile for business name
+    const profile = await prisma.profile.findUnique({ where: { userId: session.user.id } });
+    if (!profile) {
+      return NextResponse.json({ error: 'Profile not found. Please complete signup first.' }, { status: 404 });
+    }
+
+    // Use the shared createCheckoutSession so metadata, trial, and URLs
+    // are consistent with the POST /api/checkout flow
+    const checkoutSession = await createCheckoutSession({
+      userId: session.user.id,
+      planType: validPlan,
+      customerEmail: session.user.email || `${session.user.id}@groomgrid.app`,
+      businessName: profile.businessName,
+      planData: PLAN_DATA[validPlan],
+      couponCode: 'BETA50',
     });
 
-    if (!session.url) {
+    if (!checkoutSession.url) {
       return NextResponse.json({ error: 'Failed to create checkout session' }, { status: 500 });
     }
 
-    return NextResponse.redirect(session.url, 307);
+    return NextResponse.redirect(checkoutSession.url, 307);
   } catch (error: any) {
     console.error('[/api/checkout/session] Stripe error:', error?.message || error);
     return NextResponse.json({ error: 'Failed to create checkout session' }, { status: 500 });

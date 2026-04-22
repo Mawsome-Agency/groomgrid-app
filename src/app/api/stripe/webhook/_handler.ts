@@ -67,7 +67,9 @@ export const handleStripeEvent = async (event: Stripe.Event) => {
           ? rawPaymentIntent
           : rawPaymentIntent?.id ?? session.id;
 
-      if (userId) {
+      // Guard against 'anonymous' userId from legacy checkout sessions
+      // that were created without authentication
+      if (userId && userId !== 'anonymous') {
         // Wrap related operations in a transaction for consistency
         await prisma.$transaction(async (tx) => {
           // Create PAYMENT_CONFIRMED event to signal webhook received
@@ -114,6 +116,8 @@ export const handleStripeEvent = async (event: Stripe.Event) => {
           ...session,
           metadata: session.metadata ?? undefined,
         });
+      } else if (userId === 'anonymous') {
+        console.warn(`[Webhook] checkout.session.completed with userId='anonymous' — session ${session.id} cannot be linked to a real user. This session was likely created by the legacy unauthenticated checkout endpoint.`);
       }
       break;
     }
