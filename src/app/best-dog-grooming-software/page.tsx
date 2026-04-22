@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { BOFUAnalyticsWrapper } from '@/components/analytics';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'Best Dog Grooming Software 2026 | GroomGrid',
   description: 'Compare the top dog grooming software platforms of 2026. Scheduling, client records, payments, reminders — see which tool fits your grooming business.',
@@ -19,7 +21,8 @@ export default function BestDogGroomingSoftwarePage() {
   return (
     <BOFUAnalyticsWrapper
       pageType="software-guide"
-      pageName="best-dog-grooming-software">
+      sectionIds={['hero', 'cta']}
+      sectionTitles={['Hero', 'CTA']}>
       <div className="min-h-screen bg-white">
         <header className="px-6 py-12 max-w-4xl mx-auto">
           <h1 className="text-4xl font-bold">Best Dog Grooming Software</h1>
