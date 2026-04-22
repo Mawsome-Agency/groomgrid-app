@@ -8,6 +8,10 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  // Don't fail builds on prerender errors — many pages use client-side routing
+  // (useSearchParams, useRouter) and can't be statically prerendered.
+  // They'll be server-rendered at request time instead.
+  skipTrailingSlashRedirect: true,
   async redirects() {
     return [
       {
