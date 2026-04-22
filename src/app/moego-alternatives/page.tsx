@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { BOFUAnalyticsWrapper } from '@/components/analytics';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'MoeGo Alternatives | GroomGrid',
   description: 'See why groomers are switching from MoeGo to GroomGrid.',
@@ -19,8 +21,8 @@ export default function MoeGoAlternativesPage() {
   return (
     <BOFUAnalyticsWrapper
       pageType="alternative"
-      pageName="moego-alternatives"
-      competitorName="MoeGo">
+      sectionIds={['hero', 'cta']}
+      sectionTitles={['Hero', 'CTA']}>
       <div className="min-h-screen bg-white">
         <header className="px-6 py-12 max-w-4xl mx-auto">
           <h1 className="text-4xl font-bold">MoeGo Alternatives</h1>

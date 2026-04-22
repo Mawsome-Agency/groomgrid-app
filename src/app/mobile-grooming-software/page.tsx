@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { BOFUAnalyticsWrapper } from '@/components/analytics';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'Mobile Grooming Software | GroomGrid',
   description: 'The best mobile grooming software for dog groomers on the go. Scheduling, routing, reminders, and payments — all from your phone.',
@@ -19,7 +21,8 @@ export default function MobileGroomingSoftwarePage() {
   return (
     <BOFUAnalyticsWrapper
       pageType="software-guide"
-      pageName="mobile-grooming-software">
+      sectionIds={['hero', 'cta']}
+      sectionTitles={['Hero', 'CTA']}>
       <div className="min-h-screen bg-white">
         <header className="px-6 py-12 max-w-4xl mx-auto">
           <h1 className="text-4xl font-bold">Mobile Grooming Software</h1>
