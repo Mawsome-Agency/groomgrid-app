@@ -134,6 +134,19 @@ function SignupPageInner() {
 
     trackSignupStarted(formData.businessName);
 
+    // Retrieve UTM attribution captured on page load from sessionStorage
+    let attribution: Record<string, unknown> | null = null;
+    if (typeof window !== 'undefined') {
+      const stored = sessionStorage.getItem('gg_attribution');
+      if (stored) {
+        try {
+          attribution = JSON.parse(stored);
+        } catch {
+          // Ignore malformed attribution data
+        }
+      }
+    }
+
     try {
       const res = await fetch('/api/auth/signup', {
         method: 'POST',
@@ -142,6 +155,7 @@ function SignupPageInner() {
           email: formData.email,
           password: formData.password,
           businessName: formData.businessName,
+          attributionData: attribution,
         }),
       });
 
