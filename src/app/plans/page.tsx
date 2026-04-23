@@ -4,28 +4,45 @@ import { useState, useEffect, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
 import Script from 'next/script';
+import Link from 'next/link';
 import { Plan } from '@/types';
-import { PLANS } from '@/app/pricing/pricing-data';
+import { PLANS, TESTIMONIALS, FAQ_ITEMS } from '@/app/pricing/pricing-data';
 import PlanCard from '@/components/funnel/PlanCard';
-import Testimonial from '@/components/funnel/Testimonial';
-import ValueProp from '@/components/funnel/ValueProp';
 import TrustSignals from '@/components/trust/TrustSignals';
 import StickyPlanBar from '@/components/funnel/StickyPlanBar';
 import { BillingSummaryData } from '@/components/trust/BillingSummary';
 import { trackPageView, trackPlanViewed, trackPlanSelected, trackCheckoutStarted, trackBillingSummaryViewed } from '@/lib/ga4';
 
-const TESTIMONIALS = [
-  {
-    name: 'Sarah Mitchell',
-    business: 'Paws on Wheels',
-    quote: 'GroomGrid cut my booking time in half. I can focus on dogs, not paperwork.',
+/** Schema.org SoftwareApplication + OfferCatalog structured data */
+const softwareAppSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'GroomGrid',
+  applicationCategory: 'BusinessApplication',
+  operatingSystem: 'Web',
+  description: 'AI-powered pet grooming business management — scheduling, client records, automated reminders, and payments.',
+  offers: {
+    '@type': 'AggregateOffer',
+    lowPrice: '29',
+    highPrice: '149',
+    priceCurrency: 'USD',
+    offerCount: PLANS.length,
   },
-  {
-    name: 'James Rodriguez',
-    business: 'Fur Perfect Salon',
-    quote: 'My team loves mobile app. We can check schedules from anywhere and no-shows dropped 40%.',
-  },
-];
+};
+
+const offerCatalogSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'OfferCatalog',
+  name: 'GroomGrid Pricing Plans',
+  itemListElement: PLANS.map((plan, i) => ({
+    '@type': 'Offer',
+    position: i + 1,
+    name: plan.name,
+    price: plan.price,
+    priceCurrency: 'USD',
+    description: plan.features.join(', '),
+  })),
+};
 
 function PlansSkeleton() {
   return (
@@ -64,6 +81,8 @@ function PlansPageInner() {
   const planGridRef = useRef<HTMLDivElement>(null);
   const planViewedFiredRef = useRef(false);
 
+  const coupon = searchParams.get('coupon') || undefined;
+
   // Get billing summary data for selected plan
   const getBillingData = (): BillingSummaryData | null => {
     if (!selectedPlan) return null;
@@ -94,42 +113,31 @@ function PlansPageInner() {
     }
   }, [searchParams]);
 
-  useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push('/login');
-      return;
-    }
-
-    // Check if welcome screen has been shown
-    if (status === 'authenticated' && session?.user?.id) {
-      fetch('/api/profile')
-        .then((res) => res.json())
-        .then((data) => {
-          // If welcome hasn't been shown and user hasn't selected a plan yet, redirect to welcome
-          if (!data.welcomeShown && !data.stripeSubscriptionId) {
-            router.replace('/welcome');
-          }
-        })
-        .catch((err) => {
-          console.error('Failed to check welcome status:', err);
-          // Don't block page if check fails
-        });
-    }
-  }, [status, session, router]);
-
+  /**
+   * Handle plan selection:
+   * - Authenticated users → proceed to Stripe checkout
+   * - Unauthenticated users → redirect to signup with coupon preserved
+   */
   const handleSelectPlan = async (plan: Plan) => {
-    if (!session?.user?.id) return;
     if (isCheckoutInFlight) return;
 
     setSelectedPlan(plan);
     setCheckoutError(null);
+
+    // Unauthenticated users → send to signup with plan + coupon context
+    if (status !== 'authenticated' || !session?.user?.id) {
+      const signupUrl = coupon
+        ? `/signup?coupon=${encodeURIComponent(coupon)}&plan=${plan.id}`
+        : `/signup?plan=${plan.id}`;
+      router.push(signupUrl);
+      return;
+    }
+
     setIsCheckoutInFlight(true);
 
-    // Fire client-side GA4 events before redirect — window.gtag is available here
+    // Fire client-side GA4 events before redirect
     trackPlanSelected(plan.type, plan.price);
     trackCheckoutStarted(plan.name, plan.price);
-
-    // Track billing summary viewed
     trackBillingSummaryViewed(plan.name, plan.price * 100, true);
 
     try {
@@ -140,7 +148,7 @@ function PlansPageInner() {
           userId: session.user.id,
           planType: plan.type,
           customerEmail: session.user.email,
-          coupon: searchParams.get("coupon") || undefined,
+          coupon,
         }),
       });
 
@@ -171,26 +179,40 @@ function PlansPageInner() {
     }
   };
 
-  if (status === 'loading' || !session) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-stone-50 flex items-center justify-center">
-        <div className="text-center">Loading...</div>
-      </div>
-    );
+  // Show skeleton while session is loading (but don't redirect unauthenticated)
+  const isLoadingSession = status === 'loading';
+
+  if (isLoadingSession) {
+    return <PlansSkeleton />;
   }
+
+  const isAuthenticated = status === 'authenticated' && session?.user?.id;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-stone-50">
       {/* Header */}
       <header className="bg-white border-b border-stone-200">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-green-600">GroomGrid</h1>
-          <button
-            onClick={() => signOut({ callbackUrl: '/' })}
-            className="text-stone-600 hover:text-stone-900 text-sm"
-          >
-            Sign Out
-          </button>
+          <Link href="/" className="text-2xl font-bold text-green-600">
+            GroomGrid
+          </Link>
+          <div className="flex items-center gap-4">
+            {isAuthenticated ? (
+              <button
+                onClick={() => signOut({ callbackUrl: '/' })}
+                className="text-stone-600 hover:text-stone-900 text-sm"
+              >
+                Sign Out
+              </button>
+            ) : (
+              <Link
+                href="/login"
+                className="text-stone-600 hover:text-stone-900 text-sm"
+              >
+                Log In
+              </Link>
+            )}
+          </div>
         </div>
       </header>
 
@@ -202,31 +224,27 @@ function PlansPageInner() {
       </div>
 
       <main className="max-w-7xl mx-auto px-4 py-12">
-        {/* Schema.org OfferCatalog structured data for rich results */}
+        {/* Schema.org SoftwareApplication structured data for rich results */}
+        <Script
+          id="software-app-schema"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(softwareAppSchema),
+          }}
+        />
+        {/* Schema.org OfferCatalog structured data */}
         <Script
           id="pricing-schema"
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "OfferCatalog",
-              "name": "GroomGrid Pricing Plans",
-              "itemListElement": PLANS.map((plan, i) => ({
-                "@type": "Offer",
-                "position": i + 1,
-                "name": plan.name,
-                "price": plan.price,
-                "priceCurrency": "USD",
-                "description": plan.features.join(', '),
-              })),
-            }),
+            __html: JSON.stringify(offerCatalogSchema),
           }}
         />
 
         {/* Hero Section */}
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold text-stone-900 mb-4">Choose Your Plan</h2>
-          <p className="text-xl text-stone-600">All plans include a 14-day free trial</p>
+          <p className="text-xl text-stone-600">All plans include a 14-day free trial — no credit card required</p>
         </div>
 
         {/* Checkout Error Alert */}
@@ -252,11 +270,8 @@ function PlansPageInner() {
           </div>
         )}
 
-        {/* Mobile layout: Plan Cards → Trust Signals → Value Props → Testimonials → FAQ */}
-        {/* Desktop layout: Value Props → Trust Signals → Plan Cards → Testimonials → FAQ */}
-
-        {/* Plan Cards — shown first on mobile, after ValueProp on desktop */}
-        <div ref={planGridRef} className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 order-first md:order-none">
+        {/* Plan Cards */}
+        <div ref={planGridRef} className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
           {PLANS.map((plan) => (
             <PlanCard
               key={plan.id}
@@ -280,14 +295,25 @@ function PlansPageInner() {
           />
         </div>
 
-        {/* Value Props — hidden on mobile (shown above plan cards on desktop via flex order) */}
-        <div className="hidden md:block mb-8">
-          <ValueProp />
-        </div>
-
-        {/* Value Props — shown below Trust Signals on mobile only */}
-        <div className="md:hidden mb-8">
-          <ValueProp />
+        {/* Value Props */}
+        <div className="mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-white rounded-xl p-6 border border-stone-200">
+              <div className="text-2xl mb-2">📅</div>
+              <h4 className="font-semibold text-stone-900 mb-1">Smart Scheduling</h4>
+              <p className="text-sm text-stone-600">Automated reminders cut no-shows by up to 40%. Mobile-first so you can manage from the van.</p>
+            </div>
+            <div className="bg-white rounded-xl p-6 border border-stone-200">
+              <div className="text-2xl mb-2">🐾</div>
+              <h4 className="font-semibold text-stone-900 mb-1">Pet & Client Profiles</h4>
+              <p className="text-sm text-stone-600">Allergies, breed notes, vaccination records — everything in one place, not scattered across paper.</p>
+            </div>
+            <div className="bg-white rounded-xl p-6 border border-stone-200">
+              <div className="text-2xl mb-2">💳</div>
+              <h4 className="font-semibold text-stone-900 mb-1">Built-In Payments</h4>
+              <p className="text-sm text-stone-600">No more chasing checks. Clients pay at booking or after the groom — you get paid faster.</p>
+            </div>
+          </div>
         </div>
 
         {/* Testimonials */}
@@ -297,7 +323,13 @@ function PlansPageInner() {
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
             {TESTIMONIALS.map((testimonial, index) => (
-              <Testimonial key={index} {...testimonial} />
+              <div key={index} className="bg-white rounded-xl p-6 border border-stone-200">
+                <p className="text-stone-700 italic mb-4">&ldquo;{testimonial.quote}&rdquo;</p>
+                <div>
+                  <p className="font-semibold text-stone-900">{testimonial.name}</p>
+                  <p className="text-sm text-stone-500">{testimonial.business}</p>
+                </div>
+              </div>
             ))}
           </div>
         </div>
@@ -306,26 +338,27 @@ function PlansPageInner() {
         <div className="max-w-2xl mx-auto">
           <h3 className="text-2xl font-bold text-stone-900 mb-6 text-center">Frequently Asked Questions</h3>
           <div className="space-y-4">
-            <div className="bg-white rounded-xl p-6">
-              <h4 className="font-semibold text-stone-900 mb-2">What happens after the free trial?</h4>
-              <p className="text-stone-600 text-sm">
-                After 14 days, you'll be charged for your chosen plan. You can cancel anytime before the trial ends with no charge.
-              </p>
-            </div>
-            <div className="bg-white rounded-xl p-6">
-              <h4 className="font-semibold text-stone-900 mb-2">Can I change plans later?</h4>
-              <p className="text-stone-600 text-sm">
-                Yes! You can upgrade or downgrade your plan at any time from your account settings.
-              </p>
-            </div>
-            <div className="bg-white rounded-xl p-6">
-              <h4 className="font-semibold text-stone-900 mb-2">Is my data secure?</h4>
-              <p className="text-stone-600 text-sm">
-                Absolutely. We use industry-standard encryption and your data is backed up daily.
-              </p>
-            </div>
+            {FAQ_ITEMS.map((faq, index) => (
+              <div key={index} className="bg-white rounded-xl p-6">
+                <h4 className="font-semibold text-stone-900 mb-2">{faq.question}</h4>
+                <p className="text-stone-600 text-sm">{faq.answer}</p>
+              </div>
+            ))}
           </div>
         </div>
+
+        {/* Bottom CTA for unauthenticated users */}
+        {!isAuthenticated && (
+          <div className="text-center mt-12">
+            <Link
+              href={coupon ? `/signup?coupon=${encodeURIComponent(coupon)}` : '/signup'}
+              className="inline-block bg-green-600 hover:bg-green-700 text-white font-semibold px-8 py-3 rounded-xl transition-colors"
+            >
+              Get Started Free — 14 Day Trial
+            </Link>
+            <p className="text-stone-500 text-sm mt-3">No credit card required</p>
+          </div>
+        )}
       </main>
 
       {/* Sticky Plan Bar (mobile only) */}

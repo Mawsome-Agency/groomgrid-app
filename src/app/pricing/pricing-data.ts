@@ -1,5 +1,19 @@
 import { Plan } from '@/types';
 
+/**
+ * Single source of truth for all GroomGrid pricing plans.
+ *
+ * Used by:
+ *   - /plans page (PlanCard, Schema.org markup)
+ *   - /signup page (plan selection)
+ *   - API checkout route (plan validation)
+ *   - Any other component that needs plan data
+ *
+ * IMPORTANT: When adding or changing plans, also update:
+ *   - Schema.org SoftwareApplication markup in src/app/layout.tsx
+ *   - Stripe price IDs in .env (STRIPE_PRICE_SOLO, STRIPE_PRICE_SALON, STRIPE_PRICE_ENTERPRISE)
+ *   - PLAN_DATA in src/app/api/checkout/route.ts
+ */
 export const PLANS: Plan[] = [
   {
     id: 'solo',
@@ -12,6 +26,7 @@ export const PLANS: Plan[] = [
       'Unlimited appointments',
       'Client & pet profiles',
       'Automated reminders',
+      'Online booking widget',
       'Revenue tracking',
       'Mobile-friendly booking',
     ],
@@ -29,7 +44,9 @@ export const PLANS: Plan[] = [
       'Up to 5 groomers',
       'Team scheduling',
       'Staff performance metrics',
+      'Commission tracking',
       'Multi-location support',
+      'Priority support',
     ],
     popular: true,
   },
@@ -43,9 +60,10 @@ export const PLANS: Plan[] = [
     features: [
       'Everything in Salon',
       'Unlimited groomers',
-      'Custom branding',
-      'Priority support',
+      'Custom branding & white-label',
       'API access',
+      'Dedicated account manager',
+      '24/7 premium support',
     ],
     popular: false,
   },
@@ -61,13 +79,13 @@ export interface Testimonial {
 export const TESTIMONIALS: Testimonial[] = [
   {
     name: 'Sarah Johnson',
-    business: 'Paws & Claws Mobile Grooming',
-    quote: 'GroomGrid cut my admin time in half. I used to spend hours every week on scheduling and reminders. Now it just happens.',
+    business: 'Pampered Paws Mobile',
+    quote: 'GroomGrid cut my double-booking issues by 90%. The automated reminders alone saved me hundreds in missed appointments.',
   },
   {
     name: 'Mike Rodriguez',
-    business: 'The Grooming Lounge',
-    quote: 'The team scheduling feature is a game-changer. My 5 groomers can see their schedule from anywhere, and no more double bookings.',
+    business: 'Urban Dog Spa',
+    quote: 'Managing 5 groomers used to be chaos. With GroomGrid\'s team scheduling, we\'re more efficient and our groomers love it.',
   },
 ];
 
@@ -83,7 +101,7 @@ export const FAQ_ITEMS: FAQItem[] = [
   },
   {
     question: 'Can I change plans later?',
-    answer: 'Absolutely. You can upgrade or downgrade your plan at any time from your account settings.',
+    answer: 'Absolutely. You can upgrade or downgrade your plan at any time. Changes take effect at the end of your current billing period.',
   },
   {
     question: 'What payment methods do you accept?',
@@ -91,10 +109,10 @@ export const FAQ_ITEMS: FAQItem[] = [
   },
   {
     question: 'Is my data secure?',
-    answer: 'Yes. We use industry-standard encryption and security practices. Your data is backed up daily and never shared with third parties.',
+    answer: 'Yes. We use bank-grade encryption and security practices. Your data is backed up daily and never shared with third parties.',
   },
   {
     question: 'Can I cancel anytime?',
-    answer: 'Yes. There are no long-term contracts. You can cancel your subscription at any time with no penalties.',
+    answer: 'Yes. There are no long-term contracts, setup fees, or cancellation penalties. Cancel whenever you want.',
   },
 ];
