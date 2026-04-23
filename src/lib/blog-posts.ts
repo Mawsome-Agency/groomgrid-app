@@ -108,4 +108,10 @@ export const blogPosts: BlogPost[] = [
     description: 'Everything you need to start a mobile dog grooming business — van setup, licensing, pricing, finding first clients, and the tools to manage it all from day one.',
     publishedAt: '2026-04-23',
   },
+  {
+    slug: 'how-to-start-dog-grooming-business-at-home',
+    title: 'How to Start a Dog Grooming Business at Home: Step-by-Step Guide',
+    description: 'Start your dog grooming business at home with this complete guide — licensing, equipment, pricing, zoning rules, and the software that keeps everything organized from day one.',
+    publishedAt: '2026-04-23',
+  },
 ].sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
