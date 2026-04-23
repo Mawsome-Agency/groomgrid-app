@@ -42,10 +42,14 @@ export function trackSignupViewed() {
 }
 
 // Fires on successful POST /api/auth/signup response
-export function trackSignupCompleted(userId: string) {
-  trackEvent('signup_completed', {
+export function trackSignupCompleted(userId: string, attribution?: Record<string, any>) {
+  const params: Record<string, any> = {
     user_id: userId,
-  });
+  };
+  if (attribution?.utm_source) params.utm_source = attribution.utm_source;
+  if (attribution?.utm_campaign) params.utm_campaign = attribution.utm_campaign;
+  if (attribution?.utm_medium) params.utm_medium = attribution.utm_medium;
+  trackEvent('signup_completed', params);
 }
 
 // Fires when user lands on /plans page (once per mount)
@@ -110,12 +114,16 @@ export function trackOnboardingSkipped(reason?: string) {
   });
 }
 
-export function trackAccountCreated(userId: string, businessName: string) {
-  trackEvent('account_created', {
+export function trackAccountCreated(userId: string, businessName: string, attribution?: Record<string, any>) {
+  const params: Record<string, any> = {
     user_id: userId,
     business_name: businessName,
     timestamp: new Date().toISOString(),
-  });
+  };
+  if (attribution?.utm_source) params.utm_source = attribution.utm_source;
+  if (attribution?.utm_campaign) params.utm_campaign = attribution.utm_campaign;
+  if (attribution?.utm_medium) params.utm_medium = attribution.utm_medium;
+  trackEvent('account_created', params);
 }
 
 export function trackSubscriptionStarted(

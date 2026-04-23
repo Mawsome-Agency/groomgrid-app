@@ -42,6 +42,7 @@ model Profile {
   welcomeShown         Boolean   @default(false) @map("welcome_shown")
   stripeCustomerId     String?   @map("stripe_customer_id")
   stripeSubscriptionId String?   @map("stripe_subscription_id")
+  attributionData      Json?     @map("attribution_data")
   createdAt            DateTime  @default(now()) @map("created_at")
   updatedAt            DateTime  @updatedAt @map("updated_at")
 

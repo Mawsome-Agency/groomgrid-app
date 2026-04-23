@@ -81,6 +81,29 @@ function SignupPageInner() {
     }
   }, []);
 
+  // Capture UTM parameters from URL and store in sessionStorage for attribution tracking
+  // This enables channel/source analysis for the "Get first 100 paying subscribers" rock
+  useEffect(() => {
+    const utmSource = searchParams.get('utm_source');
+    const utmMedium = searchParams.get('utm_medium');
+    const utmCampaign = searchParams.get('utm_campaign');
+    const utmContent = searchParams.get('utm_content');
+    const utmTerm = searchParams.get('utm_term');
+
+    if (utmSource || utmMedium || utmCampaign) {
+      const attribution = {
+        utm_source: utmSource,
+        utm_medium: utmMedium,
+        utm_campaign: utmCampaign,
+        utm_content: utmContent,
+        utm_term: utmTerm,
+        timestamp: new Date().toISOString(),
+        referrer: typeof document !== 'undefined' ? document.referrer : null,
+      };
+      sessionStorage.setItem('gg_attribution', JSON.stringify(attribution));
+    }
+  }, [searchParams]);
+
   // Show sticky mobile CTA when form scrolls out of view
   useEffect(() => {
     const el = formRef.current;
@@ -134,6 +157,15 @@ function SignupPageInner() {
 
     trackSignupStarted(formData.businessName);
 
+    // Retrieve UTM attribution from sessionStorage (set on page load by useEffect)
+    let attribution = null;
+    if (typeof window !== 'undefined') {
+      const stored = sessionStorage.getItem('gg_attribution');
+      if (stored) {
+        attribution = JSON.parse(stored);
+      }
+    }
+
     try {
       const res = await fetch('/api/auth/signup', {
         method: 'POST',
@@ -142,6 +174,7 @@ function SignupPageInner() {
           email: formData.email,
           password: formData.password,
           businessName: formData.businessName,
+          attributionData: attribution,
         }),
       });
 
@@ -159,8 +192,8 @@ function SignupPageInner() {
         return;
       }
 
-      trackSignupCompleted(data.userId);
-      trackAccountCreated(data.userId, formData.businessName);
+      trackSignupCompleted(data.userId, attribution);
+      trackAccountCreated(data.userId, formData.businessName, attribution);
 
       const result = await signIn('credentials', {
         email: formData.email,
