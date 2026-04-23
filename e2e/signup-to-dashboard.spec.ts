@@ -62,8 +62,8 @@ test.describe('Full signup-to-dashboard journey', () => {
     await expect(page.getByRole('heading', { name: /Create Account/i })).toBeVisible();
     await expect(page.getByLabel(/Business Name/i)).toBeVisible();
     await expect(page.getByLabel(/Email Address/i)).toBeVisible();
-    await expect(page.getByLabel(/Password/i)).toBeVisible();
-    await expect(page.getByRole('button', { name: /Create Account/i })).toBeVisible();
+    await expect(page.getByRole('textbox', { name: /Password/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /Start Free Trial/i })).toBeVisible();
   });
 
   // ── Step 4 + 5: Fill signup form and create account ──────────────────────
@@ -73,8 +73,8 @@ test.describe('Full signup-to-dashboard journey', () => {
 
     await page.getByLabel(/Business Name/i).fill(businessName);
     await page.getByLabel(/Email Address/i).fill(email);
-    await page.getByLabel(/Password/i).fill(password);
-    await page.getByRole('button', { name: /Create Account/i }).click();
+    await page.getByRole('textbox', { name: /Password/i }).fill(password);
+    await page.getByRole('button', { name: /Start Free Trial/i }).click();
 
     // After signup the app signs in and redirects to /welcome
     await expect(page).toHaveURL(/\/(welcome|plans|dashboard|onboarding)/, { timeout: 30_000 });

@@ -135,7 +135,7 @@ describe('POST /api/auth/signup', () => {
       const res = await POST(req)
       const body = await res.json()
 
-      expect(res.status).toBe(200)
+      expect(res.status).toBe(201)
       expect(body.success).toBe(true)
       expect(body.userId).toBe(TEST_USER.id)
     })
@@ -286,7 +286,7 @@ describe('POST /api/auth/signup', () => {
 
       const body = await res.json()
 
-      expect(res.status).toBe(200)
+      expect(res.status).toBe(201)
       expect(body.success).toBe(true)
     })
 
@@ -324,7 +324,7 @@ describe('POST /api/auth/signup', () => {
 
       const body = await res.json()
 
-      expect(res.status).toBe(200)
+      expect(res.status).toBe(201)
       expect(body.success).toBe(true)
     })
 

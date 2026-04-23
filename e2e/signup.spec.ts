@@ -16,8 +16,8 @@ test.describe('Signup page', () => {
     await expect(page.getByText(/Start your 14-day free trial/i)).toBeVisible();
     await expect(page.getByLabel(/Business Name/i)).toBeVisible();
     await expect(page.getByLabel(/Email Address/i)).toBeVisible();
-    await expect(page.getByLabel(/Password/i)).toBeVisible();
-    await expect(page.getByRole('button', { name: /Create Account/i })).toBeVisible();
+    await expect(page.getByRole('textbox', { name: /Password/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /Start Free Trial/i })).toBeVisible();
   });
 
   test('shows sign in link', async ({ page }) => {
@@ -33,8 +33,8 @@ test.describe('Signup page', () => {
     // Use a fixed email that should already exist in staging
     await page.getByLabel(/Business Name/i).fill('Test Business');
     await page.getByLabel(/Email Address/i).fill('existing@example.com');
-    await page.getByLabel(/Password/i).fill('TestPassword123!');
-    await page.getByRole('button', { name: /Create Account/i }).click();
+    await page.getByRole('textbox', { name: /Password/i }).fill('TestPassword123!');
+    await page.getByRole('button', { name: /Start Free Trial/i }).click();
 
     // The form should either show an error or succeed — just ensure it doesn't crash
     // A proper duplicate test would need a known-existing user
@@ -43,7 +43,7 @@ test.describe('Signup page', () => {
 
   test('requires all fields before submission', async ({ page }) => {
     // Click submit without filling fields — HTML5 validation should prevent submission
-    await page.getByRole('button', { name: /Create Account/i }).click();
+    await page.getByRole('button', { name: /Start Free Trial/i }).click();
     // Should still be on signup page
     await expect(page).toHaveURL(/\/signup/);
   });
@@ -55,10 +55,10 @@ test.describe('Signup page', () => {
 
     await page.getByLabel(/Business Name/i).fill(businessName);
     await page.getByLabel(/Email Address/i).fill(email);
-    await page.getByLabel(/Password/i).fill(password);
+    await page.getByRole('textbox', { name: /Password/i }).fill(password);
 
     // Click submit and check for loading state or redirect
-    await page.getByRole('button', { name: /Create Account/i }).click();
+    await page.getByRole('button', { name: /Start Free Trial/i }).click();
 
     // Should either show loading button text or redirect
     const isLoading = await page.getByText(/Creating Account/i).isVisible().catch(() => false);
@@ -74,8 +74,8 @@ test.describe('Signup page', () => {
 
     await page.getByLabel(/Business Name/i).fill(businessName);
     await page.getByLabel(/Email Address/i).fill(email);
-    await page.getByLabel(/Password/i).fill(password);
-    await page.getByRole('button', { name: /Create Account/i }).click();
+    await page.getByRole('textbox', { name: /Password/i }).fill(password);
+    await page.getByRole('button', { name: /Start Free Trial/i }).click();
 
     await expect(page).toHaveURL(/\/(welcome|plans|dashboard|onboarding)/, { timeout: 30_000 });
   });
