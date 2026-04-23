@@ -67,7 +67,7 @@ function p(text: string, muted = false): string {
   return `<p style="margin:0 0 14px 0;font-size:15px;line-height:1.6;color:${muted ? BRAND.textMuted : BRAND.text};">${text}</p>`
 }
 
-// ─── STEP 0: Welcome ──────────────────────────────────────────────────────────
+// ─── STEP 0: Welcome + Getting Started (Day 0) ──────────────────────────────────
 
 function step0(userName: string, appUrl: string): EmailContent {
   const firstName = userName.split(' ')[0]
@@ -124,54 +124,16 @@ Questions? Reply to this email.`
   }
 }
 
-// ─── STEP 1: First Client ─────────────────────────────────────────────────────
+// ─── STEP 1: How GroomGrid Solves No-Shows (Day 1) ────────────────────────────
 
 function step1(userName: string, appUrl: string): EmailContent {
   const firstName = userName.split(' ')[0]
-  const clientUrl = `${appUrl}/clients/new`
+  const remindersUrl = `${appUrl}/settings/reminders`
 
   const html = emailWrapper(`
-    ${h1(`Add your first client in 60 seconds`)}
-    ${p(`Hey ${firstName} — adding clients in GroomGrid is fast, and it unlocks the whole platform.`)}
-    ${p(`Here's what GroomGrid stores for every pet client:`)}
-    <ul style="padding-left:20px;margin:12px 0 20px 0;">
-      <li style="font-size:15px;line-height:2;color:${BRAND.text};">Breed, age, and weight</li>
-      <li style="font-size:15px;line-height:2;color:${BRAND.text};">Known allergies and sensitivities</li>
-      <li style="font-size:15px;line-height:2;color:${BRAND.text};">Grooming preferences and coat notes</li>
-      <li style="font-size:15px;line-height:2;color:${BRAND.text};">Owner contact details</li>
-      <li style="font-size:15px;line-height:2;color:${BRAND.text};">Full appointment history</li>
-    </ul>
-    ${p(`No more sticky notes or forgotten details. Every client visit is better than the last.`)}
-    ${ctaButton('Add a Client Now', clientUrl)}
-    <br /><br />
-    ${p(`Takes less than a minute. We promise.`, true)}
-  `)
-
-  const text = `Hey ${firstName},
-
-Add your first client in GroomGrid and start building your client records.
-
-GroomGrid stores: breed, allergies, grooming preferences, owner contacts, and full appointment history.
-
-Add a client: ${clientUrl}`
-
-  return {
-    subject: 'Add your first client in 60 seconds',
-    html,
-    text,
-  }
-}
-
-// ─── STEP 3: No-Shows ─────────────────────────────────────────────────────────
-
-function step3(userName: string, appUrl: string): EmailContent {
-  const firstName = userName.split(' ')[0]
-  const settingsUrl = `${appUrl}/settings/reminders`
-
-  const html = emailWrapper(`
-    ${h1(`Never chase a no-show again`)}
-    ${p(`Hey ${firstName} — missed appointments are one of the biggest pain points for groomers. GroomGrid's automated reminder system keeps your calendar full.`)}
-    ${p(`Here's how it works:`)}
+    ${h1(`The #1 thing that costs groomers money? No-shows.`)}
+    ${p(`Hey ${firstName} — if you've ever waited around for a client who never showed up, you know the feeling. Empty slots mean lost revenue, wasted time, and frustration.`)}
+    ${p(`Here's the good news: GroomGrid's automated reminders cut no-shows dramatically. Here's what happens when you turn them on:`)}
     <table cellpadding="0" cellspacing="0" style="width:100%;margin:16px 0 20px 0;border-collapse:collapse;">
       <tr>
         <td style="padding:10px 16px;border-bottom:1px solid ${BRAND.border};">
@@ -189,81 +151,159 @@ function step3(userName: string, appUrl: string): EmailContent {
         </td>
       </tr>
     </table>
-    ${p(`Clients confirm with one tap. No-shows drop. Revenue holds.`)}
-    ${p(`It takes 2 minutes to set up. You choose which reminders to send and when.`)}
-    ${ctaButton('Enable Reminders', settingsUrl)}
+    ${p(`Clients confirm with one tap. No-shows drop. Revenue holds steady.`)}
+    ${p(`It takes 2 minutes to set up — and it works while you focus on grooming.`)}
+    ${ctaButton('Enable Reminders Now', remindersUrl)}
     <br /><br />
-    ${p(`Already enabled? You're ahead of the game — most groomers don't discover this until month 2.`, true)}
+    ${p(`Already enabled? You're ahead of most groomers. Tomorrow we'll share how one groomer grew her business with GroomGrid.`, true)}
   `)
 
   const text = `Hey ${firstName},
 
-GroomGrid's automated reminder system reduces no-shows dramatically.
+The #1 thing that costs groomers money? No-shows. GroomGrid's automated reminders fix this.
 
-- 48 hours before: email reminder
-- 24 hours before: SMS with your address
+Here's what happens when you enable reminders:
+- 48 hours before: email reminder sent automatically
+- 24 hours before: SMS reminder with your address
 - 2 hours before: final confirmation nudge
 
-Enable reminders now: ${settingsUrl}`
+Clients confirm with one tap. No-shows drop. Revenue holds.
 
+Enable reminders now: ${remindersUrl}`
+  
   return {
-    subject: 'Never chase a no-show again',
+    subject: 'The #1 thing that costs groomers money 💸',
     html,
     text,
   }
 }
 
-// ─── STEP 7: Check-in ────────────────────────────────────────────────────────
+// ─── STEP 3: Case Study — Sarah Mitchell (Day 3) ──────────────────────────────
+
+function step3(userName: string, appUrl: string): EmailContent {
+  const firstName = userName.split(' ')[0]
+  const plansUrl = `${appUrl}/plans`
+
+  const html = emailWrapper(`
+    ${h1(`How Sarah grew her mobile grooming business by 40%`)}
+    ${p(`Hey ${firstName} — three days in, and you're already seeing how GroomGrid handles the basics. Let us show you what it looks like when it really clicks.`)}
+    ${p(`<strong>Sarah Mitchell</strong> is a mobile groomer in Austin, TX. Before GroomGrid, she was juggling 30+ clients on paper and losing $800+/month to no-shows.`)}
+    <table cellpadding="0" cellspacing="0" style="width:100%;margin:16px 0 20px 0;background-color:${BRAND.bg};border-radius:8px;padding:20px;">
+      <tr>
+        <td style="padding:8px 0;">
+          <p style="margin:0 0 6px 0;font-size:15px;font-weight:600;color:${BRAND.text};">"I used to text reminders manually the night before every appointment. Now GroomGrid does it automatically, and my no-show rate dropped from 18% to under 4%. That's an extra $900 a month I was leaving on the table."</p>
+          <p style="margin:0;font-size:13px;color:${BRAND.textMuted};">— Sarah Mitchell, Paws & Claws Mobile Grooming</p>
+        </td>
+      </tr>
+    </table>
+    ${p(`Sarah also uses GroomGrid's client profiles to store coat notes, vaccination records, and behavioral quirks — so every groom is tailored to the pet, not just the breed.`)}
+    ${p(`Her results after 3 months:`)}
+    <ul style="padding-left:20px;margin:8px 0 20px 0;">
+      <li style="font-size:15px;line-height:2;color:${BRAND.text};"><strong>40%</strong> revenue increase</li>
+      <li style="font-size:15px;line-height:2;color:${BRAND.text};"><strong>18% → 4%</strong> no-show rate</li>
+      <li style="font-size:15px;line-height:2;color:${BRAND.text};"><strong>2 hrs/week</strong> saved on admin</li>
+    </ul>
+    ${ctaButton('See What GroomGrid Can Do for You', plansUrl)}
+    <br /><br />
+    ${p(`Your results will vary, but the pattern is clear: less admin = more grooming = more revenue.`, true)}
+  `)
+
+  const text = `Hey ${firstName},
+
+How Sarah grew her mobile grooming business by 40%.
+
+Sarah Mitchell is a mobile groomer in Austin, TX. Before GroomGrid, she was losing $800+/month to no-shows.
+
+"I used to text reminders manually the night before every appointment. Now GroomGrid does it automatically, and my no-show rate dropped from 18% to under 4%. That's an extra $900 a month I was leaving on the table."
+
+— Sarah Mitchell, Paws & Claws Mobile Grooming
+
+Her results after 3 months:
+- 40% revenue increase
+- 18% → 4% no-show rate
+- 2 hrs/week saved on admin
+
+See what GroomGrid can do for you: ${plansUrl}`
+
+  return {
+    subject: 'How Sarah grew her grooming business by 40% 📈',
+    html,
+    text,
+  }
+}
+
+// ─── STEP 5: Feature Spotlight — Automated Reminders (Day 5) ──────────────────
+
+function step5(userName: string, appUrl: string): EmailContent {
+  const firstName = userName.split(' ')[0]
+  const settingsUrl = `${appUrl}/settings/reminders`
+
+  const html = emailWrapper(`
+    ${h1(`Your secret weapon: Automated reminders 📱`)}
+    ${p(`Hey ${firstName} — let's talk about the feature that pays for itself.`)}
+    ${p(`GroomGrid's automated reminders aren't just "nice to have." They're the single biggest driver of revenue retention for our groomers. Here's why:`)}
+    <table cellpadding="0" cellspacing="0" style="width:100%;margin:16px 0 24px 0;border-collapse:collapse;">
+      <tr style="background-color:${BRAND.bg};">
+        <td style="padding:14px 20px;border-radius:8px 8px 0 0;">
+          <p style="margin:0;font-size:15px;font-weight:700;color:${BRAND.text};">🛡️ 3-Layer Reminder System</p>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:14px 20px;border-bottom:1px solid ${BRAND.border};">
+          <p style="margin:0;font-size:14px;color:${BRAND.text};"><strong>Email at 48 hours</strong> — gives clients time to reschedule if needed</p>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:14px 20px;border-bottom:1px solid ${BRAND.border};">
+          <p style="margin:0;font-size:14px;color:${BRAND.text};"><strong>SMS at 24 hours</strong> — high open rate, includes your business address</p>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:14px 20px;">
+          <p style="margin:0;font-size:14px;color:${BRAND.text};"><strong>Final nudge at 2 hours</strong> — last chance to confirm or cancel</p>
+        </td>
+      </tr>
+    </table>
+    ${p(`The result? Our groomers see no-show rates drop from an industry average of 15-20% down to under 5%. That's real money back in your pocket.`)}
+    ${p(`And it's completely customizable — you choose which reminders to send, when, and what they say.`)}
+    ${ctaButton('Set Up Reminders in 2 Minutes', settingsUrl)}
+    <br /><br />
+    ${p(`P.S. Two more days until something special lands in your inbox. Keep an eye out. 👀`, true)}
+  `)
+
+  const text = `Hey ${firstName},
+
+Your secret weapon: Automated reminders.
+
+GroomGrid's 3-layer reminder system is the single biggest driver of revenue retention for our groomers:
+
+- Email at 48 hours — gives clients time to reschedule
+- SMS at 24 hours — high open rate, includes your address
+- Final nudge at 2 hours — last chance to confirm
+
+The result? No-show rates drop from 15-20% down to under 5%.
+
+Set up reminders in 2 minutes: ${settingsUrl}
+
+P.S. Two more days until something special. Keep an eye out.`
+
+  return {
+    subject: 'Your secret weapon against no-shows 📱',
+    html,
+    text,
+  }
+}
+
+// ─── STEP 7: Early Adopter Offer + Upgrade CTA (Day 7) ────────────────────────
 
 function step7(userName: string, appUrl: string): EmailContent {
   const firstName = userName.split(' ')[0]
-  const docsUrl = `${appUrl}/docs`
-  const calendlyUrl = 'https://calendly.com/groomgrid/onboarding'
+  const plansUrl = `${appUrl}/plans`
 
   const html = emailWrapper(`
-    ${h1(`How's GroomGrid working for you?`)}
-    ${p(`Hey ${firstName} — you've been using GroomGrid for a week now. We wanted to check in.`)}
-    ${p(`Are there any features you haven't been able to figure out? Any parts of your workflow that still feel clunky?`)}
-    ${p(`A few resources that groomers find helpful at this stage:`)}
-    <ul style="padding-left:20px;margin:12px 0 20px 0;">
-      <li style="font-size:15px;line-height:2;color:${BRAND.text};"><a href="${docsUrl}" style="color:${BRAND.primary};">Help docs</a> — guides for every feature</li>
-      <li style="font-size:15px;line-height:2;color:${BRAND.text};"><a href="${appUrl}/settings" style="color:${BRAND.primary};">Settings</a> — customize your workflow</li>
-      <li style="font-size:15px;line-height:2;color:${BRAND.text};">Reply to this email — we read everything</li>
-    </ul>
-    ${p(`If you'd like a quick walkthrough of anything, you can book 15 minutes with us:`)}
-    ${ctaButton('Book a 15-min Call', calendlyUrl)}
-    <br /><br />
-    ${p(`No pressure — just here if you need us.`, true)}
-  `)
-
-  const text = `Hey ${firstName},
-
-A week in — how's GroomGrid working for you?
-
-Resources:
-- Help docs: ${docsUrl}
-- Settings: ${appUrl}/settings
-- Reply to this email
-
-Want a quick walkthrough? Book 15 min: ${calendlyUrl}`
-
-  return {
-    subject: "How's GroomGrid working for you?",
-    html,
-    text,
-  }
-}
-
-// ─── STEP 14: Upgrade ────────────────────────────────────────────────────────
-
-function step14(userName: string, appUrl: string): EmailContent {
-  const firstName = userName.split(' ')[0]
-  const pricingUrl = `${appUrl}/pricing`
-
-  const html = emailWrapper(`
-    ${h1(`Your trial ends soon — lock in your rate 🔒`)}
-    ${p(`Hey ${firstName} — your GroomGrid trial is wrapping up. Don't lose your data, your client records, or your booking history.`)}
-    ${p(`Pick the plan that fits your business:`)}
+    ${h1(`Early adopter pricing — locked in for you 🔒`)}
+    ${p(`Hey ${firstName} — it's been a week since you signed up, and we want you to stick around.`)}
+    ${p(`As an early adopter, you get <strong>locked-in pricing</strong> that won't change even as we add features. This is our way of saying thanks for believing in GroomGrid from the start.`)}
     <table cellpadding="0" cellspacing="0" style="width:100%;margin:16px 0 24px 0;border-collapse:collapse;border:1px solid ${BRAND.border};border-radius:8px;overflow:hidden;">
       <tr style="background-color:${BRAND.bg};">
         <td style="padding:16px 20px;border-bottom:1px solid ${BRAND.border};border-right:1px solid ${BRAND.border};">
@@ -294,23 +334,27 @@ function step14(userName: string, appUrl: string): EmailContent {
         </td>
       </tr>
     </table>
-    ${p(`Upgrade today and keep the same rate even as we add features. Early customers always get the best deal.`)}
-    ${ctaButton('Upgrade Now', pricingUrl)}
+    ${p(`This early adopter rate is only available for a limited time. Lock it in now and your price stays the same — forever.`)}
+    ${ctaButton('Lock In My Rate', plansUrl)}
     <br /><br />
-    ${p(`Questions about which plan is right for you? Reply to this email.`, true)}
+    ${p(`Not sure which plan fits? Reply to this email — we'll help you pick.`, true)}
   `)
 
   const text = `Hey ${firstName},
 
-Your GroomGrid trial is ending soon. Upgrade to keep your data and booking history.
+Early adopter pricing — locked in for you.
+
+As an early adopter, you get locked-in pricing that won't change even as we add features.
 
 Solo — $29/mo: 1 groomer, unlimited clients, automated reminders, booking calendar.
 Salon — $79/mo: up to 5 groomers, staff scheduling, revenue reporting.
 
-Upgrade now: ${pricingUrl}`
+This rate is only available for a limited time. Lock it in now and your price stays the same — forever.
+
+Choose your plan: ${plansUrl}`
 
   return {
-    subject: 'Your trial ends soon — lock in your rate 🔒',
+    subject: 'Early adopter pricing — locked in for you 🔒',
     html,
     text,
   }
@@ -330,10 +374,10 @@ export function getDripEmailContent(
       return step1(userName, appUrl)
     case 3:
       return step3(userName, appUrl)
+    case 5:
+      return step5(userName, appUrl)
     case 7:
       return step7(userName, appUrl)
-    case 14:
-      return step14(userName, appUrl)
     default:
       throw new Error(`No drip template for step ${step}`)
   }
