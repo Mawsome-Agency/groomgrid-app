@@ -64,10 +64,16 @@ Add to your `.env.local`:
 ```bash
 STRIPE_SECRET_KEY=sk_live_...
 STRIPE_WEBHOOK_SECRET=whsec_...
-STRIPE_PRICE_SOLO=price_...  # Price ID from product creation
-STRIPE_PRICE_SALON=price_...
-STRIPE_PRICE_ENTERPRISE=price_...
+
+# Production price IDs (live mode) — confirmed 2026-04-23
+STRIPE_PRICE_SOLO=price_1TJDgnG4DfZ9Hko3qZUifmgo
+STRIPE_PRICE_SALON=price_1TJDguG4DfZ9Hko36faOkkXr
+STRIPE_PRICE_ENTERPRISE=price_1TJDgvG4DfZ9Hko3vLzhNLZ1
 ```
+
+> **Deploy note:** On the production droplet, run `scripts/set-stripe-prices.sh` to
+> patch these into `/home/deployer/cortex/groomgrid-app/.env.local` automatically,
+> then rebuild: `npm run build && pm2 restart groomgrid-app`.
 
 ## Testing in Sandbox
 

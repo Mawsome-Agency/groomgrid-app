@@ -11,6 +11,10 @@ module.exports = {
       //   MAILGUN_API_KEY, MAILGUN_DOMAIN, SENTRY_DSN, NEXT_PUBLIC_SENTRY_DSN
       //   NEXT_PUBLIC_GA4_MEASUREMENT_ID  — from GA4 Admin → Data Streams → Measurement ID
       //   GA4_API_SECRET                  — from GA4 Admin → Data Streams → Measurement Protocol API Secrets
+      //   STRIPE_PRICE_SOLO               — Stripe price ID for $29/mo Solo plan
+      //   STRIPE_PRICE_SALON              — Stripe price ID for $79/mo Salon plan
+      //   STRIPE_PRICE_ENTERPRISE         — Stripe price ID for $149/mo Enterprise plan
+      //   Run scripts/set-stripe-prices.sh on the droplet to set these automatically.
       env_file: '/home/deployer/cortex/groomgrid-app/.env.local',
       instances: 1,
       autorestart: true,
