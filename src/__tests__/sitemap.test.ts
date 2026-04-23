@@ -123,7 +123,7 @@ describe('Sitemap Generation', () => {
   it('should have total entries matching all pages', () => {
     const result = sitemap();
 
-    // 4 static pages + 5 landing pages + 17 blog posts = 26 total
-    expect(result.length).toBe(26);
+    // 4 static pages + 7 landing pages + 21 blog posts = 32 total
+    expect(result.length).toBe(32);
   });
 });
