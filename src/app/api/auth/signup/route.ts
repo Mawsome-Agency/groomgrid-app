@@ -123,7 +123,7 @@ export async function POST(req: NextRequest) {
       console.error('Drip enrollment failed:', err)
     )
 
-    return NextResponse.json({ success: true, userId: user.id })
+    return NextResponse.json({ success: true, userId: user.id }, { status: 201 })
   } catch (error) {
     console.error('Signup error:', error)
     return NextResponse.json({ error: 'Failed to create account' }, { status: 500 })

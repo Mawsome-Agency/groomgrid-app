@@ -130,11 +130,22 @@ function SignupPageInner() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    // Validate all fields client-side before hitting the API
+    const emailValid = validateField('email', formData.email, {
+      required: true,
+      pattern: EMAIL_REGEX,
+      custom: (v) => (EMAIL_REGEX.test(v) ? null : 'Please enter a valid email address'),
+    });
+    const businessNameValid = validateField('businessName', formData.businessName, { required: true, minLength: 2 });
+    const passwordValid = validateField('password', formData.password, { required: true, minLength: 8 });
+
+    if (!emailValid || !businessNameValid || !passwordValid) return;
+
     setLoading(true);
 
-    trackSignupStarted(formData.businessName);
-
     try {
+      trackSignupStarted(formData.businessName);
       const res = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
