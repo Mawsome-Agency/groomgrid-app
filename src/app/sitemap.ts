@@ -39,6 +39,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     'mobile-grooming-business',
     'mobile-grooming-software',
     'moego-alternatives',
+    'daysmart-alternatives',
+    'pawfinity-alternatives',
   ].map((slug) => ({
     url: `${baseUrl}/${slug}`,
     lastModified: new Date(),
