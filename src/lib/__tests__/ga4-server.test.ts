@@ -146,19 +146,19 @@ describe('ga4-server.ts', () => {
       consoleWarn.mockRestore();
     });
 
-    it('should not warn in production if API_SECRET not set', async () => {
+    it('should error in production if API_SECRET not set', async () => {
       (process.env as any).NODE_ENV = 'production';
       delete process.env.GA4_API_SECRET;
       (global as any).fetch = jest.fn();
-      const consoleWarn = jest.spyOn(console, 'warn');
+      const consoleError = jest.spyOn(console, 'error');
 
       await trackServerEvent('client_123', { name: 'test_event' });
 
       expect(fetch).not.toHaveBeenCalled();
-      expect(consoleWarn).toHaveBeenCalledWith(
-        '[GA4 Server] GA4_API_SECRET missing — server-side GA4 events disabled'
+      expect(consoleError).toHaveBeenCalledWith(
+        '[GA4 Server] GA4_API_SECRET missing — server-side GA4 events disabled. Set GA4_API_SECRET in production environment.'
       );
-      consoleWarn.mockRestore();
+      consoleError.mockRestore();
     });
 
     it('should handle network errors gracefully', async () => {
