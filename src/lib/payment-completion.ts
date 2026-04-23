@@ -139,6 +139,7 @@ export async function triggerPaymentCompletionHandler(
 
     if (stripeSubscriptionId) {
       await trackSubscriptionStartedServer(
+        clientId || userId,
         userId,
         stripeSubscriptionId,
         planType,

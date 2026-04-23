@@ -1,39 +1,70 @@
-# CORTEX_PLAN.md — Signup Page UX: Reduce 80% Bounce Rate
+# CORTEX_PLAN.md — Configure GA4_API_SECRET for Production Server-Side Event Tracking
 
-## Scope: TWEAK | Branch: cortex/jesse-korbin/dev-pipeline-build-signup-page-ux-reduce
+## Scope: BUGFIX | Branch: cortex/jesse-korbin/dev-pipeline-build-configure-ga4-api-sec
 
 ## Problem
-/signup has 80% bounce rate (GA4, 15 sessions). Users land and leave without submitting.
+All server-side GA4 BOFU events (checkout_completed, subscription_started, purchase_completed,
+payment_success, etc.) are silently dropped in production because `GA4_API_SECRET` is not set
+in the production environment. The code early-returns with a console.warn that goes undetected
+in Sentry, leaving the bottom-of-funnel conversion funnel completely dark.
 
-## Root Causes
-- No social proof or sense of community
-- Form feels isolated — no benefit reminder alongside it
-- No friction-reduced trust signals (CTA must feel safe)
-- No mobile sticky CTA for scrolled-away visitors
+A secondary bug: `payment-completion.ts` was calling `trackSubscriptionStartedServer` with 5
+args in the wrong order (userId/subscriptionId/planType swapped). This would have sent garbled
+data once the env var was fixed.
 
-## Changes
+## Root Cause
+1. `GA4_API_SECRET` missing from production `.env.local` on the droplet.
+2. `payment-completion.ts` had wrong arg order for `trackSubscriptionStartedServer`.
+3. Production missing secret logged as `console.warn` (not captured by Sentry).
 
-### 1. src/app/signup/page.tsx (main change)
-- **Layout**: Expand card to 2-column on desktop (md:grid-cols-2):
-  - Left panel: green gradient bg, logo, social proof counter, benefits checklist
-  - Right panel: form (unchanged fields), simplified trust signals row
-- **Social proof counter**: "47 groomers joined this week" with mount-time count-up animation (43→47)
-- **Benefits checklist**: 3 items with checkmarks (scheduling, reminders, payments)
-- **Trust signals row**: Inline "No credit card · Cancel anytime · 14-day free trial" below submit btn
-- **Sticky mobile CTA**: Fixed bottom bar visible on mobile when form scrolls out of view (uses IntersectionObserver on form ref, same pattern as StickyPlanBar)
-- Replace heavy TrustSignals component for signup with lightweight inline version
+## Code Changes Made
 
-### 2. src/app/signup/signup.css
-- Add slide-up animation for sticky mobile CTA bar
+### 1. `src/lib/payment-completion.ts`
+Fixed `trackSubscriptionStartedServer` call — was passing 5 args in wrong order:
+- Before: `(userId, stripeSubscriptionId, planType, 'trial', planPrice)`
+- After:  `(clientId || userId, userId, stripeSubscriptionId, planType, 'trial', planPrice)`
 
-## Files Modified
-- src/app/signup/page.tsx
-- src/app/signup/signup.css
+### 2. `src/lib/ga4-server.ts`
+Changed production log from `console.warn` → `console.error` for missing `GA4_API_SECRET`.
+Sentry captures errors, not warnings — this ensures the gap is visible in error monitoring.
 
-## Tests
-- Update/add unit tests for signup page component behavior
-- No E2E changes needed (form fields unchanged)
+### 3. `ecosystem.config.js`
+Added documentation comments listing all required `.env.local` entries, explicitly calling out
+`GA4_API_SECRET` and `NEXT_PUBLIC_GA4_MEASUREMENT_ID` with instructions for where to find them.
+
+### 4. `.env.example`
+Improved GA4 section with step-by-step instructions for obtaining the Measurement ID and
+API Secret from GA4 Admin.
+
+## Test Changes
+
+### `src/lib/__tests__/ga4-server.test.ts`
+- Updated "should not warn in production" → "should error in production" to check `console.error`.
+
+### `src/lib/__tests__/payment-completion.test.ts`
+- Updated all 3 `trackSubscriptionStartedServer` assertion to use correct 6-arg signature.
+
+## Deploy Checklist (for deploy agent)
+
+The following must be done on the production droplet for events to fire:
+
+1. **Create GA4 API Secret** (manual — Matt):
+   GA4 Admin → Data Streams → Web stream → Measurement Protocol API Secrets → Create
+   Copy the secret value.
+
+2. **Add to `/home/deployer/cortex/groomgrid-app/.env.local`**:
+   ```
+   GA4_API_SECRET=<secret_from_step_1>
+   NEXT_PUBLIC_GA4_MEASUREMENT_ID=G-XXXXXXXXXX   # real value from GA4 Data Streams
+   ```
+
+3. **Restart PM2**:
+   ```
+   pm2 restart groomgrid-app
+   ```
+
+4. **Verify**: Trigger a test checkout and check GA4 DebugView for `checkout_completed`.
 
 ## Risks
-- Layout change may affect existing E2E selectors — form fields are unchanged so selectors should still work
-- Social proof number is hardcoded (plausible, no backend needed for MVP)
+- Blast radius: Low — only server-side GA4 events affected.
+- Regression risk: Low — code changes are env-var guard + arg order fix.

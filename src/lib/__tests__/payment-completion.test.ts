@@ -254,11 +254,12 @@ describe('triggerPaymentCompletionHandler — happy path', () => {
     await triggerPaymentCompletionHandler(BASE_SESSION);
 
     expect(mockTrackSubscription).toHaveBeenCalledWith(
-      'user-abc',
-      'sub_test_456',
-      'solo',
-      'trial',
-      expect.any(Number)
+      'ga4-client-id', // clientId from session metadata
+      'user-abc',      // userId
+      'sub_test_456',  // subscriptionId
+      'solo',          // planType
+      'trial',         // status
+      expect.any(Number) // price
     );
   });
 
@@ -362,17 +363,19 @@ describe('triggerPaymentCompletionHandler — plan price in GA4', () => {
     ['salon', 79],
     ['enterprise', 149],
   ])('passes correct price for plan "%s" to GA4 subscription event', async (planType, expectedPrice) => {
+    // clientId: '' is falsy so falls back to userId for the clientId arg
     await triggerPaymentCompletionHandler({
       ...BASE_SESSION,
       metadata: { userId: 'user-abc', planType, clientId: '' },
     });
 
     expect(mockTrackSubscription).toHaveBeenCalledWith(
-      'user-abc',
-      'sub_test_456',
-      planType,
-      'trial',
-      expectedPrice
+      'user-abc',    // clientId ('' falls back to userId)
+      'user-abc',    // userId
+      'sub_test_456', // subscriptionId
+      planType,      // planType
+      'trial',       // status
+      expectedPrice  // price
     );
   });
 
@@ -383,11 +386,12 @@ describe('triggerPaymentCompletionHandler — plan price in GA4', () => {
     });
 
     expect(mockTrackSubscription).toHaveBeenCalledWith(
-      'user-abc',
-      'sub_test_456',
-      'unknown_plan',
-      'trial',
-      0
+      'user-abc',      // clientId ('' falls back to userId)
+      'user-abc',      // userId
+      'sub_test_456',  // subscriptionId
+      'unknown_plan',  // planType
+      'trial',         // status
+      0                // price
     );
   });
 });

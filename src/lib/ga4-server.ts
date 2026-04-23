@@ -39,11 +39,12 @@ export async function trackServerEvent(
   }
 
   if (!apiSecret) {
-    // Log in development so the gap is visible; don't throw in production
+    // In development, warn with event details so the gap is visible during local testing.
+    // In production, error so Sentry captures it — this is a critical attribution gap.
     if (process.env.NODE_ENV !== 'production') {
       console.warn('[GA4 Server] GA4_API_SECRET not set — event not sent:', events);
     } else {
-      console.warn('[GA4 Server] GA4_API_SECRET missing — server-side GA4 events disabled');
+      console.error('[GA4 Server] GA4_API_SECRET missing — server-side GA4 events disabled. Set GA4_API_SECRET in production environment.');
     }
     return;
   }
