@@ -41,6 +41,20 @@ jest.mock('@/lib/validation', () => ({
   ensureEnv: jest.fn(),
 }));
 
+// next/headers is only available in Next.js request scope; stub it so
+// getServerSession doesn't throw "headers() called outside request scope".
+jest.mock('next/headers', () => ({
+  headers: jest.fn(() => new Headers()),
+  cookies: jest.fn(() => ({ get: jest.fn(), getAll: jest.fn(() => []) })),
+}));
+
+// Mock getServerSession so route auth check passes without a real request context.
+jest.mock('next-auth', () => ({
+  getServerSession: jest.fn(() =>
+    Promise.resolve({ user: { id: 'user-123', email: 'test@example.com' } })
+  ),
+}));
+
 // ── Imports ────────────────────────────────────────────────────────────────
 
 import { NextRequest } from 'next/server';
@@ -97,11 +111,11 @@ describe('createCheckoutSession params — Bug 1 & 2 interface contract', () => 
 
   // Bug 2: userId must be passed so createCheckoutSession can set session.metadata.userId
   it('passes userId to createCheckoutSession so session-level metadata.userId can be set (Bug 2)', async () => {
-    const req = makeReq({ userId: 'user-42', planType: 'salon' });
+    const req = makeReq({ userId: 'user-123', planType: 'salon' });
     await POST(req);
 
     const [args] = mockCreateCheckoutSession.mock.calls[0];
-    expect(args.userId).toBe('user-42');
+    expect(args.userId).toBe('user-123');
   });
 
   it('passes planType to createCheckoutSession', async () => {
@@ -290,7 +304,7 @@ describe('createCheckoutSession — request validation', () => {
     mockFindFirstLockout.mockResolvedValue(null);
     mockFindUniqueProfile.mockResolvedValue(null);
 
-    const res = await POST(makeReq({ userId: 'ghost-user', planType: 'solo' }));
+    const res = await POST(makeReq({ userId: 'user-123', planType: 'solo' }));
     expect(res.status).toBe(404);
     expect(mockCreateCheckoutSession).not.toHaveBeenCalled();
   });
@@ -406,11 +420,11 @@ describe('customerEmail fallback', () => {
   });
 
   it('falls back to {userId}@groomgrid.app when customerEmail is absent', async () => {
-    const req = makeReq({ userId: 'user-fallback', planType: 'solo' });
+    const req = makeReq({ userId: 'user-123', planType: 'solo' });
     await POST(req);
 
     const [args] = mockCreateCheckoutSession.mock.calls[0];
-    expect(args.customerEmail).toBe('user-fallback@groomgrid.app');
+    expect(args.customerEmail).toBe('user-123@groomgrid.app');
   });
 
   it('uses provided customerEmail when present, does not fall back', async () => {

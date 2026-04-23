@@ -36,6 +36,20 @@ jest.mock('@/lib/validation', () => ({
   ensureEnv: jest.fn(), // no-op — env vars set in jest.setup.js
 }));
 
+// next/headers is only available in Next.js request scope; stub it so
+// getServerSession doesn't throw "headers() called outside request scope".
+jest.mock('next/headers', () => ({
+  headers: jest.fn(() => new Headers()),
+  cookies: jest.fn(() => ({ get: jest.fn(), getAll: jest.fn(() => []) })),
+}));
+
+// Mock getServerSession to return a test user with id matching most test cases.
+jest.mock('next-auth', () => ({
+  getServerSession: jest.fn(() =>
+    Promise.resolve({ user: { id: 'user-123', email: 'test@example.com' } })
+  ),
+}));
+
 // --- Imports (after mocks) ---
 
 import { NextRequest } from 'next/server';
@@ -211,11 +225,11 @@ describe('POST /api/checkout', () => {
   });
 
   it('falls back to userId@groomgrid.app when customerEmail is omitted', async () => {
-    const req = makeRequest({ userId: 'user-99', planType: 'enterprise' });
+    const req = makeRequest({ userId: 'user-123', planType: 'enterprise' });
     await POST(req);
 
     const [args] = mockCreateCheckoutSession.mock.calls[0];
-    expect(args.customerEmail).toBe('user-99@groomgrid.app');
+    expect(args.customerEmail).toBe('user-123@groomgrid.app');
   });
 
   it('tracks payment initiation via GA4', async () => {
@@ -334,7 +348,7 @@ describe('POST /api/checkout', () => {
   // ── Profile not found ───────────────────────
   it('returns 404 when profile does not exist', async () => {
     mockFindUniqueProfile.mockResolvedValueOnce(null);
-    const req = makeRequest({ userId: 'no-profile-user', planType: 'solo' });
+    const req = makeRequest({ userId: 'user-123', planType: 'solo' });
     const res = await POST(req);
     const body = await res.json();
 
@@ -344,7 +358,7 @@ describe('POST /api/checkout', () => {
 
   it('does not call Stripe when profile is missing', async () => {
     mockFindUniqueProfile.mockResolvedValueOnce(null);
-    const req = makeRequest({ userId: 'ghost-user', planType: 'salon' });
+    const req = makeRequest({ userId: 'user-123', planType: 'salon' });
     await POST(req);
 
     expect(mockCreateCheckoutSession).not.toHaveBeenCalled();

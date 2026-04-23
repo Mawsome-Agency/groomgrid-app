@@ -90,9 +90,9 @@ describe('getDripEmailContent — invalid step numbers throw', () => {
     )
   })
 
-  it('throws for step 5 (not in the sequence)', () => {
-    expect(() => getDripEmailContent(5, FULL_NAME, APP_URL)).toThrow(
-      'No drip template for step 5'
+  it('throws for step 6 (not in the sequence)', () => {
+    expect(() => getDripEmailContent(6, FULL_NAME, APP_URL)).toThrow(
+      'No drip template for step 6'
     )
   })
 
@@ -163,12 +163,12 @@ describe('Step 0 — Welcome email', () => {
   })
 })
 
-// ─── Group 4: Step 1 — First Client ────────────────────────────────────────────
+// ─── Group 4: Step 1 — No-Shows / Reminders ────────────────────────────────────
 
-describe('Step 1 — Add first client email', () => {
-  it('subject mentions adding a client', () => {
+describe('Step 1 — No-shows cost money email', () => {
+  it('subject mentions money or groomers', () => {
     const result = getDripEmailContent(1, FULL_NAME, APP_URL)
-    expect(result.subject).toContain('client')
+    expect(result.subject).toMatch(/money|groomer/i)
   })
 
   it('html contains first name', () => {
@@ -176,26 +176,19 @@ describe('Step 1 — Add first client email', () => {
     expect(result.html).toContain('Sarah')
   })
 
-  it('html contains client list URL', () => {
+  it('html contains reminders settings URL', () => {
     const result = getDripEmailContent(1, FULL_NAME, APP_URL)
-    expect(result.html).toContain(`${APP_URL}/clients/new`)
+    expect(result.html).toContain(`${APP_URL}/settings/reminders`)
   })
 
-  it('text contains client list URL', () => {
+  it('text contains reminders settings URL', () => {
     const result = getDripEmailContent(1, FULL_NAME, APP_URL)
-    expect(result.text).toContain(`${APP_URL}/clients/new`)
+    expect(result.text).toContain(`${APP_URL}/settings/reminders`)
   })
 
-  it('html contains CTA button', () => {
+  it('html contains CTA button to enable reminders', () => {
     const result = getDripEmailContent(1, FULL_NAME, APP_URL)
-    expect(result.html).toContain('Add a Client Now')
-  })
-
-  it('html mentions client data fields', () => {
-    const result = getDripEmailContent(1, FULL_NAME, APP_URL)
-    expect(result.html).toContain('Breed')
-    expect(result.html).toContain('allergies')
-    expect(result.html).toContain('Grooming preferences')
+    expect(result.html).toContain('Enable Reminders Now')
   })
 
   it('uses first name only (not full name)', () => {
@@ -205,12 +198,12 @@ describe('Step 1 — Add first client email', () => {
   })
 })
 
-// ─── Group 5: Step 3 — No-Shows ────────────────────────────────────────────────
+// ─── Group 5: Step 3 — Social Proof / Case Study ───────────────────────────────
 
-describe('Step 3 — No-show reminder email', () => {
-  it('subject mentions no-shows', () => {
+describe('Step 3 — Social proof email', () => {
+  it('subject mentions growth or business', () => {
     const result = getDripEmailContent(3, FULL_NAME, APP_URL)
-    expect(result.subject).toContain('no-show')
+    expect(result.subject).toMatch(/grew|business|growth/i)
   })
 
   it('html contains first name', () => {
@@ -218,33 +211,19 @@ describe('Step 3 — No-show reminder email', () => {
     expect(result.html).toContain('Sarah')
   })
 
-  it('html contains reminders settings URL', () => {
+  it('html contains plans URL', () => {
     const result = getDripEmailContent(3, FULL_NAME, APP_URL)
-    expect(result.html).toContain(`${APP_URL}/settings/reminders`)
+    expect(result.html).toContain(`${APP_URL}/plans`)
   })
 
-  it('text contains reminders settings URL', () => {
+  it('text contains plans URL', () => {
     const result = getDripEmailContent(3, FULL_NAME, APP_URL)
-    expect(result.text).toContain(`${APP_URL}/settings/reminders`)
+    expect(result.text).toContain(`${APP_URL}/plans`)
   })
 
-  it('html mentions reminder timeline (48h, 24h, 2h)', () => {
+  it('html contains CTA button', () => {
     const result = getDripEmailContent(3, FULL_NAME, APP_URL)
-    expect(result.html).toContain('48 hours')
-    expect(result.html).toContain('24 hours')
-    expect(result.html).toContain('2 hours')
-  })
-
-  it('text mentions reminder timeline', () => {
-    const result = getDripEmailContent(3, FULL_NAME, APP_URL)
-    expect(result.text).toContain('48 hours')
-    expect(result.text).toContain('24 hours')
-    expect(result.text).toContain('2 hours')
-  })
-
-  it('html contains CTA button to enable reminders', () => {
-    const result = getDripEmailContent(3, FULL_NAME, APP_URL)
-    expect(result.html).toContain('Enable Reminders')
+    expect(result.html).toContain('See What GroomGrid Can Do for You')
   })
 
   it('uses first name only', () => {
@@ -254,12 +233,60 @@ describe('Step 3 — No-show reminder email', () => {
   })
 })
 
-// ─── Group 6: Step 7 — Check-in ────────────────────────────────────────────────
+// ─── Group 5.5: Step 5 — Feature Spotlight (Automated Reminders) ──────────────
 
-describe('Step 7 — Check-in email', () => {
-  it('subject asks about GroomGrid experience', () => {
+describe('Step 5 — Feature Spotlight email', () => {
+  it('subject mentions no-shows or reminders', () => {
+    const result = getDripEmailContent(5, FULL_NAME, APP_URL)
+    expect(result.subject).toMatch(/reminder|no-show/i)
+  })
+
+  it('html contains first name', () => {
+    const result = getDripEmailContent(5, FULL_NAME, APP_URL)
+    expect(result.html).toContain('Sarah')
+  })
+
+  it('html contains reminders settings URL', () => {
+    const result = getDripEmailContent(5, FULL_NAME, APP_URL)
+    expect(result.html).toContain(`${APP_URL}/settings/reminders`)
+  })
+
+  it('text contains reminders settings URL', () => {
+    const result = getDripEmailContent(5, FULL_NAME, APP_URL)
+    expect(result.text).toContain(`${APP_URL}/settings/reminders`)
+  })
+
+  it('html mentions 3-layer reminder system', () => {
+    const result = getDripEmailContent(5, FULL_NAME, APP_URL)
+    expect(result.html).toContain('48')
+    expect(result.html).toContain('24')
+    expect(result.html).toContain('2')
+  })
+
+  it('text mentions reminder timeline', () => {
+    const result = getDripEmailContent(5, FULL_NAME, APP_URL)
+    expect(result.text).toContain('48')
+    expect(result.text).toContain('24')
+  })
+
+  it('html contains CTA button to set up reminders', () => {
+    const result = getDripEmailContent(5, FULL_NAME, APP_URL)
+    expect(result.html).toContain('Set Up Reminders')
+  })
+
+  it('uses first name only', () => {
+    const result = getDripEmailContent(5, 'Alex Three Names Here', APP_URL)
+    expect(result.html).toContain('Alex')
+    expect(result.html).not.toContain('Three Names Here')
+  })
+})
+
+// ─── Group 6: Step 7 — Early Adopter Pricing ────────────────────────────────────
+
+describe('Step 7 — Early adopter pricing email', () => {
+  it('subject mentions early adopter or pricing', () => {
     const result = getDripEmailContent(7, FULL_NAME, APP_URL)
-    expect(result.subject).toContain('GroomGrid')
+    expect(result.subject).toMatch(/early adopter|pricing/i)
   })
 
   it('html contains first name', () => {
@@ -267,35 +294,29 @@ describe('Step 7 — Check-in email', () => {
     expect(result.html).toContain('Sarah')
   })
 
-  it('html contains help docs link', () => {
+  it('html contains plans URL', () => {
     const result = getDripEmailContent(7, FULL_NAME, APP_URL)
-    expect(result.html).toContain(`${APP_URL}/docs`)
+    expect(result.html).toContain(`${APP_URL}/plans`)
   })
 
-  it('html contains settings link', () => {
+  it('text contains plans URL', () => {
     const result = getDripEmailContent(7, FULL_NAME, APP_URL)
-    expect(result.html).toContain(`${APP_URL}/settings`)
+    expect(result.text).toContain(`${APP_URL}/plans`)
   })
 
-  it('text contains help docs and settings links', () => {
+  it('html mentions Solo plan price ($29)', () => {
     const result = getDripEmailContent(7, FULL_NAME, APP_URL)
-    expect(result.text).toContain(`${APP_URL}/docs`)
-    expect(result.text).toContain(`${APP_URL}/settings`)
+    expect(result.html).toContain('$29')
   })
 
-  it('html contains Calendly link for booking a call', () => {
+  it('html mentions Salon plan price ($79)', () => {
     const result = getDripEmailContent(7, FULL_NAME, APP_URL)
-    expect(result.html).toContain('calendly.com/groomgrid/onboarding')
+    expect(result.html).toContain('$79')
   })
 
-  it('text contains Calendly link', () => {
+  it('html contains CTA button', () => {
     const result = getDripEmailContent(7, FULL_NAME, APP_URL)
-    expect(result.text).toContain('calendly.com/groomgrid/onboarding')
-  })
-
-  it('html contains CTA button for booking', () => {
-    const result = getDripEmailContent(7, FULL_NAME, APP_URL)
-    expect(result.html).toContain('Book a 15-min Call')
+    expect(result.html).toContain('Lock In My Rate')
   })
 
   it('uses first name only', () => {
@@ -305,7 +326,7 @@ describe('Step 7 — Check-in email', () => {
   })
 })
 
-// ─── Group 7: Step 14 — Upgrade ────────────────────────────────────────────────
+// ─── Group 7: Step 14 — Upgrade CTA ────────────────────────────────────────────
 
 describe('Step 14 — Upgrade CTA email', () => {
   it('subject mentions trial ending', () => {
@@ -318,14 +339,14 @@ describe('Step 14 — Upgrade CTA email', () => {
     expect(result.html).toContain('Sarah')
   })
 
-  it('html contains pricing page URL', () => {
+  it('html contains plans page URL', () => {
     const result = getDripEmailContent(14, FULL_NAME, APP_URL)
-    expect(result.html).toContain(`${APP_URL}/pricing`)
+    expect(result.html).toContain(`${APP_URL}/plans`)
   })
 
-  it('text contains pricing page URL', () => {
+  it('text contains plans page URL', () => {
     const result = getDripEmailContent(14, FULL_NAME, APP_URL)
-    expect(result.text).toContain(`${APP_URL}/pricing`)
+    expect(result.text).toContain(`${APP_URL}/plans`)
   })
 
   it('html mentions Solo plan price ($29)', () => {

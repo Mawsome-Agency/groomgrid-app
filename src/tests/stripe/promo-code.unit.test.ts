@@ -36,6 +36,20 @@ jest.mock('@/lib/validation', () => ({
   ensureEnv: jest.fn(),
 }));
 
+// next/headers is only available in Next.js request scope; stub it so
+// getServerSession doesn't throw "headers() called outside request scope".
+jest.mock('next/headers', () => ({
+  headers: jest.fn(() => new Headers()),
+  cookies: jest.fn(() => ({ get: jest.fn(), getAll: jest.fn(() => []) })),
+}));
+
+// All promo tests use userId: 'user-promo' — mock session to match.
+jest.mock('next-auth', () => ({
+  getServerSession: jest.fn(() =>
+    Promise.resolve({ user: { id: 'user-promo', email: 'promo@example.com' } })
+  ),
+}));
+
 // ── Imports ────────────────────────────────────────────────────────────────
 
 import { NextRequest } from 'next/server';
