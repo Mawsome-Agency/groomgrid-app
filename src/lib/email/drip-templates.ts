@@ -378,7 +378,70 @@ export function getDripEmailContent(
       return step5(userName, appUrl)
     case 7:
       return step7(userName, appUrl)
+    case 14:
+      return step14(userName, appUrl)
     default:
       throw new Error(`No drip template for step ${step}`)
+  }
+}
+
+// ─── STEP 14: Trial Ending — Upgrade CTA (Day 14) ─────────────────────────────
+
+function step14(userName: string, appUrl: string): EmailContent {
+  const firstName = userName.split(' ')[0]
+  const plansUrl = `${appUrl}/plans`
+
+  const html = emailWrapper(`
+    ${h1(`Your trial is ending — don't lose your setup 🐾`)}
+    ${p(`Hey ${firstName} — your free trial is coming to an end soon, and we'd hate for you to lose the clients, appointments, and settings you've built up.`)}
+    ${p(`Upgrade now and keep everything. Here are your options:`)}
+    <table cellpadding="0" cellspacing="0" style="width:100%;margin:16px 0 24px 0;border-collapse:collapse;border:1px solid ${BRAND.border};border-radius:8px;overflow:hidden;">
+      <tr style="background-color:${BRAND.bg};">
+        <td style="padding:16px 20px;border-bottom:1px solid ${BRAND.border};border-right:1px solid ${BRAND.border};">
+          <p style="margin:0 0 4px 0;font-size:18px;font-weight:700;color:${BRAND.text};">Solo</p>
+          <p style="margin:0;font-size:24px;font-weight:700;color:${BRAND.primary};">$29<span style="font-size:14px;font-weight:400;color:${BRAND.textMuted};">/mo</span></p>
+        </td>
+        <td style="padding:16px 20px;border-bottom:1px solid ${BRAND.border};">
+          <p style="margin:0 0 4px 0;font-size:18px;font-weight:700;color:${BRAND.text};">Salon</p>
+          <p style="margin:0;font-size:24px;font-weight:700;color:${BRAND.primary};">$79<span style="font-size:14px;font-weight:400;color:${BRAND.textMuted};">/mo</span></p>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:16px 20px;border-right:1px solid ${BRAND.border};vertical-align:top;">
+          <ul style="margin:0;padding-left:18px;">
+            <li style="font-size:13px;line-height:2;color:${BRAND.textMuted};">1 groomer</li>
+            <li style="font-size:13px;line-height:2;color:${BRAND.textMuted};">Unlimited clients</li>
+            <li style="font-size:13px;line-height:2;color:${BRAND.textMuted};">Automated reminders</li>
+          </ul>
+        </td>
+        <td style="padding:16px 20px;vertical-align:top;">
+          <ul style="margin:0;padding-left:18px;">
+            <li style="font-size:13px;line-height:2;color:${BRAND.textMuted};">Up to 5 groomers</li>
+            <li style="font-size:13px;line-height:2;color:${BRAND.textMuted};">Everything in Solo</li>
+            <li style="font-size:13px;line-height:2;color:${BRAND.textMuted};">Staff scheduling</li>
+          </ul>
+        </td>
+      </tr>
+    </table>
+    ${p(`Don't let your trial data disappear. Upgrade today and keep the momentum going.`)}
+    ${ctaButton('Upgrade Now', plansUrl)}
+    <br /><br />
+    ${p(`Questions about which plan is right for you? Just reply — we're happy to help.`, true)}
+  `)
+
+  const text = `Hey ${firstName},
+
+Your free trial is ending soon. Upgrade now to keep your clients, appointments, and data.
+
+Solo — $29/mo: 1 groomer, unlimited clients, automated reminders.
+Salon — $79/mo: up to 5 groomers, staff scheduling, revenue reporting.
+
+Don't lose your setup. Upgrade today:
+${plansUrl}`
+
+  return {
+    subject: 'Your trial is ending — upgrade to keep your data',
+    html,
+    text,
   }
 }

@@ -1,6 +1,6 @@
 import prisma from '@/lib/prisma'
 
-const DRIP_DAYS = [0, 1, 3, 5, 7]
+const DRIP_DAYS = [0, 1, 3, 7, 14]
 
 export async function enrollUserInDrip(
   userId: string,
