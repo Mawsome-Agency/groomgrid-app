@@ -4,6 +4,7 @@ import crypto from 'crypto'
 import prisma from '@/lib/prisma'
 import { sendWelcomeEmail } from '@/lib/email/welcome'
 import { sendVerificationEmail } from '@/lib/email/verify-email'
+import { enrollUserInDrip } from '@/lib/email/enroll-drip'
 
 // Verification token expires in 24 hours
 const VERIFICATION_TOKEN_EXPIRY_MS = 24 * 60 * 60 * 1000
@@ -117,6 +118,9 @@ export async function POST(req: NextRequest) {
     )
     sendWelcomeEmail(user.email, businessName).catch(err =>
       console.error('Welcome email failed:', err)
+    )
+    enrollUserInDrip(user.id, user.email).catch(err =>
+      console.error('Drip enrollment failed:', err)
     )
 
     return NextResponse.json({ success: true, userId: user.id })
