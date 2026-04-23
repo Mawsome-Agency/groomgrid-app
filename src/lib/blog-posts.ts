@@ -54,4 +54,58 @@ export const blogPosts: BlogPost[] = [
     description: 'Cut grooming no-shows by 60% with automated reminders, deposit policies, and a multi-touch follow-up strategy. Real tactics groomers use every day.',
     publishedAt: '2026-04-06',
   },
+  {
+    slug: 'groomgrid-vs-moego',
+    title: 'GroomGrid vs MoeGo: Which Dog Grooming Software is Right for You?',
+    description: 'Comparing GroomGrid vs MoeGo for dog grooming businesses? See how pricing, features, and ease of use stack up — and why independent groomers are switching.',
+    publishedAt: '2026-04-20',
+  },
+  {
+    slug: 'dog-grooming-tools-equipment-list',
+    title: 'Dog Grooming Tools & Equipment List: The Complete Professional Checklist',
+    description: 'Complete dog grooming tools and equipment list for professional groomers. Covers clippers, shears, dryers, tables, tubs, and estimated costs for mobile and salon setups.',
+    publishedAt: '2026-04-21',
+  },
+  {
+    slug: 'pet-grooming-software',
+    title: 'Pet Grooming Software: What It Is and Why Your Business Needs It',
+    description: 'Pet grooming software automates booking, reminders, payments, and client records. Learn what to look for, what to avoid, and how the right tool transforms your grooming business.',
+    publishedAt: '2026-04-21',
+  },
+  {
+    slug: 'best-pet-grooming-software',
+    title: 'Best Pet Grooming Software in 2026: Top Picks for Professional Groomers',
+    description: 'The best pet grooming software for 2026 — reviewed and compared. Find the right platform for solo groomers, mobile businesses, and small salons based on features, pricing, and ease of use.',
+    publishedAt: '2026-04-22',
+  },
+  {
+    slug: 'how-to-increase-sales-dog-grooming-business',
+    title: 'How to Increase Sales in Your Dog Grooming Business: 8 Proven Strategies',
+    description: 'Increase revenue in your dog grooming business without adding more appointments. Learn upselling, service packages, rebooking strategies, and the operational changes that drive growth.',
+    publishedAt: '2026-04-22',
+  },
+  {
+    slug: 'mobile-dog-grooming-business-tips',
+    title: 'Mobile Dog Grooming Business Tips: Run a Tighter, More Profitable Operation',
+    description: 'Practical mobile dog grooming business tips from experienced operators — route optimization, van organization, client communication, pricing, and the tools that keep mobile businesses running smoothly.',
+    publishedAt: '2026-04-22',
+  },
+  {
+    slug: 'dog-grooming-client-intake-form',
+    title: 'Dog Grooming Client Intake Form: What to Ask Every New Client',
+    description: 'A complete guide to dog grooming client intake forms — what questions to ask, what information protects your business, and how to collect it digitally without the paperwork.',
+    publishedAt: '2026-04-23',
+  },
+  {
+    slug: 'how-much-to-start-dog-grooming-business',
+    title: 'How Much Does It Cost to Start a Dog Grooming Business?',
+    description: 'Detailed cost breakdown to start a dog grooming business in 2026 — equipment, licensing, insurance, marketing, and software. Includes home salon, mobile, and retail location estimates.',
+    publishedAt: '2026-04-23',
+  },
+  {
+    slug: 'how-to-start-a-mobile-dog-grooming-business',
+    title: 'How to Start a Mobile Dog Grooming Business: The Complete Guide',
+    description: 'Everything you need to start a mobile dog grooming business — van setup, licensing, pricing, finding first clients, and the tools to manage it all from day one.',
+    publishedAt: '2026-04-23',
+  },
 ].sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
