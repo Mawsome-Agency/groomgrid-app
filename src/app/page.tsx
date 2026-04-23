@@ -106,11 +106,11 @@ export default function HomePage() {
           Built for busy groomers
         </p>
         <h1 className="text-4xl sm:text-5xl font-extrabold text-stone-900 leading-tight mb-6">
-          Stop losing money to<br className="hidden sm:block" /> no-shows and double bookings.
+          Stop losing $500/month to<br className="hidden sm:block" /> no-shows and double bookings.
         </h1>
         <p className="text-lg text-stone-600 mb-8 max-w-xl mx-auto leading-relaxed">
-          GroomGrid is the AI-powered scheduling app that handles bookings, fires
-          off reminders, and collects payment — so you can focus on the dogs.
+          Built for solo mobile groomers. Handle bookings, reminders, and payments
+          from your van — between dogs, with one hand.
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
           <CtaLink
@@ -142,15 +142,15 @@ export default function HomePage() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             {[
               {
-                pain: '😤 \u201cI double-booked again.\u201d',
+                pain: '😤 \u201cI double-booked again.\u201d — I\u2019m late to the next appointment and have to call 3 clients to reschedule.',
                 fix: 'Smart scheduling blocks conflicts the moment you book — zero overlaps, zero angry clients.',
               },
               {
-                pain: '😩 \u201cThey just didn\u2019t show up.\u201d',
+                pain: '😩 \u201cThey just didn\u2019t show up.\u201d — That\u2019s $75\u2013120 of income lost, plus wasted gas and drive time.',
                 fix: 'Auto SMS + email reminders go out 48 hrs and 2 hrs before every appointment. Ghosting drops fast.',
               },
               {
-                pain: '💸 \u201cStill chasing that invoice.\u201d',
+                pain: '💸 \u201cStill chasing that invoice.\u201d — I just spent 2 hours grooming and need that money NOW.',
                 fix: 'Collect payment at booking time. No awkward follow-ups. Money hits your account, done.',
               },
             ].map(({ pain, fix }, index) => (
@@ -266,7 +266,7 @@ export default function HomePage() {
         className="scroll-reveal px-6 py-14 max-w-2xl mx-auto text-center"
       >
         <h2 className="text-2xl font-bold text-stone-800 mb-2">Simple pricing. No surprises.</h2>
-        <p className="text-stone-500 mb-8">Cheaper than one no-show a month.</p>
+        <p className="text-stone-500 mb-8">$29/mo · Cheaper than one no-show a month · Save $120–600/year vs MoeGo</p>
         <div className="bg-green-50 border border-green-200 rounded-2xl p-8 mb-6">
           <p className="text-sm font-semibold text-green-600 uppercase tracking-widest mb-1">
             Solo Groomer
@@ -313,11 +313,11 @@ export default function HomePage() {
         ref={revealRef(0)}
         className="scroll-reveal px-6 py-16 bg-green-600 text-white text-center"
       >
-        <h2 className="text-3xl font-bold mb-3">Ready to stop the chaos?</h2>
-        <p className="text-green-100 mb-8 max-w-md mx-auto leading-relaxed">
+        <h2 className="text-3xl font-bold mb-3">Ready to stop playing phone tag from your van?</h2>
+        <p className="text-green-100 mb-2 max-w-md mx-auto leading-relaxed">
           Join the groomers who are done with scheduling headaches. Your first 14
-          days are completely on us.
-        </p>
+          days are completely on us.</p>
+        <p className="text-yellow-200 font-semibold text-sm mb-8">First 20 groomers lock in $29/mo founding pricing — forever.</p>
         <CtaLink
           href={SIGNUP_URL}
           className="inline-block px-10 py-4 rounded-xl bg-white text-green-600 font-bold text-lg hover:bg-green-50 transition-colors shadow-lg"
