@@ -13,6 +13,7 @@ import Link from 'next/link';
 import type { PipelineItem, PipelineResponse } from '@/types/pipeline';
 
 const POLL_INTERVAL = 30_000; // 30 seconds
+// Default filters to "cortex/" since all Cortex-managed PR branches follow this prefix
 const DEFAULT_BRANCH_FILTER = 'cortex/';
 
 function timeAgo(dateStr: string): string {
@@ -85,7 +86,7 @@ export default function PipelinePage() {
           </div>
           <div className="flex items-center gap-4">
             {lastFetched && (
-              <span className="text-xs text-stone-400">
+              <span className="text-xs text-stone-500">
                 Updated {timeAgo(lastFetched)}
               </span>
             )}
@@ -124,18 +125,18 @@ export default function PipelinePage() {
 
         {/* Error state */}
         {error && (
-          <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-4 text-red-800">
+          <div aria-live="polite" className="mb-4 rounded-lg border border-red-200 bg-red-50 p-4 text-red-800">
             {error}
           </div>
         )}
 
         {/* Loading state */}
         {loading && pullRequests.length === 0 ? (
-          <div className="flex items-center justify-center py-12">
+          <div role="status" className="flex items-center justify-center py-12">
             <div className="text-stone-500">Loading pipeline data...</div>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div aria-live="polite" className="space-y-3">
             {filtered.length === 0 ? (
               <div className="rounded-xl border border-stone-200 bg-white p-8 text-center">
                 <p className="text-stone-500">
@@ -143,7 +144,7 @@ export default function PipelinePage() {
                     ? `No open PRs matching "${branchFilter}"`
                     : 'No open pull requests'}
                 </p>
-                <p className="mt-2 text-sm text-stone-400">
+                <p className="mt-2 text-sm text-stone-500">
                   {branchFilter
                     ? 'Try adjusting the branch filter'
                     : 'All clear — no PRs in the pipeline'}
@@ -158,7 +159,7 @@ export default function PipelinePage() {
                   <div className="flex items-start justify-between gap-4">
                     <div className="min-w-0 flex-1">
                       <div className="mb-1 flex items-center gap-2">
-                        <span className="text-sm font-medium text-stone-400">
+                        <span className="text-sm font-medium text-stone-600">
                           #{pr.number}
                         </span>
                         <h3 className="truncate text-base font-semibold text-stone-800">
@@ -199,7 +200,7 @@ export default function PipelinePage() {
 
         {/* Count summary */}
         {pullRequests.length > 0 && (
-          <div className="mt-4 text-center text-xs text-stone-400">
+          <div className="mt-4 text-center text-xs text-stone-500">
             Showing {filtered.length} of {pullRequests.length} open PRs
           </div>
         )}
