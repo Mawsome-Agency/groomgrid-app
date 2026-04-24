@@ -85,19 +85,6 @@ export const handleStripeEvent = async (event: Stripe.Event) => {
             },
           });
 
-          // Record event processing for idempotency
-          await tx.paymentEvent.create({
-            data: {
-              paymentId: event.id,
-              eventType: 'EVENT_PROCESSED',
-              payload: {
-                eventId: event.id,
-                originalPaymentId: paymentId,
-                processedAt: new Date().toISOString(),
-              },
-            },
-          });
-
           // Update payment lockout status if exists
           const lockout = await tx.paymentLockout.findFirst({
             where: { userId, paymentId },
@@ -111,11 +98,17 @@ export const handleStripeEvent = async (event: Stripe.Event) => {
           }
         });
 
-        // Trigger payment completion handler (outside transaction - it has its own)
+        // Trigger payment completion handler (outside transaction - it has its own idempotency)
         await triggerPaymentCompletionHandler({
           ...session,
           metadata: session.metadata ?? undefined,
         });
+
+        // Mark event as processed ONLY after completion handler succeeds.
+        // Writing EVENT_PROCESSED before this point caused a race condition: if
+        // triggerPaymentCompletionHandler threw (network blip, DB timeout), Stripe
+        // retried but isEventProcessed returned true → Profile never got updated.
+        await recordEventProcessed(event.id, event.type, paymentId);
       } else if (userId === 'anonymous') {
         console.warn(`[Webhook] checkout.session.completed with userId='anonymous' — session ${session.id} cannot be linked to a real user. This session was likely created by the legacy unauthenticated checkout endpoint.`);
       }
