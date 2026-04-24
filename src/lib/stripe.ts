@@ -45,11 +45,24 @@ export async function createCheckoutSession({
   const stripe = getStripe();
   const priceId = getPriceIds()[planType];
 
-  // When a coupon is provided, apply it directly (fixed discount) instead of
-  // allowing the user to enter a promo code at checkout.
-  const discountFields: Partial<Stripe.Checkout.SessionCreateParams> = couponCode
-    ? { discounts: [{ coupon: couponCode }] }
-    : { allow_promotion_codes: true };
+  // When a coupon is provided, validate it exists in Stripe before applying.
+  // Invalid coupons should fall back gracefully (allow promo codes) rather than
+  // crashing the checkout flow. This prevents "No such coupon" errors when
+  // users enter typoed or expired coupon codes.
+  let discountFields: Partial<Stripe.Checkout.SessionCreateParams>;
+
+  if (couponCode) {
+    try {
+      // Validate the coupon exists in Stripe before applying
+      await stripe.coupons.retrieve(couponCode);
+      discountFields = { discounts: [{ coupon: couponCode }] };
+    } catch {
+      console.warn(`[Checkout] Coupon code "${couponCode}" not found in Stripe, falling back to promo code entry`);
+      discountFields = { allow_promotion_codes: true };
+    }
+  } else {
+    discountFields = { allow_promotion_codes: true };
+  }
 
   const session = await stripe.checkout.sessions.create({
     customer_email: customerEmail,
