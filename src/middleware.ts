@@ -6,9 +6,15 @@ const protectedRoutes = ['/dashboard', '/onboarding', '/welcome', '/admin']
 const authRoutes = ['/login', '/signup']
 
 export async function middleware(request: NextRequest) {
+  const cookieName =
+    process.env.NODE_ENV === 'production'
+      ? '__Secure-next-auth.session-token'
+      : 'next-auth.session-token'
+
   const token = await getToken({
     req: request,
     secret: process.env.NEXTAUTH_SECRET,
+    cookieName,
   })
 
   const { pathname } = request.nextUrl

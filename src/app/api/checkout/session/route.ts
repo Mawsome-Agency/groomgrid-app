@@ -4,19 +4,20 @@ import { authOptions } from '@/lib/next-auth-options';
 import { createCheckoutSession } from '@/lib/stripe';
 import prisma from '@/lib/prisma';
 import { ensureEnv } from '@/lib/validation';
+import { PLANS } from '@/app/pricing/pricing-data';
 
 // Use the public app URL as redirect base — req.url resolves to localhost:3002
 // behind nginx, which produces unreachable redirects in production.
 const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://app.getgroomgrid.com';
 
-const VALID_PLANS = ['solo', 'salon', 'enterprise'] as const;
-type PlanType = typeof VALID_PLANS[number];
+// Derive valid plan types and price data from the single source of truth.
+// Prices are stored in cents for Stripe.
+const VALID_PLANS = PLANS.map((p) => p.type) as readonly string[];
+type PlanType = typeof PLANS[number]['type'];
 
-const PLAN_DATA: Record<PlanType, { name: string; price: number }> = {
-  solo: { name: 'Solo', price: 2900 },
-  salon: { name: 'Salon', price: 7900 },
-  enterprise: { name: 'Enterprise', price: 14900 },
-};
+const PLAN_DATA = Object.fromEntries(
+  PLANS.map((plan) => [plan.type, { name: plan.name, price: plan.price * 100 }])
+) as Record<PlanType, { name: string; price: number }>;
 
 /**
  * GET /api/checkout/session?plan=solo|salon|enterprise
@@ -42,7 +43,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Missing plan parameter' }, { status: 400 });
   }
 
-  if (!(VALID_PLANS as readonly string[]).includes(plan)) {
+  if (!VALID_PLANS.includes(plan)) {
     return NextResponse.json({ error: 'Invalid plan. Must be solo, salon, or enterprise.' }, { status: 400 });
   }
 

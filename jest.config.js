@@ -24,8 +24,9 @@ const config = {
     '<rootDir>/src/app/api/stripe/webhook/__tests__/route.test.ts',
     // Loads native Prisma bindings that cause SIGTRAP worker crash in jest-worker
     '<rootDir>/src/lib/__tests__/stripe.test.ts',
-    // Loads Stripe SDK natively + next/headers; causes SIGTRAP/OOM in jest-worker CI
-    '<rootDir>/src/tests/stripe/checkout-session-route.unit.test.ts',
+    // checkout-session-route.unit.test.ts — re-enabled after mocking strategy fix:
+    // now mocks @/lib/stripe directly (not stripe npm) + adds next/headers, next-auth,
+    // next-auth-options, prisma mocks. SIGTRAP root cause was missing mocks.
   ],
   globals: {
     'ts-jest': {

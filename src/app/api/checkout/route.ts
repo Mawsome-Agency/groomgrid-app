@@ -5,13 +5,14 @@ import { createCheckoutSession, getCheckoutSession, getStripeErrorMessage } from
 import prisma from '@/lib/prisma';
 import { trackPaymentInitiatedServer } from '@/lib/ga4-server';
 import { ensureEnv } from '@/lib/validation';
+import { PLANS } from '@/app/pricing/pricing-data';
+import type { PlanType } from '@/types';
 
-// Plan data for metadata
-const PLAN_DATA = {
-  solo: { name: 'Solo', price: 2900 },
-  salon: { name: 'Salon', price: 7900 },
-  enterprise: { name: 'Enterprise', price: 14900 },
-} as const;
+// Derive plan data from the single source of truth (pricing-data.ts).
+// Prices are stored in cents for Stripe.
+const PLAN_DATA = Object.fromEntries(
+  PLANS.map((plan) => [plan.type, { name: plan.name, price: plan.price * 100 }])
+) as Record<PlanType, { name: string; price: number }>;
 
 /** Validate plan type */
 export function validatePlan(planType: string): boolean {
@@ -71,10 +72,10 @@ export async function POST(req: NextRequest) {
 
     const checkoutSession = await createCheckoutSession({
       userId,
-      planType: planType as keyof typeof PLAN_DATA,
+      planType: planType as PlanType,
       customerEmail: customerEmail || `${userId}@groomgrid.app`,
       businessName: profile.businessName,
-      planData: PLAN_DATA[planType as keyof typeof PLAN_DATA],
+      planData: PLAN_DATA[planType as PlanType],
       clientId,
       couponCode: coupon,
     });

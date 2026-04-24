@@ -4,12 +4,14 @@
  * Unit tests for POST /api/auth/signup
  *
  * Coverage focus: PR #130 gap — email verification token creation and
- * fire-and-forget email flow.
+ * fire-and-forget email flow. Extended (test stage) to add enrollUserInDrip
+ * mock, input validation, duplicate-email, and rate-limit edge cases.
  *
  * Mocked dependencies:
  *   - @/lib/prisma  (user.findUnique, user.create, emailVerificationToken.create)
  *   - @/lib/email/verify-email  (sendVerificationEmail)
  *   - @/lib/email/welcome  (sendWelcomeEmail)
+ *   - @/lib/email/enroll-drip  (enrollUserInDrip — fire-and-forget)
  *   - bcryptjs  (hash — avoid real CPU-intensive hashing in unit tests)
  */
 
@@ -40,6 +42,14 @@ jest.mock('@/lib/email/verify-email', () => ({
 const mockSendWelcomeEmail = jest.fn()
 jest.mock('@/lib/email/welcome', () => ({
   sendWelcomeEmail: mockSendWelcomeEmail,
+}))
+
+// Must mock enroll-drip — it calls prisma.dripEmailQueue which is NOT in the
+// prisma mock above. Without this mock the fire-and-forget catch swallows a
+// silent TypeError, giving false confidence that the function was never invoked.
+const mockEnrollUserInDrip = jest.fn()
+jest.mock('@/lib/email/enroll-drip', () => ({
+  enrollUserInDrip: mockEnrollUserInDrip,
 }))
 
 jest.mock('bcryptjs', () => ({
@@ -117,6 +127,7 @@ describe('POST /api/auth/signup', () => {
     })
     mockSendVerificationEmail.mockResolvedValue(undefined)
     mockSendWelcomeEmail.mockResolvedValue(undefined)
+    mockEnrollUserInDrip.mockResolvedValue(undefined)
   })
 
   afterEach(() => {
@@ -422,6 +433,296 @@ describe('POST /api/auth/signup', () => {
       expect(verifyUrl).toMatch(
         /^https:\/\/staging\.getgroomgrid\.com\/api\/auth\/verify-email\?token=[0-9a-f]{64}$/
       )
+    })
+
+    it('falls back to app subdomain when NEXT_PUBLIC_APP_URL is an empty string', async () => {
+      // Empty string is falsy — the || operator falls through to the hardcoded
+      // app subdomain, same as undefined/unset.  This can happen if someone
+      // accidentally sets NEXT_PUBLIC_APP_URL= in their .env file.
+      process.env.NEXT_PUBLIC_APP_URL = ''
+
+      const req = makeRequest({
+        email: 'emptyenv@example.com',
+        password: 'pass1234',
+        businessName: 'Empty Env Test',
+      })
+      await POST(req)
+
+      const [, verifyUrl]: [string, string] =
+        mockSendVerificationEmail.mock.calls[0]
+
+      expect(verifyUrl).toMatch(
+        /^https:\/\/app\.getgroomgrid\.com\/api\/auth\/verify-email\?token=[0-9a-f]{64}$/
+      )
+    })
+  })
+
+  // ── (8) enrollUserInDrip — fire-and-forget drip enrollment ───────────────────
+
+  describe('enrollUserInDrip — fire-and-forget', () => {
+    it('calls enrollUserInDrip with the correct userId and email on happy path', async () => {
+      const req = makeRequest({
+        email: 'drip@example.com',
+        password: 'pass1234',
+        businessName: 'Drip Test',
+      })
+      await POST(req)
+      // Flush fire-and-forget microtasks
+      await Promise.resolve()
+      await Promise.resolve()
+
+      // Route calls enrollUserInDrip(user.id, user.email) using the DB result
+      // object — so the email here is TEST_USER.email from the mock, not the
+      // raw request body email.
+      expect(mockEnrollUserInDrip).toHaveBeenCalledTimes(1)
+      expect(mockEnrollUserInDrip).toHaveBeenCalledWith(
+        TEST_USER.id,
+        TEST_USER.email
+      )
+    })
+
+    it('returns 201 even when enrollUserInDrip rejects (fire-and-forget)', async () => {
+      mockEnrollUserInDrip.mockRejectedValue(new Error('DB timeout'))
+
+      const req = makeRequest({
+        email: 'drip2@example.com',
+        password: 'pass1234',
+        businessName: 'Drip Fail Test',
+      })
+      const res = await POST(req)
+      await Promise.resolve()
+      await Promise.resolve()
+
+      const body = await res.json()
+
+      expect(res.status).toBe(201)
+      expect(body.success).toBe(true)
+    })
+
+    it('still creates user and token when enrollUserInDrip rejects', async () => {
+      mockEnrollUserInDrip.mockRejectedValue(new Error('Queue full'))
+
+      const req = makeRequest({
+        email: 'drip3@example.com',
+        password: 'pass1234',
+        businessName: 'Drip Fail 2',
+      })
+      await POST(req)
+      await Promise.resolve()
+      await Promise.resolve()
+
+      expect(mockUserCreate).toHaveBeenCalledTimes(1)
+      expect(mockEmailVerificationTokenCreate).toHaveBeenCalledTimes(1)
+    })
+
+    it('does NOT call enrollUserInDrip when emailVerificationToken.create fails', async () => {
+      // enrollUserInDrip runs after the awaited DB write — if the DB write
+      // throws it propagates to the catch block and skips the fire-and-forget block.
+      mockEmailVerificationTokenCreate.mockRejectedValue(new Error('DB error'))
+
+      const req = makeRequest({
+        email: 'drip4@example.com',
+        password: 'pass1234',
+        businessName: 'Drip Skip Test',
+      })
+      await POST(req)
+
+      expect(mockEnrollUserInDrip).not.toHaveBeenCalled()
+    })
+  })
+
+  // ── (9) Input validation ──────────────────────────────────────────────────────
+
+  describe('input validation', () => {
+    it('returns 400 when email is missing', async () => {
+      const req = makeRequest({ password: 'pass1234', businessName: 'Test' })
+      const res = await POST(req)
+      const body = await res.json()
+
+      expect(res.status).toBe(400)
+      expect(body.error).toBe('Missing required fields')
+    })
+
+    it('returns 400 when password is missing', async () => {
+      const req = makeRequest({ email: 'a@b.com', businessName: 'Test' })
+      const res = await POST(req)
+      const body = await res.json()
+
+      expect(res.status).toBe(400)
+      expect(body.error).toBe('Missing required fields')
+    })
+
+    it('returns 400 when businessName is missing', async () => {
+      const req = makeRequest({ email: 'a@b.com', password: 'pass1234' })
+      const res = await POST(req)
+      const body = await res.json()
+
+      expect(res.status).toBe(400)
+      expect(body.error).toBe('Missing required fields')
+    })
+
+    it('returns 400 when body is entirely empty', async () => {
+      const req = makeRequest({})
+      const res = await POST(req)
+      const body = await res.json()
+
+      expect(res.status).toBe(400)
+      expect(body.error).toBe('Missing required fields')
+    })
+
+    it('does NOT create a user when required fields are missing', async () => {
+      const req = makeRequest({ email: 'a@b.com' })
+      await POST(req)
+
+      expect(mockUserCreate).not.toHaveBeenCalled()
+    })
+  })
+
+  // ── (10) Duplicate email ──────────────────────────────────────────────────────
+
+  describe('duplicate email', () => {
+    it('returns 409 when email is already in use', async () => {
+      mockUserFindUnique.mockResolvedValue(TEST_USER) // simulate existing user
+
+      const req = makeRequest({
+        email: 'groomer@example.com',
+        password: 'SecurePass1!',
+        businessName: 'Duplicate Test',
+      })
+      const res = await POST(req)
+      const body = await res.json()
+
+      expect(res.status).toBe(409)
+      expect(body.error).toBe('Email already in use')
+    })
+
+    it('does NOT create a user when email is already in use', async () => {
+      mockUserFindUnique.mockResolvedValue(TEST_USER)
+
+      const req = makeRequest({
+        email: 'groomer@example.com',
+        password: 'SecurePass1!',
+        businessName: 'Duplicate Test 2',
+      })
+      await POST(req)
+
+      expect(mockUserCreate).not.toHaveBeenCalled()
+    })
+
+    it('normalises email to lowercase before duplicate check', async () => {
+      mockUserFindUnique.mockResolvedValue(null)
+
+      const req = makeRequest({
+        email: 'UPPER@EXAMPLE.COM',
+        password: 'pass1234',
+        businessName: 'Casing Test',
+      })
+      await POST(req)
+
+      expect(mockUserFindUnique).toHaveBeenCalledWith({
+        where: { email: 'upper@example.com' },
+      })
+    })
+  })
+
+  // ── (11) user.create DB failure propagates ────────────────────────────────────
+
+  describe('user.create DB failure', () => {
+    it('returns 500 when user.create throws', async () => {
+      mockUserCreate.mockRejectedValue(new Error('DB connection lost'))
+
+      const req = makeRequest({
+        email: 'fail@example.com',
+        password: 'pass1234',
+        businessName: 'Create Fail',
+      })
+      const res = await POST(req)
+      const body = await res.json()
+
+      expect(res.status).toBe(500)
+      expect(body.error).toBe('Failed to create account')
+    })
+
+    it('does NOT call sendVerificationEmail when user.create throws', async () => {
+      mockUserCreate.mockRejectedValue(new Error('DB error'))
+
+      const req = makeRequest({
+        email: 'fail2@example.com',
+        password: 'pass1234',
+        businessName: 'Create Fail 2',
+      })
+      await POST(req)
+
+      expect(mockSendVerificationEmail).not.toHaveBeenCalled()
+    })
+  })
+
+  // ── (12) Rate limiting ────────────────────────────────────────────────────────
+
+  describe('rate limiting', () => {
+    it('returns 429 after 5 signup attempts from the same IP', async () => {
+      const ip = `10.0.0.${Math.floor(Math.random() * 200) + 1}`
+
+      // First 5 should be allowed (they may fail for other reasons but won't 429)
+      for (let i = 0; i < 5; i++) {
+        const req = makeRequest(
+          { email: `rl${i}@example.com`, password: 'pass1234', businessName: 'RL Test' },
+          ip
+        )
+        const res = await POST(req)
+        expect(res.status).not.toBe(429)
+      }
+
+      // 6th attempt from the same IP should be rate-limited
+      const blockedReq = makeRequest(
+        { email: 'rl6@example.com', password: 'pass1234', businessName: 'RL Blocked' },
+        ip
+      )
+      const blockedRes = await POST(blockedReq)
+      const body = await blockedRes.json()
+
+      expect(blockedRes.status).toBe(429)
+      expect(body.error).toBe('Too many signup attempts')
+    })
+
+    it('includes Retry-After header on 429 response', async () => {
+      const ip = `10.1.0.${Math.floor(Math.random() * 200) + 1}`
+
+      for (let i = 0; i < 5; i++) {
+        await POST(makeRequest(
+          { email: `ra${i}@example.com`, password: 'pass1234', businessName: 'RA Test' },
+          ip
+        ))
+      }
+
+      const res = await POST(makeRequest(
+        { email: 'ra6@example.com', password: 'pass1234', businessName: 'RA Block' },
+        ip
+      ))
+
+      expect(res.status).toBe(429)
+      expect(res.headers.get('Retry-After')).not.toBeNull()
+    })
+
+    it('allows requests from different IPs independently', async () => {
+      // Two different IPs — each gets its own rate limit window
+      const ip1 = `10.2.0.${Math.floor(Math.random() * 200) + 1}`
+      const ip2 = `10.3.0.${Math.floor(Math.random() * 200) + 1}`
+
+      // Exhaust ip1's limit
+      for (let i = 0; i < 5; i++) {
+        await POST(makeRequest(
+          { email: `ip1-${i}@example.com`, password: 'pass1234', businessName: 'IP1 Test' },
+          ip1
+        ))
+      }
+
+      // ip2 should still be allowed
+      const res = await POST(makeRequest(
+        { email: 'ip2@example.com', password: 'pass1234', businessName: 'IP2 Test' },
+        ip2
+      ))
+      expect(res.status).not.toBe(429)
     })
   })
 })

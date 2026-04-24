@@ -1,54 +1,15 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/next-auth-options';
-import { createCheckoutSession } from '@/lib/stripe';
-import prisma from '@/lib/prisma';
+import { NextResponse } from 'next/server';
 
 /**
- * POST /api/stripe
- * Public-facing endpoint for Stripe checkout session creation.
- * Accepts { planType } and uses the current authenticated user's session.
- * Delegates to the same createCheckoutSession logic as /api/checkout.
+ * POST /api/stripe — DEPRECATED
+ *
+ * This endpoint is dead code: the frontend exclusively calls POST /api/checkout
+ * (confirmed in src/app/plans/page.tsx). Returning 405 here documents the move
+ * and prevents silent success if this route is accidentally hit.
  */
-export async function POST(req: NextRequest) {
-  try {
-    const authSession = await getServerSession(authOptions);
-
-    if (!authSession?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const { planType } = await req.json();
-
-    if (!planType) {
-      return NextResponse.json({ error: 'Missing required field: planType' }, { status: 400 });
-    }
-
-    // FIX 1: Add planType validation
-    const VALID_PLANS = ["solo", "salon", "enterprise"];
-    if (!VALID_PLANS.includes(planType)) {
-      return NextResponse.json({ error: "Invalid plan type" }, { status: 400 });
-    }
-
-    const userId = authSession.user.id;
-    const customerEmail = authSession.user.email ?? `${userId}@groomgrid.app`;
-
-    const profile = await prisma.profile.findUnique({ where: { userId } });
-    if (!profile) {
-      return NextResponse.json({ error: 'Profile not found' }, { status: 404 });
-    }
-
-    const session = await createCheckoutSession({
-      userId,
-      planType: planType as 'solo' | 'salon' | 'enterprise',
-      customerEmail,
-      businessName: profile.businessName,
-    });
-
-    return NextResponse.json({ url: session.url });
-  } catch (error: any) {
-    console.error('Stripe checkout error:', error);
-    // FIX 2: Sanitize error response (don't leak internal error details)
-    return NextResponse.json({ error: "Failed to create checkout session" }, { status: 500 });
-  }
+export function POST() {
+  return NextResponse.json(
+    { error: 'This endpoint has moved. Use POST /api/checkout instead.' },
+    { status: 405, headers: { Location: '/api/checkout' } },
+  );
 }
