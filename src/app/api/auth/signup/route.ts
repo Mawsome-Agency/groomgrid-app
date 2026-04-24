@@ -111,7 +111,8 @@ export async function POST(req: NextRequest) {
     })
 
     // Non-blocking — fire and forget so signup response is never delayed
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://getgroomgrid.com'
+    // Fallback uses app subdomain — bare getgroomgrid.com redirects break email verification links
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://app.getgroomgrid.com'
     const verifyUrl = `${appUrl}/api/auth/verify-email?token=${verificationToken}`
 
     sendVerificationEmail(user.email, verifyUrl).catch(err =>
