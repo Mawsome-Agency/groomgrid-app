@@ -5,7 +5,7 @@
  * tests don't depend on database access.
  *
  * Key contracts to verify:
- *  - enrollUserInDrip creates 5 rows (one per day in DRIP_DAYS: [0, 1, 3, 7, 14])
+ *  - enrollUserInDrip creates 6 rows (one per day in DRIP_DAYS: [0, 1, 3, 5, 7, 14])
  *  - Each row has correct userId, email, sequenceStep, status='pending'
  *  - scheduledAt is calculated correctly (signupDate + day * 86400000ms)
  *  - Default signupDate uses current time when not provided
@@ -38,7 +38,7 @@ const SIGNUP_DATE = new Date('2026-04-22T12:00:00.000Z')
 
 beforeEach(() => {
   jest.clearAllMocks()
-  mockCreateMany.mockResolvedValue({ count: 5 })
+  mockCreateMany.mockResolvedValue({ count: 6 })
 })
 
 // ─── Group 1: Happy path — enrollment creates correct rows ────────────────────
@@ -49,38 +49,38 @@ describe('enrollUserInDrip — happy path', () => {
     expect(mockCreateMany).toHaveBeenCalledTimes(1)
   })
 
-  it('creates exactly 5 rows (one per DRIP_DAYS entry)', async () => {
+  it('creates exactly 6 rows (one per DRIP_DAYS entry)', async () => {
     await enrollUserInDrip(USER_ID, EMAIL, SIGNUP_DATE)
     const call = mockCreateMany.mock.calls[0][0]
-    expect(call.data).toHaveLength(5)
+    expect(call.data).toHaveLength(6)
   })
 
-  it('creates rows with sequenceSteps matching [0, 1, 3, 7, 14]', async () => {
+  it('creates rows with sequenceSteps matching [0, 1, 3, 5, 7, 14]', async () => {
     await enrollUserInDrip(USER_ID, EMAIL, SIGNUP_DATE)
     const call = mockCreateMany.mock.calls[0][0]
     const steps = call.data.map((row: any) => row.sequenceStep).sort((a: number, b: number) => a - b)
-    expect(steps).toEqual([0, 1, 3, 7, 14])
+    expect(steps).toEqual([0, 1, 3, 5, 7, 14])
   })
 
   it('sets all rows status to "pending"', async () => {
     await enrollUserInDrip(USER_ID, EMAIL, SIGNUP_DATE)
     const call = mockCreateMany.mock.calls[0][0]
     const statuses = call.data.map((row: any) => row.status)
-    expect(statuses).toEqual(['pending', 'pending', 'pending', 'pending', 'pending'])
+    expect(statuses).toEqual(['pending', 'pending', 'pending', 'pending', 'pending', 'pending'])
   })
 
   it('passes userId to all rows', async () => {
     await enrollUserInDrip(USER_ID, EMAIL, SIGNUP_DATE)
     const call = mockCreateMany.mock.calls[0][0]
     const userIds = call.data.map((row: any) => row.userId)
-    expect(userIds).toEqual([USER_ID, USER_ID, USER_ID, USER_ID, USER_ID])
+    expect(userIds).toEqual([USER_ID, USER_ID, USER_ID, USER_ID, USER_ID, USER_ID])
   })
 
   it('passes email to all rows', async () => {
     await enrollUserInDrip(USER_ID, EMAIL, SIGNUP_DATE)
     const call = mockCreateMany.mock.calls[0][0]
     const emails = call.data.map((row: any) => row.email)
-    expect(emails).toEqual([EMAIL, EMAIL, EMAIL, EMAIL, EMAIL])
+    expect(emails).toEqual([EMAIL, EMAIL, EMAIL, EMAIL, EMAIL, EMAIL])
   })
 })
 
@@ -116,6 +116,14 @@ describe('enrollUserInDrip — scheduledAt date calculations', () => {
     const step7 = call.data.find((row: any) => row.sequenceStep === 7)
     const expected = new Date(SIGNUP_DATE.getTime() + 7 * 24 * 60 * 60 * 1000)
     expect(step7.scheduledAt.getTime()).toBe(expected.getTime())
+  })
+
+  it('step 5 is scheduled 5 days after signupDate', async () => {
+    await enrollUserInDrip(USER_ID, EMAIL, SIGNUP_DATE)
+    const call = mockCreateMany.mock.calls[0][0]
+    const step5 = call.data.find((row: any) => row.sequenceStep === 5)
+    const expected = new Date(SIGNUP_DATE.getTime() + 5 * 24 * 60 * 60 * 1000)
+    expect(step5.scheduledAt.getTime()).toBe(expected.getTime())
   })
 
   it('step 14 is scheduled 14 days after signupDate', async () => {
@@ -181,7 +189,7 @@ describe('enrollUserInDrip — edge cases', () => {
     await enrollUserInDrip(USER_ID, specialEmail, SIGNUP_DATE)
     const call = mockCreateMany.mock.calls[0][0]
     const emails = call.data.map((row: any) => row.email)
-    expect(emails).toEqual([specialEmail, specialEmail, specialEmail, specialEmail, specialEmail])
+    expect(emails).toEqual([specialEmail, specialEmail, specialEmail, specialEmail, specialEmail, specialEmail])
   })
 
   it('handles UUID-style userId', async () => {
@@ -189,7 +197,7 @@ describe('enrollUserInDrip — edge cases', () => {
     await enrollUserInDrip(uuid, EMAIL, SIGNUP_DATE)
     const call = mockCreateMany.mock.calls[0][0]
     const userIds = call.data.map((row: any) => row.userId)
-    expect(userIds).toEqual([uuid, uuid, uuid, uuid, uuid])
+    expect(userIds).toEqual([uuid, uuid, uuid, uuid, uuid, uuid])
   })
 
   it('handles signupDate at end of month (month boundary)', async () => {

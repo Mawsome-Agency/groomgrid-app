@@ -28,7 +28,7 @@ const EMPTY_NAME = ''
 // ─── Group 1: getDripEmailContent — valid steps ────────────────────────────────
 
 describe('getDripEmailContent — valid steps return EmailContent', () => {
-  const validSteps = [0, 1, 3, 7, 14]
+  const validSteps = [0, 1, 3, 5, 7, 14]
 
   it.each(validSteps)('step %d returns an object with subject, html, text', (step) => {
     const result = getDripEmailContent(step, FULL_NAME, APP_URL)
@@ -434,19 +434,19 @@ describe('getDripEmailContent — appUrl variations', () => {
 // ─── Group 10: Subject line uniqueness ────────────────────────────────────────
 
 describe('getDripEmailContent — subject lines are distinct per step', () => {
-  it('all 5 valid steps have unique subject lines', () => {
-    const subjects = [0, 1, 3, 7, 14].map(
+  it('all 6 valid steps have unique subject lines', () => {
+    const subjects = [0, 1, 3, 5, 7, 14].map(
       (step) => getDripEmailContent(step, FULL_NAME, APP_URL).subject
     )
     const uniqueSubjects = new Set(subjects)
-    expect(uniqueSubjects.size).toBe(5)
+    expect(uniqueSubjects.size).toBe(6)
   })
 })
 
 // ─── Group 11: HTML structure ────────────────────────────────────────────────
 
 describe('getDripEmailContent — HTML structure consistency', () => {
-  const validSteps = [0, 1, 3, 7, 14]
+  const validSteps = [0, 1, 3, 5, 7, 14]
 
   it.each(validSteps)('step %d html has proper html/head/body tags', (step) => {
     const result = getDripEmailContent(step, FULL_NAME, APP_URL)
