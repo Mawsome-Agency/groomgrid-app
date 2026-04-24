@@ -1,74 +1,65 @@
-# CORTEX_PLAN.md — Configure Stripe Products/Prices + Production Env Vars
+# GroomGrid Engineering Plan — Updated April 24, 2026
 
-## Scope: HOTFIX | Branch: cortex/jesse-korbin/dev-pipeline-build-configure-stripe-prod
+## Current Status
 
-## Problem
-`/api/checkout` returns 500 on every request. Root cause: `ensureEnv('stripe')` in
-`src/app/api/checkout/route.ts` throws because `STRIPE_PRICE_SOLO`, `STRIPE_PRICE_SALON`,
-and `STRIPE_PRICE_ENTERPRISE` are missing from the production `.env.local` on the droplet.
+### Production Health
+- ✅ All endpoints returning 200 (landing, app, plans, signup)
+- ✅ PM2 stable (restart counter reset to 0)
+- ✅ Memory limit increased to 700MB (was 450MB)
+- ✅ Coupon validation fix deployed (PR #174)
 
-The `validation.ts` module requires all 3 vars to be present and throws a descriptive error
-if any are missing. This hits the catch block in the checkout route → 500 to the client.
+### Critical Metrics
+- **Paying subscribers: 0** — All 6 DB users are test accounts
+- **Completed checkouts: 0** — No real transactions processed
+- **Stale checkout sessions: 2** — From test webhooks, need cleanup
+- **Failed payment intents: 2** — $27 each, stuck in "requires_payment_method"
 
-## Investigation Results
+### Known Issues
+1. ~~Invalid coupon codes crash checkout~~ → **FIXED** (PR #174)
+2. PM2 ecosystem.config.js outdated (wrong path, wrong port) — needs cleanup
+3. `/plans` route occasionally throws `InvariantError: client reference manifest` — intermittent, likely memory-related
+4. No 500.html error page — Next.js falls back to default error
 
-### Stripe (live mode) — all 3 products + prices ALREADY EXIST
-| Plan       | Product ID              | Price ID                             | Amount |
-|------------|-------------------------|--------------------------------------|--------|
-| Solo       | prod_UHnHV2mf0xQLwS     | price_1TJDgnG4DfZ9Hko3qZUifmgo      | $29/mo |
-| Salon      | prod_UHnHEMJYz7sJgW     | price_1TJDguG4DfZ9Hko36faOkkXr      | $79/mo |
-| Enterprise | prod_UHnHo1tGfmZ8Aq     | price_1TJDgvG4DfZ9Hko3vLzhNLZ1      | $149/mo|
+## Immediate Priority: First Paying Subscriber
 
-### Local .env.local — correct price IDs already present
-### Code (pricing-data.ts, stripe.ts, validation.ts) — correct, no changes needed
-### Gap — ecosystem.config.js comment did not list STRIPE_PRICE_* as required vars
-### Gap — no deploy script existed to patch production .env.local
+### Step 1: Verify Checkout Flow (IN PROGRESS)
+- [ ] Test end-to-end signup → Stripe checkout → webhook → subscription activation
+- [ ] Test with valid coupon BETA50 (50% off)
+- [ ] Test with invalid coupon (should gracefully fall back)
+- [ ] Test with no coupon
+- [ ] Verify webhook processes checkout.session.completed
 
-## Code Changes Made
+### Step 2: Clean Up Stripe
+- [ ] Expire stale checkout sessions
+- [ ] Investigate and resolve $27 payment intents
 
-### 1. `ecosystem.config.js`
-Added STRIPE_PRICE_* to the required .env.local documentation comment. Prevents future
-deploys from missing these vars. Points to the new helper script.
+### Step 3: Infrastructure Cleanup
+- [ ] Fix PM2 ecosystem.config.js (update paths, ports)
+- [ ] Add 500.html error page
+- [ ] Set up basic uptime monitoring
 
-### 2. `scripts/set-stripe-prices.sh` (NEW)
-Runnable shell script that patches `/home/deployer/cortex/groomgrid-app/.env.local` with
-the correct production price IDs. Handles both update and append cases safely.
+## Stalled Missions — Restructured
 
-### 3. `docs/STRIPE_SETUP.md`
-Added actual production price IDs and deploy instructions for the deploy agent.
+### Mission: Complete MVP → "Verify Checkout & First Subscriber"
+- 36/40 done, but the 4 remaining are critical for revenue
+- Focus: End-to-end checkout verification, Stripe data cleanup, PM2 config
 
-## No Code Logic Changes Needed
-The application code correctly reads price IDs from env vars. No TypeScript changes required.
-The 500 errors are 100% caused by missing env vars in production.
+### Mission: Post-MVP → Descoped
+- Remove nice-to-haves, keep only: transactional email, basic monitoring
+- Email: Mailgun is configured, need welcome/password-reset/subscription-confirmation templates
+- Monitoring: Basic health checks (uptime + error rate)
 
-## Deploy Checklist (CRITICAL — for deploy agent)
+### Mission: PR Triage → Close Out
+- Review remaining 3 PRs
+- Admin pipeline status page PR awaiting review
 
-These steps MUST be executed on the production droplet for checkout to work:
+### Mission: Unblock MVP → Replaced
+- Original blockers resolved
+- New focus: Get first paying subscriber through the door
 
-```bash
-# 1. SSH to droplet
-ssh -i $PROD_KEY_PATH -p $PROD_PORT $PROD_USER@$PROD_HOST
-
-# 2. Run the price ID patch script
-cd /home/deployer/cortex/groomgrid-app
-bash scripts/set-stripe-prices.sh
-
-# 3. Verify env vars are set
-grep STRIPE_PRICE .env.local
-
-# 4. Rebuild the app (env vars are baked in at build time for server components)
-npm run build
-
-# 5. Restart PM2
-pm2 restart groomgrid-app
-
-# 6. Verify checkout works
-curl -s https://getgroomgrid.com/api/health | python3 -m json.tool
-```
-
-## Acceptance Criteria
-- [ ] STRIPE_PRICE_SOLO, STRIPE_PRICE_SALON, STRIPE_PRICE_ENTERPRISE set in production .env.local
-- [ ] App rebuilt and restarted
-- [ ] /plans page loads without errors
-- [ ] Subscribe CTA initiates a real Stripe checkout session (no 500)
-- [ ] No 500 errors on /api/checkout
+## Architecture Notes
+- Single Next.js app on port 3002 serving both getgroomgrid.com and app.getgroomgrid.com
+- PostgreSQL on the same droplet (1GB RAM, 25GB disk)
+- PM2 process management with nginx reverse proxy
+- SSL via Certbot (wildcard *.getgroomgrid.com)
+- Stripe live mode with webhook at /api/stripe/webhook
