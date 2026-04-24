@@ -355,7 +355,7 @@ function SignupPageInner() {
                 Business Name
               </label>
               <div className="relative">
-                <Building className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-stone-400" />
+                <Building className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-stone-500" />
                 <input
                   id="businessName"
                   name="businessName"
@@ -384,7 +384,7 @@ function SignupPageInner() {
                 Email Address
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-stone-400" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-stone-500" />
                 <input
                   id="email"
                   type="email"
@@ -413,7 +413,7 @@ function SignupPageInner() {
                 Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-stone-400" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-stone-500" />
                 <input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
@@ -432,7 +432,7 @@ function SignupPageInner() {
                 <button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-500 hover:text-stone-600 transition-colors"
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                   tabIndex={-1}
                 >
