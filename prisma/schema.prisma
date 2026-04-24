@@ -69,6 +69,7 @@ model Client {
   appointments Appointment[]
 
   @@unique([userId, email])
+  @@index([userId])
   @@map("clients")
 }
 
@@ -86,6 +87,7 @@ model Pet {
   client       Client       @relation(fields: [clientId], references: [id], onDelete: Cascade)
   appointments Appointment[]
 
+  @@index([clientId])
   @@map("pets")
 }
 
@@ -149,6 +151,7 @@ model DripEmailQueue {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId, status, scheduledAt])
   @@map("drip_email_queue")
 }
 
@@ -179,6 +182,7 @@ model AnalyticsEvent {
   // are stored without a user session. If a user is deleted, their events are nulled.
   user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
 
+  @@index([userId, eventName, createdAt])
   @@map("analytics_events")
 }
 
