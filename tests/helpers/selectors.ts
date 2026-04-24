@@ -61,8 +61,8 @@ export const signupSelectors = {
   passwordLabel: 'label:has-text("Password")',
 
   // Buttons
-  submitButton: 'button:has-text("Create Account")',
-  loadingButton: 'button:has-text("Creating Account")',
+  submitButton: 'button:has-text("Start Free Trial")',
+  loadingButton: 'button:has-text("Creating Account...")',
 
   // Links
   signInLink: 'a:has-text("Sign in")',

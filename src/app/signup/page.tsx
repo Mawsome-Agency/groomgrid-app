@@ -450,6 +450,7 @@ function SignupPageInner() {
             {/* Submit button */}
             <button
               type="submit"
+              data-testid="signup-submit"
               disabled={loading || submitSuccess}
               className={`w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold
                 transition-[transform,box-shadow,background-color] duration-150 ease-out
