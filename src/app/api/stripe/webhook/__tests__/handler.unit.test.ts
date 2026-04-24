@@ -143,6 +143,7 @@ jest.mock('@/lib/prisma', () => ({
   prisma: {
     paymentEvent: {
       create: jest.fn().mockResolvedValue({}),
+      upsert: jest.fn().mockResolvedValue({}),
       findFirst: jest.fn().mockResolvedValue(null),
       findUnique: jest.fn().mockResolvedValue(null),
     },
@@ -185,6 +186,52 @@ describe('handleStripeEvent', () => {
       // Should not create paymentEvent or call triggerPaymentCompletionHandler
       expect(mockPrisma.paymentEvent.create).not.toHaveBeenCalled();
       expect(triggerPaymentCompletionHandler).not.toHaveBeenCalled();
+    });
+
+    it('should write idempotency marker AFTER triggerPaymentCompletionHandler succeeds', async () => {
+      // Regression test for race condition: if recordEventProcessed fires before the
+      // completion handler and the handler throws, Stripe retries would see the
+      // marker and skip — leaving the user's profile unupdated after a real payment.
+      const callOrder: string[] = [];
+
+      (triggerPaymentCompletionHandler as jest.Mock).mockImplementationOnce(async () => {
+        callOrder.push('completionHandler');
+      });
+      mockPrisma.paymentEvent.create.mockImplementationOnce(async () => {
+        callOrder.push('recordEventProcessed');
+        return {};
+      });
+
+      const event = mockStripeEvents.checkoutSessionCompleted;
+      await handleStripeEvent(event);
+
+      expect(callOrder).toEqual(['completionHandler', 'recordEventProcessed']);
+    });
+
+    it('should retry completion handler if it failed on a previous attempt (PAYMENT_CONFIRMED already exists)', async () => {
+      // Simulates: transaction committed PAYMENT_CONFIRMED, but triggerPaymentCompletionHandler
+      // threw on the first attempt. Stripe retries. isEventProcessed must return false so
+      // the completion handler runs again.
+      // The upsert ensures the transaction doesn't throw on PAYMENT_CONFIRMED duplicate.
+      // isEventProcessed filters by eventType=CHECKOUT_SESSION_COMPLETED and finds nothing
+      // (because recordEventProcessed was never called on the first attempt).
+      mockPrisma.paymentEvent.findFirst.mockResolvedValueOnce(null); // no idempotency record yet
+
+      const event = mockStripeEvents.checkoutSessionCompleted;
+      await handleStripeEvent(event);
+
+      expect(triggerPaymentCompletionHandler).toHaveBeenCalledTimes(1);
+      // Idempotency marker created after completion
+      expect(mockPrisma.paymentEvent.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            eventType: 'CHECKOUT_SESSION_COMPLETED',
+            payload: expect.objectContaining({
+              eventId: event.id,
+            }),
+          }),
+        })
+      );
     });
   });
 
