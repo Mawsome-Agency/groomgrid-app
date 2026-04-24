@@ -6,13 +6,12 @@ import { Plan } from '@/types';
  * Used by:
  *   - /plans page (PlanCard, Schema.org markup)
  *   - /signup page (plan selection)
- *   - API checkout route (plan validation)
+ *   - API checkout routes (plan validation + metadata)
  *   - Any other component that needs plan data
  *
- * IMPORTANT: When adding or changing plans, also update:
+ * When adding or changing plans, also update:
  *   - Schema.org SoftwareApplication markup in src/app/layout.tsx
  *   - Stripe price IDs in .env (STRIPE_PRICE_SOLO, STRIPE_PRICE_SALON, STRIPE_PRICE_ENTERPRISE)
- *   - PLAN_DATA in src/app/api/checkout/route.ts
  */
 export const PLANS: Plan[] = [
   {
@@ -68,6 +67,11 @@ export const PLANS: Plan[] = [
     popular: false,
   },
 ];
+
+// Prices in cents, derived from PLANS — no manual sync needed.
+// Import this in API routes instead of hardcoding local PLAN_DATA objects.
+export const PLAN_DATA_CENTS: Record<string, { name: string; price: number }> =
+  Object.fromEntries(PLANS.map(p => [p.id, { name: p.name, price: p.price * 100 }]));
 
 export interface Testimonial {
   name: string;
