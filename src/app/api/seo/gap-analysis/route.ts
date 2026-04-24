@@ -39,7 +39,8 @@ export async function POST(req: NextRequest) {
     }
 
     // Rate limiting
-    const ip = req.ip || req.headers.get('x-forwarded-for') || 'unknown';
+    const forwarded = req.headers.get('x-forwarded-for');
+    const ip = forwarded ? forwarded.split(',')[0].trim() : 'unknown';
     const rateLimitKey = `seo-gap-analysis:${ip}`;
     const { allowed, retryAfter } = checkRateLimit(rateLimitKey, RATE_LIMIT.limit, RATE_LIMIT.windowMs);
 
