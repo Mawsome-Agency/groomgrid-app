@@ -5,6 +5,8 @@ const nextConfig = {
       bodySizeLimit: '2mb',
     },
   },
+  // Skip TS type-checking during build — 1GB production droplet OOMs on full type check.
+  // CI (GitHub Actions) validates types on every PR instead.
   typescript: {
     ignoreBuildErrors: true,
   },

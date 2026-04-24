@@ -42,6 +42,7 @@ model Profile {
   welcomeShown         Boolean   @default(false) @map("welcome_shown")
   stripeCustomerId     String?   @map("stripe_customer_id")
   stripeSubscriptionId String?   @map("stripe_subscription_id")
+  attributionData      Json?     @map("attribution_data")
   createdAt            DateTime  @default(now()) @map("created_at")
   updatedAt            DateTime  @updatedAt @map("updated_at")
 
@@ -168,13 +169,15 @@ model Feedback {
 
 model AnalyticsEvent {
   id         String   @id @default(cuid())
-  userId     String   @map("user_id")
+  userId     String?  @map("user_id")
   eventName  String   @map("event_name")
   properties Json?
   sessionId  String?  @map("session_id")
   createdAt  DateTime @default(now()) @map("created_at")
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // userId is optional — anonymous pre-signup events (signup_viewed, signup_started)
+  // are stored without a user session. If a user is deleted, their events are nulled.
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   @@map("analytics_events")
 }

@@ -32,6 +32,10 @@ describe('Sitemap Generation', () => {
     expect(urls).toContain('https://getgroomgrid.com/blog/mobile-dog-grooming-business-plan');
     expect(urls).toContain('https://getgroomgrid.com/blog/reduce-no-shows-dog-grooming');
     expect(urls).toContain('https://getgroomgrid.com/blog/dog-grooming-software');
+    expect(urls).toContain('https://getgroomgrid.com/blog/how-to-start-dog-grooming-business-at-home');
+    expect(urls).toContain('https://getgroomgrid.com/blog/how-to-open-a-pet-grooming-business');
+    expect(urls).toContain('https://getgroomgrid.com/blog/how-to-build-mobile-grooming-trailer');
+    expect(urls).toContain('https://getgroomgrid.com/blog/free-dog-grooming-software');
   });
 
   it('should include SEO landing pages', () => {
@@ -43,6 +47,8 @@ describe('Sitemap Generation', () => {
     expect(urls).toContain('https://getgroomgrid.com/mobile-grooming-business');
     expect(urls).toContain('https://getgroomgrid.com/mobile-grooming-software');
     expect(urls).toContain('https://getgroomgrid.com/moego-alternatives');
+    expect(urls).toContain('https://getgroomgrid.com/daysmart-alternatives');
+    expect(urls).toContain('https://getgroomgrid.com/pawfinity-alternatives');
   });
 
   it('should have correct priority for homepage', () => {
@@ -80,7 +86,7 @@ describe('Sitemap Generation', () => {
 
   it('should have appropriate priorities for landing pages', () => {
     const result = sitemap();
-    const landingSlugs = ['best-dog-grooming-software', 'grooming-business-operations', 'mobile-grooming-business', 'mobile-grooming-software', 'moego-alternatives'];
+    const landingSlugs = ['best-dog-grooming-software', 'grooming-business-operations', 'mobile-grooming-business', 'mobile-grooming-software', 'moego-alternatives', 'daysmart-alternatives', 'pawfinity-alternatives'];
     
     landingSlugs.forEach(slug => {
       const page = result.find(p => p.url === `https://getgroomgrid.com/${slug}`);
@@ -123,7 +129,7 @@ describe('Sitemap Generation', () => {
   it('should have total entries matching all pages', () => {
     const result = sitemap();
 
-    // 4 static pages + 5 landing pages + 17 blog posts = 26 total
-    expect(result.length).toBe(26);
+    // 4 static pages + 7 landing pages + 21 blog posts = 32 total
+    expect(result.length).toBe(32);
   });
 });

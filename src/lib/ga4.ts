@@ -34,18 +34,42 @@ export function trackEvent(eventName: string, params: Record<string, any> = {}) 
   }
 }
 
+// Posts a pre-signup funnel event to the local analytics endpoint alongside GA4.
+// Fire-and-forget — analytics errors never break the UX.
+// Uses sessionStorage to maintain a consistent session ID across the funnel
+// so pre-signup events can be stitched to the eventual signup event.
+function postToLocalTrack(eventName: string, properties?: Record<string, unknown>) {
+  if (typeof window === 'undefined') return;
+  const key = 'gg_session_id';
+  let sessionId = sessionStorage.getItem(key);
+  if (!sessionId) {
+    sessionId = `sess_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+    sessionStorage.setItem(key, sessionId);
+  }
+  fetch('/api/analytics/track', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ eventName, properties: properties ?? {}, sessionId }),
+  }).catch(() => {}); // non-critical — never surface analytics errors to users
+}
+
 // Funnel events
 
 // Fires when user lands on /signup page (page load, not form submit)
 export function trackSignupViewed() {
   trackEvent('signup_started');
+  postToLocalTrack('signup_viewed');
 }
 
 // Fires on successful POST /api/auth/signup response
-export function trackSignupCompleted(userId: string) {
-  trackEvent('signup_completed', {
+export function trackSignupCompleted(userId: string, attribution?: Record<string, any>) {
+  const params: Record<string, any> = {
     user_id: userId,
-  });
+  };
+  if (attribution?.utm_source) params.utm_source = attribution.utm_source;
+  if (attribution?.utm_campaign) params.utm_campaign = attribution.utm_campaign;
+  if (attribution?.utm_medium) params.utm_medium = attribution.utm_medium;
+  trackEvent('signup_completed', params);
 }
 
 // Fires when user lands on /plans page (once per mount)
@@ -66,6 +90,7 @@ export function trackSignupStarted(businessName: string) {
     business_name: businessName,
     timestamp: new Date().toISOString(),
   });
+  postToLocalTrack('signup_started', { business_name: businessName });
 }
 
 export function trackEmailVerified(userId: string) {
@@ -110,12 +135,16 @@ export function trackOnboardingSkipped(reason?: string) {
   });
 }
 
-export function trackAccountCreated(userId: string, businessName: string) {
-  trackEvent('account_created', {
+export function trackAccountCreated(userId: string, businessName: string, attribution?: Record<string, any>) {
+  const params: Record<string, any> = {
     user_id: userId,
     business_name: businessName,
     timestamp: new Date().toISOString(),
-  });
+  };
+  if (attribution?.utm_source) params.utm_source = attribution.utm_source;
+  if (attribution?.utm_campaign) params.utm_campaign = attribution.utm_campaign;
+  if (attribution?.utm_medium) params.utm_medium = attribution.utm_medium;
+  trackEvent('account_created', params);
 }
 
 export function trackSubscriptionStarted(

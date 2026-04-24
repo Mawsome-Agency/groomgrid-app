@@ -63,7 +63,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { email, password, businessName } = await req.json()
+    const { email, password, businessName, attributionData } = await req.json()
 
     if (!email || !password || !businessName) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
@@ -92,6 +92,7 @@ export async function POST(req: NextRequest) {
             businessName,
             subscriptionStatus: 'trial',
             trialEndsAt,
+            ...(attributionData && { attributionData }),
           },
         },
       },

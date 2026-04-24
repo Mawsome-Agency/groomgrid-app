@@ -108,4 +108,28 @@ export const blogPosts: BlogPost[] = [
     description: 'Everything you need to start a mobile dog grooming business — van setup, licensing, pricing, finding first clients, and the tools to manage it all from day one.',
     publishedAt: '2026-04-23',
   },
+  {
+    slug: 'how-to-start-dog-grooming-business-at-home',
+    title: 'How to Start a Dog Grooming Business at Home: Step-by-Step Guide',
+    description: 'Start your dog grooming business at home with this complete guide — licensing, equipment, pricing, zoning rules, and the software that keeps everything organized from day one.',
+    publishedAt: '2026-04-23',
+  },
+  {
+    slug: 'how-to-open-a-pet-grooming-business',
+    title: 'How to Open a Pet Grooming Business: Complete Guide for 2026',
+    description: 'Everything you need to open a pet grooming business — business plans, licensing, location, equipment, staffing, pricing, and the software that ties it all together.',
+    publishedAt: '2026-04-23',
+  },
+  {
+    slug: 'how-to-build-mobile-grooming-trailer',
+    title: 'How to Build a Mobile Grooming Trailer: Complete Conversion Guide',
+    description: 'Step-by-step guide to building or converting a mobile grooming trailer — layout, plumbing, electrical, equipment, costs, and the software that keeps your mobile business running smoothly.',
+    publishedAt: '2026-04-23',
+  },
+  {
+    slug: 'free-dog-grooming-software',
+    title: 'Free Dog Grooming Software: What You Actually Get (And What You Don\'t)',
+    description: 'Honest look at free dog grooming software — what features free tiers include, where they fall short, and when paying $29/month actually saves you money. Plus alternatives that offer free trials.',
+    publishedAt: '2026-04-23',
+  },
 ].sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
