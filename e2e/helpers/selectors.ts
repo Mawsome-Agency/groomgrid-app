@@ -20,7 +20,7 @@ export const E2E_SELECTORS = {
     businessNameLabel: /Business Name/i,
     emailLabel: /Email Address/i,
     passwordLabel: /Password/i,
-    submitButton: /Create Account/i,
+    submitButton: /Start Free Trial/i,
     signInLink: /Sign in/i,
     errorBanner: '.bg-red-50',
   },
