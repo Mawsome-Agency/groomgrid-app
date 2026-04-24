@@ -70,11 +70,13 @@ export function trackSignupCompleted(userId: string, attribution?: Record<string
   if (attribution?.utm_campaign) params.utm_campaign = attribution.utm_campaign;
   if (attribution?.utm_medium) params.utm_medium = attribution.utm_medium;
   trackEvent('signup_completed', params);
+  postToLocalTrack('signup_completed', { user_id: userId, ...attribution });
 }
 
 // Fires when user lands on /plans page (once per mount)
 export function trackPlanViewed() {
   trackEvent('plan_viewed');
+  postToLocalTrack('plan_viewed');
 }
 
 // Fires when user clicks a paid plan CTA
@@ -83,6 +85,7 @@ export function trackCheckoutStarted(planName: string, planPrice: number) {
     plan_name: planName,
     plan_price: planPrice,
   });
+  postToLocalTrack('checkout_started', { plan_name: planName, plan_price: planPrice });
 }
 
 export function trackSignupStarted(businessName: string) {
@@ -106,6 +109,7 @@ export function trackPlanSelected(planType: string, planPrice: number) {
     plan_price: planPrice,
     timestamp: new Date().toISOString(),
   });
+  postToLocalTrack('plan_selected', { plan_type: planType, plan_price: planPrice });
 }
 
 export function trackCheckoutCompleted(
