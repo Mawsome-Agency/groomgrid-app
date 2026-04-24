@@ -132,4 +132,16 @@ export const blogPosts: BlogPost[] = [
     description: 'Honest look at free dog grooming software — what features free tiers include, where they fall short, and when paying $29/month actually saves you money. Plus alternatives that offer free trials.',
     publishedAt: '2026-04-23',
   },
+  {
+    slug: 'groomgrid-vs-daysmart',
+    title: 'GroomGrid vs DaySmart Pet: Which Grooming Software is Right for You?',
+    description: 'Comparing GroomGrid vs DaySmart Pet for your grooming business? See how pricing, AI features, mobile-first design, and ease of onboarding stack up — and why independent groomers are switching.',
+    publishedAt: '2026-04-24',
+  },
+  {
+    slug: 'groomgrid-vs-pawfinity',
+    title: 'GroomGrid vs Pawfinity: Best Grooming Software for Mobile Groomers',
+    description: 'Comparing GroomGrid vs Pawfinity for your mobile grooming business? See how AI features, mobile-first design, automated reminders, and pricing compare — and why groomers are upgrading.',
+    publishedAt: '2026-04-24',
+  },
 ].sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
