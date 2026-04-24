@@ -4,7 +4,16 @@ import { authOptions } from '@/lib/next-auth-options';
 import { createCheckoutSession } from '@/lib/stripe';
 import prisma from '@/lib/prisma';
 import { ensureEnv } from '@/lib/validation';
-import { PLAN_DATA_CENTS } from '@/app/pricing/pricing-data';
+import { PLANS } from '@/app/pricing/pricing-data';
+
+// Derive valid plan types and price data from the single source of truth.
+// Prices are stored in cents for Stripe.
+const VALID_PLANS = PLANS.map((p) => p.type) as readonly string[];
+type PlanType = typeof PLANS[number]['type'];
+
+const PLAN_DATA = Object.fromEntries(
+  PLANS.map((plan) => [plan.type, { name: plan.name, price: plan.price * 100 }])
+) as Record<PlanType, { name: string; price: number }>;
 
 /**
  * GET /api/checkout/session?plan=solo|salon|enterprise
@@ -30,9 +39,11 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Missing plan parameter' }, { status: 400 });
   }
 
-  if (!Object.hasOwn(PLAN_DATA_CENTS, plan)) {
+  if (!VALID_PLANS.includes(plan)) {
     return NextResponse.json({ error: 'Invalid plan. Must be solo, salon, or enterprise.' }, { status: 400 });
   }
+
+  const validPlan = plan as PlanType;
 
   try {
     ensureEnv('stripe');
@@ -48,10 +59,10 @@ export async function GET(req: NextRequest) {
     // are consistent with the POST /api/checkout flow
     const checkoutSession = await createCheckoutSession({
       userId: session.user.id,
-      planType: plan as 'solo' | 'salon' | 'enterprise',
+      planType: validPlan,
       customerEmail: session.user.email || `${session.user.id}@groomgrid.app`,
       businessName: profile.businessName,
-      planData: PLAN_DATA_CENTS[plan],
+      planData: PLAN_DATA[validPlan],
       couponCode: 'BETA50',
     });
 
