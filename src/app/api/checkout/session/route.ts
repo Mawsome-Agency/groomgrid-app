@@ -5,6 +5,10 @@ import { createCheckoutSession } from '@/lib/stripe';
 import prisma from '@/lib/prisma';
 import { ensureEnv } from '@/lib/validation';
 
+// Use the public app URL as redirect base — req.url resolves to localhost:3002
+// behind nginx, which produces unreachable redirects in production.
+const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://app.getgroomgrid.com';
+
 const VALID_PLANS = ['solo', 'salon', 'enterprise'] as const;
 type PlanType = typeof VALID_PLANS[number];
 
@@ -26,7 +30,7 @@ export async function GET(req: NextRequest) {
   // ── Authentication check ──────────────────────────────────────────
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
-    const loginUrl = new URL('/login', req.url);
+    const loginUrl = new URL('/login', appUrl);
     loginUrl.searchParams.set('next', '/plans');
     return NextResponse.redirect(loginUrl, 302);
   }
