@@ -91,6 +91,22 @@ describe('Stripe webhook route (test mode)', () => {
     expect(callArg.metadata.userId).toBe('test_user_id');
   });
 
+  it('should return 200 for requests missing stripe-signature header (bot traffic)', async () => {
+    process.env.NODE_ENV = 'production';
+    process.env.ENABLE_TEST_WEBHOOK_BYPASS = 'false';
+
+    const req = new Request('http://localhost/api/stripe/webhook', {
+      method: 'POST',
+      body: JSON.stringify({}),
+      // No stripe-signature header
+    });
+
+    const response = await POST(req);
+    expect(response.status).toBe(200);
+    const json = await response.json();
+    expect(json).toEqual({ received: true });
+  });
+
   it('should verify Stripe signature in production mode', async () => {
     process.env.NODE_ENV = 'production';
     process.env.ENABLE_TEST_WEBHOOK_BYPASS = 'false';

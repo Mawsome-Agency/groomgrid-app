@@ -26,7 +26,7 @@ export async function POST(req: Request) {
   }
 
   const body = await req.text();
-  const signature = headersList.get('stripe-signature')!;
+  const signature = headersList.get('stripe-signature');
 
   let event;
 
@@ -56,6 +56,14 @@ export async function POST(req: Request) {
     // Use mock event in test mode
     event = mockStripeWebhookEvent;
   } else {
+    // Guard: bots/scanners hit this endpoint without the stripe-signature header.
+    // Stripe always includes it — absent header = not a real webhook.
+    // Return 200 so bots don't retry; log at debug only to avoid masking real failures.
+    if (!signature) {
+      console.debug('[Webhook] Missing stripe-signature header — likely bot/scanner, ignoring');
+      return NextResponse.json({ received: true });
+    }
+
     // Production: always require valid Stripe signature
     try {
       event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
