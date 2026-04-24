@@ -6,7 +6,19 @@
  * - Edge cases: missing env vars, network failures
  * - Single vs array events
  * - All 9 server functions tested
+ * - DB writes: prisma.analyticsEvent.create called fire-and-forget for checkout_completed and subscription_started
  */
+
+jest.mock('@/lib/prisma', () => ({
+  __esModule: true,
+  default: {
+    analyticsEvent: {
+      create: jest.fn().mockResolvedValue({}),
+    },
+  },
+}));
+
+import prisma from '@/lib/prisma';
 import {
   trackServerEvent,
   trackCheckoutCompletedServer,
@@ -19,6 +31,8 @@ import {
   trackPaymentFailedServer,
   trackPurchaseCompletedServer,
 } from '../ga4-server';
+
+const mockAnalyticsEventCreate = prisma.analyticsEvent.create as jest.MockedFunction<typeof prisma.analyticsEvent.create>;
 
 describe('ga4-server.ts', () => {
   const originalEnv = {
@@ -241,6 +255,26 @@ describe('ga4-server.ts', () => {
       const fetchBody = JSON.parse((fetch as jest.Mock).mock.calls[0][1].body);
       expect(fetchBody.events[0].params.session_id).toBeNull();
     });
+
+    it('should write checkout_completed to analytics_events DB', async () => {
+      (global as any).fetch = jest.fn().mockResolvedValue({ ok: true });
+      mockAnalyticsEventCreate.mockResolvedValue({} as any);
+
+      await trackCheckoutCompletedServer('user_123', 'user_123', 'sess_456', 'solo', true);
+
+      expect(mockAnalyticsEventCreate).toHaveBeenCalledWith({
+        data: expect.objectContaining({
+          userId: 'user_123',
+          eventName: 'checkout_completed',
+          properties: expect.objectContaining({
+            plan_type: 'solo',
+            session_id: 'sess_456',
+            trial_started: true,
+          }),
+          sessionId: null,
+        }),
+      });
+    });
   });
 
   describe('trackSubscriptionCreatedServer', () => {
@@ -304,6 +338,25 @@ describe('ga4-server.ts', () => {
 
       const fetchBody = JSON.parse((fetch as jest.Mock).mock.calls[0][1].body);
       expect(fetchBody.events[0].params.price).toBe(149.99);
+    });
+
+    it('should write subscription_started to analytics_events DB', async () => {
+      (global as any).fetch = jest.fn().mockResolvedValue({ ok: true });
+      mockAnalyticsEventCreate.mockResolvedValue({} as any);
+
+      await trackSubscriptionStartedServer('user_123', 'user_123', 'sub_456', 'solo', 'active', 29);
+
+      expect(mockAnalyticsEventCreate).toHaveBeenCalledWith({
+        data: expect.objectContaining({
+          userId: 'user_123',
+          eventName: 'subscription_started',
+          properties: expect.objectContaining({
+            plan_type: 'solo',
+            user_id: 'user_123',
+          }),
+          sessionId: null,
+        }),
+      });
     });
   });
 

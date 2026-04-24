@@ -12,6 +12,8 @@
  * If GA4_API_SECRET is not set, events are logged to console (no-op in prod).
  */
 
+import prisma from '@/lib/prisma';
+
 // Read env vars dynamically so per-test overrides take effect at call time
 const MP_ENDPOINT = 'https://www.google-analytics.com/mp/collect';
 
@@ -107,6 +109,15 @@ export async function trackCheckoutCompletedServer(
     },
     userId
   );
+  // Write to local DB for funnel analysis — fire-and-forget, never blocks the response
+  prisma.analyticsEvent.create({
+    data: {
+      userId,
+      eventName: 'checkout_completed',
+      properties: { plan_type: planType, session_id: sessionId, trial_started: trialStarted },
+      sessionId: null,
+    },
+  }).catch(() => {});
 }
 
 export async function trackSubscriptionCreatedServer(
@@ -185,6 +196,15 @@ export async function trackSubscriptionStartedServer(
     },
     userId
   );
+  // Write to local DB for funnel analysis — fire-and-forget, never blocks the response
+  prisma.analyticsEvent.create({
+    data: {
+      userId,
+      eventName: 'subscription_started',
+      properties: { plan_type: planType, user_id: userId },
+      sessionId: null,
+    },
+  }).catch(() => {});
 }
 
 export async function trackPaymentInitiatedServer(

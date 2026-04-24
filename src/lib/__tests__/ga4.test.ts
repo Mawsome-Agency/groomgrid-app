@@ -404,6 +404,19 @@ describe('ga4.ts', () => {
 
       expect(window.gtag).not.toHaveBeenCalled();
     });
+
+    it('should call postToLocalTrack with plan_selected', () => {
+      trackPlanSelected('solo', 29);
+
+      expect(global.fetch).toHaveBeenCalledWith(
+        '/api/analytics/track',
+        expect.objectContaining({ method: 'POST' })
+      );
+      const body = JSON.parse((global.fetch as jest.Mock).mock.calls[0][1].body);
+      expect(body.eventName).toBe('plan_selected');
+      expect(body.properties.plan_type).toBe('solo');
+      expect(body.properties.plan_price).toBe(29);
+    });
   });
 
   describe('trackCheckoutCompleted', () => {
@@ -1365,6 +1378,18 @@ describe('ga4.ts', () => {
 
       expect(window.gtag).not.toHaveBeenCalled();
     });
+
+    it('should call postToLocalTrack with signup_completed', () => {
+      trackSignupCompleted('user_12345');
+
+      expect(global.fetch).toHaveBeenCalledWith(
+        '/api/analytics/track',
+        expect.objectContaining({ method: 'POST' })
+      );
+      const body = JSON.parse((global.fetch as jest.Mock).mock.calls[0][1].body);
+      expect(body.eventName).toBe('signup_completed');
+      expect(body.properties.user_id).toBe('user_12345');
+    });
   });
 
   // ─── trackPlanViewed ────────────────────────────────────────────────────────
@@ -1385,6 +1410,17 @@ describe('ga4.ts', () => {
       trackPlanViewed();
 
       expect(window.gtag).not.toHaveBeenCalled();
+    });
+
+    it('should call postToLocalTrack with plan_viewed', () => {
+      trackPlanViewed();
+
+      expect(global.fetch).toHaveBeenCalledWith(
+        '/api/analytics/track',
+        expect.objectContaining({ method: 'POST' })
+      );
+      const body = JSON.parse((global.fetch as jest.Mock).mock.calls[0][1].body);
+      expect(body.eventName).toBe('plan_viewed');
     });
   });
 
@@ -1427,6 +1463,19 @@ describe('ga4.ts', () => {
       trackCheckoutStarted('Solo', 29);
 
       expect(window.gtag).not.toHaveBeenCalled();
+    });
+
+    it('should call postToLocalTrack with checkout_started', () => {
+      trackCheckoutStarted('Solo', 29);
+
+      expect(global.fetch).toHaveBeenCalledWith(
+        '/api/analytics/track',
+        expect.objectContaining({ method: 'POST' })
+      );
+      const body = JSON.parse((global.fetch as jest.Mock).mock.calls[0][1].body);
+      expect(body.eventName).toBe('checkout_started');
+      expect(body.properties.plan_name).toBe('Solo');
+      expect(body.properties.plan_price).toBe(29);
     });
   });
 });
