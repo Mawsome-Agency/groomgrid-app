@@ -23,16 +23,16 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'eventName is required' }, { status: 400 })
   }
 
-  // Auth required for analytics
+  // Auth is optional — anonymous pre-signup events (signup_viewed, signup_started)
+  // are stored with userId = null. This enables full funnel tracking in the local
+  // analytics_events table even before a user account exists.
   const session = await getServerSession(authOptions)
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  const userId = session?.user?.id ?? null
 
   try {
     await prisma.analyticsEvent.create({
       data: {
-        userId: session.user.id,
+        userId,
         eventName,
         properties: (properties ?? {}) as object,
         sessionId: sessionId ?? null,
@@ -40,9 +40,10 @@ export async function POST(req: NextRequest) {
     })
 
     return NextResponse.json({ success: true })
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Unknown error'
     return NextResponse.json(
-      { error: `Failed to track event: ${error.message}` },
+      { error: `Failed to track event: ${message}` },
       { status: 500 }
     )
   }
