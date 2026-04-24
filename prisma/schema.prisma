@@ -169,13 +169,15 @@ model Feedback {
 
 model AnalyticsEvent {
   id         String   @id @default(cuid())
-  userId     String   @map("user_id")
+  userId     String?  @map("user_id")
   eventName  String   @map("event_name")
   properties Json?
   sessionId  String?  @map("session_id")
   createdAt  DateTime @default(now()) @map("created_at")
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // userId is optional — anonymous pre-signup events (signup_viewed, signup_started)
+  // are stored without a user session. If a user is deleted, their events are nulled.
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   @@map("analytics_events")
 }
