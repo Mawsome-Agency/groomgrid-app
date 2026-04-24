@@ -179,7 +179,7 @@ export default function ABTestsPage() {
             {tests.length === 0 ? (
               <div className="rounded-xl border border-stone-200 bg-white p-8 text-center">
                 <p className="text-stone-500">No A/B tests found</p>
-                <p className="mt-2 text-sm text-stone-400">
+                <p className="mt-2 text-sm text-stone-500">
                   Create your first test to start experimenting
                 </p>
               </div>
@@ -384,7 +384,7 @@ function TestCard({
             </p>
           </div>
         </div>
-        <p className="text-stone-400">
+        <p className="text-stone-500">
           Created {new Date(test.createdAt).toLocaleDateString()}
         </p>
       </div>
