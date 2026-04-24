@@ -5,17 +5,11 @@ import { createCheckoutSession, getCheckoutSession, getStripeErrorMessage } from
 import prisma from '@/lib/prisma';
 import { trackPaymentInitiatedServer } from '@/lib/ga4-server';
 import { ensureEnv } from '@/lib/validation';
-
-// Plan data for metadata
-const PLAN_DATA = {
-  solo: { name: 'Solo', price: 2900 },
-  salon: { name: 'Salon', price: 7900 },
-  enterprise: { name: 'Enterprise', price: 14900 },
-} as const;
+import { PLAN_DATA_CENTS } from '@/app/pricing/pricing-data';
 
 /** Validate plan type */
 export function validatePlan(planType: string): boolean {
-  return Object.keys(PLAN_DATA).includes(planType);
+  return Object.hasOwn(PLAN_DATA_CENTS, planType);
 }
 
 /** Idempotency helper */
@@ -71,10 +65,10 @@ export async function POST(req: NextRequest) {
 
     const checkoutSession = await createCheckoutSession({
       userId,
-      planType: planType as keyof typeof PLAN_DATA,
+      planType: planType as 'solo' | 'salon' | 'enterprise',
       customerEmail: customerEmail || `${userId}@groomgrid.app`,
       businessName: profile.businessName,
-      planData: PLAN_DATA[planType as keyof typeof PLAN_DATA],
+      planData: PLAN_DATA_CENTS[planType],
       clientId,
       couponCode: coupon,
     });

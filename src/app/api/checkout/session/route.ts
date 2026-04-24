@@ -4,15 +4,7 @@ import { authOptions } from '@/lib/next-auth-options';
 import { createCheckoutSession } from '@/lib/stripe';
 import prisma from '@/lib/prisma';
 import { ensureEnv } from '@/lib/validation';
-
-const VALID_PLANS = ['solo', 'salon', 'enterprise'] as const;
-type PlanType = typeof VALID_PLANS[number];
-
-const PLAN_DATA: Record<PlanType, { name: string; price: number }> = {
-  solo: { name: 'Solo', price: 2900 },
-  salon: { name: 'Salon', price: 7900 },
-  enterprise: { name: 'Enterprise', price: 14900 },
-};
+import { PLAN_DATA_CENTS } from '@/app/pricing/pricing-data';
 
 /**
  * GET /api/checkout/session?plan=solo|salon|enterprise
@@ -38,11 +30,9 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Missing plan parameter' }, { status: 400 });
   }
 
-  if (!(VALID_PLANS as readonly string[]).includes(plan)) {
+  if (!Object.hasOwn(PLAN_DATA_CENTS, plan)) {
     return NextResponse.json({ error: 'Invalid plan. Must be solo, salon, or enterprise.' }, { status: 400 });
   }
-
-  const validPlan = plan as PlanType;
 
   try {
     ensureEnv('stripe');
@@ -58,10 +48,10 @@ export async function GET(req: NextRequest) {
     // are consistent with the POST /api/checkout flow
     const checkoutSession = await createCheckoutSession({
       userId: session.user.id,
-      planType: validPlan,
+      planType: plan as 'solo' | 'salon' | 'enterprise',
       customerEmail: session.user.email || `${session.user.id}@groomgrid.app`,
       businessName: profile.businessName,
-      planData: PLAN_DATA[validPlan],
+      planData: PLAN_DATA_CENTS[plan],
       couponCode: 'BETA50',
     });
 

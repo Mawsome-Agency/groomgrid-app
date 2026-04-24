@@ -471,6 +471,86 @@ describe('TESTIMONIALS export', () => {
   });
 });
 
+// ─────────────────────────────────────────────────────────────────────────────
+// PLAN_DATA_CENTS — derived cents export (regression lock against manual-sync)
+// ─────────────────────────────────────────────────────────────────────────────
+describe('PLAN_DATA_CENTS export', () => {
+  let PLANS: any[];
+  let PLAN_DATA_CENTS: Record<string, { name: string; price: number }>;
+
+  beforeAll(() => {
+    const mod = importPricingData({
+      STRIPE_PRICE_SOLO: 'price_a',
+      STRIPE_PRICE_SALON: 'price_b',
+      STRIPE_PRICE_ENTERPRISE: 'price_c',
+    });
+    PLANS = mod.PLANS;
+    PLAN_DATA_CENTS = mod.PLAN_DATA_CENTS;
+  });
+
+  it('exports PLAN_DATA_CENTS', () => {
+    expect(PLAN_DATA_CENTS).toBeDefined();
+    expect(typeof PLAN_DATA_CENTS).toBe('object');
+  });
+
+  it('PLAN_DATA_CENTS has an entry for every plan id', () => {
+    PLANS.forEach((p) => {
+      expect(PLAN_DATA_CENTS).toHaveProperty(p.id);
+    });
+  });
+
+  it('each entry has name and price fields', () => {
+    Object.values(PLAN_DATA_CENTS).forEach((entry) => {
+      expect(entry).toHaveProperty('name');
+      expect(entry).toHaveProperty('price');
+      expect(typeof entry.name).toBe('string');
+      expect(typeof entry.price).toBe('number');
+    });
+  });
+
+  it('solo price in cents equals PLANS[0].price * 100', () => {
+    expect(PLAN_DATA_CENTS['solo'].price).toBe(PLANS[0].price * 100);
+  });
+
+  it('salon price in cents equals PLANS[1].price * 100', () => {
+    expect(PLAN_DATA_CENTS['salon'].price).toBe(PLANS[1].price * 100);
+  });
+
+  it('enterprise price in cents equals PLANS[2].price * 100', () => {
+    expect(PLAN_DATA_CENTS['enterprise'].price).toBe(PLANS[2].price * 100);
+  });
+
+  it('solo name matches PLANS[0].name', () => {
+    expect(PLAN_DATA_CENTS['solo'].name).toBe(PLANS[0].name);
+  });
+
+  it('salon name matches PLANS[1].name', () => {
+    expect(PLAN_DATA_CENTS['salon'].name).toBe(PLANS[1].name);
+  });
+
+  it('enterprise name matches PLANS[2].name', () => {
+    expect(PLAN_DATA_CENTS['enterprise'].name).toBe(PLANS[2].name);
+  });
+
+  it('prices are always integers (no fractional cents)', () => {
+    Object.values(PLAN_DATA_CENTS).forEach((entry) => {
+      expect(Number.isInteger(entry.price)).toBe(true);
+    });
+  });
+
+  it('all three plans are present — no extra keys', () => {
+    expect(Object.keys(PLAN_DATA_CENTS)).toHaveLength(3);
+  });
+
+  // Regression lock: changing a price in PLANS must automatically update cents
+  it('full regression lock — all entries match PLANS[n].price * 100 and name', () => {
+    PLANS.forEach((p) => {
+      expect(PLAN_DATA_CENTS[p.id].price).toBe(p.price * 100);
+      expect(PLAN_DATA_CENTS[p.id].name).toBe(p.name);
+    });
+  });
+});
+
 describe('FAQ_ITEMS export', () => {
   let FAQ_ITEMS: any[];
 
