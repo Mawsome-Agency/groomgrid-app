@@ -8,52 +8,23 @@ import {
   ArrowLeft, CreditCard, Check, AlertCircle, ExternalLink, RefreshCw, Mail,
 } from 'lucide-react';
 import { trackPageView } from '@/lib/ga4';
+import { PLANS as PRICING_PLANS } from '@/app/pricing/pricing-data';
 
-const PLANS = [
-  {
-    id: 'solo',
-    name: 'Solo',
-    price: '$29',
-    period: '/month',
-    description: 'Perfect for independent mobile groomers',
-    features: [
-      'Unlimited appointments',
-      'Client & pet profiles',
-      'Automated reminders',
-      'Payment tracking',
-      'Invoice generation',
-    ],
-  },
-  {
-    id: 'salon',
-    name: 'Salon',
-    price: '$79',
-    period: '/month',
-    description: 'Ideal for salons with 2–5 groomers',
-    popular: true,
-    features: [
-      'Everything in Solo',
-      'Staff scheduling',
-      'Multi-groomer calendar',
-      'Revenue analytics',
-      'Priority support',
-    ],
-  },
-  {
-    id: 'enterprise',
-    name: 'Enterprise',
-    price: '$149',
-    period: '/month',
-    description: 'For large operations',
-    features: [
-      'Everything in Salon',
-      'Unlimited staff',
-      'Custom integrations',
-      'Dedicated account manager',
-      'SLA support',
-    ],
-  },
-];
+const PLAN_DESCRIPTIONS: Record<string, string> = {
+  solo: 'Perfect for independent mobile groomers',
+  salon: 'Ideal for salons with 2–5 groomers',
+  enterprise: 'For large operations',
+};
+
+const PLANS = PRICING_PLANS.map((plan) => ({
+  id: plan.id,
+  name: plan.name,
+  price: `$${plan.price}`,
+  period: '/month',
+  description: PLAN_DESCRIPTIONS[plan.id] ?? '',
+  popular: plan.popular,
+  features: plan.features,
+}));
 
 const PLAN_DISPLAY: Record<string, { label: string; color: string }> = {
   trial: { label: 'Free Trial', color: 'bg-green-100 text-green-700' },

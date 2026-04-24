@@ -143,6 +143,7 @@ jest.mock('@/lib/prisma', () => ({
   prisma: {
     paymentEvent: {
       create: jest.fn().mockResolvedValue({}),
+      upsert: jest.fn().mockResolvedValue({}),
       findFirst: jest.fn().mockResolvedValue(null),
       findUnique: jest.fn().mockResolvedValue(null),
     },
