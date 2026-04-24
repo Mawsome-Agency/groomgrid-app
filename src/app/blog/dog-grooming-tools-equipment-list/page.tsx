@@ -52,6 +52,53 @@ const articleSchema = {
   },
 };
 
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'What equipment does a dog groomer need to start?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'A beginner groomer needs professional clippers ($150–400), a blade set (#10, #7F, #5F, #4F), straight and curved shears ($80–200 each), a slicker brush, steel comb, nail trimmers, styptic powder, shampoo and conditioner, towels, a grooming table ($150–500), and a grooming loop or noose. For mobile groomers, add a portable tub and a generator or battery system. Budget $1,500–3,000 for a starter kit.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'How much does dog grooming equipment cost?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'A basic home or starter setup costs $1,500–3,000 including clippers, shears, table, and basic tools. A fully equipped salon runs $10,000–25,000 adding hydraulic tables, professional tubs, cage dryers, and HVAC. A mobile grooming van conversion starts at $25,000–80,000 including the vehicle, water system, generator, and all grooming equipment.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'What is the best grooming table for a mobile groomer?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Mobile groomers need a compact, lightweight table that fits in a van. Folding hydraulic tables ($200–500) are popular because they adjust height and fold flat for storage. Look for models with a non-slip surface, adjustable grooming arm, and weight capacity of at least 150 lbs. Electric tables ($400–800) are quieter but require a reliable power source.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Do I need a grooming van to start a mobile grooming business?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Not necessarily. Many mobile groomers start with a converted trailer ($5,000–15,000) or even a house-call model using portable equipment transported in an SUV or van. A full grooming van conversion ($25,000–80,000) is a significant investment best made after validating your client base. Start small, build demand, then upgrade.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'What software should I use to manage my grooming business?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Professional grooming software like GroomGrid helps manage scheduling, client and pet profiles, automated reminders, and payments — all from one app. For mobile groomers, it eliminates the need to juggle paper calendars, text messages, and spreadsheets. GroomGrid starts at $29/month and includes AI-powered scheduling and breed-specific time estimates.',
+      },
+    },
+  ],
+};
+
 export default function DogGroomingToolsEquipmentListPage() {
   return (
     <>
@@ -64,6 +111,11 @@ export default function DogGroomingToolsEquipmentListPage() {
         id="article-schema"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
+      />
+      <Script
+        id="faq-schema"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
 
       <div className="min-h-screen bg-white text-stone-900">

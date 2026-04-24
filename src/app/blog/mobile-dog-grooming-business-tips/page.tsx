@@ -52,6 +52,53 @@ const articleSchema = {
   },
 };
 
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'How do I get clients for my mobile dog grooming business?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Start with your local community — post before-and-after photos on neighborhood Facebook groups and Nextdoor. Offer a first-time discount to build reviews. Partner with local vets, pet stores, and dog walkers for referrals. Claim your Google Business Profile and encourage happy clients to leave reviews. Most mobile groomers fill their books within 3–6 months through word of mouth alone.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'How much should I charge for mobile dog grooming?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Mobile grooming commands a premium over salon pricing due to convenience. Typical rates range from $60–150 per dog depending on size, breed, coat condition, and your local market. Small dogs average $60–80, medium dogs $75–100, and large breeds $100–150+. Factor in drive time, fuel, and vehicle costs when setting your base price. Most mobile groomers set a minimum service fee of $50–75 per stop.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'What is the best route planning for mobile groomers?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Group appointments by zip code or neighborhood to minimize drive time. Schedule 4–6 dogs per day with 15–30 minute buffers between stops for travel and cleanup. Avoid booking across town in the same day. Use a scheduling tool that supports geographic grouping — GroomGrid offers route-friendly scheduling that helps mobile groomers cluster appointments by area automatically.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'How do I prevent no-shows as a mobile groomer?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'No-shows are especially costly for mobile groomers because you lose both revenue and fuel. Require a deposit or credit card on file at booking. Send automated reminders 24 hours and 1 hour before the appointment. Implement a cancellation policy (24-hour notice required). GroomGrid users report 30–40% fewer no-shows with automated 3-touch reminder sequences and deposit requirements.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'What software helps run a mobile grooming business?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Mobile groomers need software that works on the road — scheduling, client and pet records, automated reminders, and payment processing in one app. GroomGrid is built mobile-first with features designed specifically for van-based groomers, including route-friendly scheduling, breed-specific time estimates, and automated reminder sequences that reduce no-shows.',
+      },
+    },
+  ],
+};
+
 export default function MobileDogGroomingBusinessTipsPage() {
   return (
     <>
@@ -64,6 +111,11 @@ export default function MobileDogGroomingBusinessTipsPage() {
         id="article-schema"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
+      />
+      <Script
+        id="faq-schema"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
 
       <div className="min-h-screen bg-white text-stone-900">

@@ -170,11 +170,15 @@ function SignupPageInner() {
     trackSignupStarted(formData.businessName);
 
     // Retrieve UTM attribution from sessionStorage (set on page load by useEffect)
-    let attribution = null;
+    let attribution: Record<string, unknown> | null = null;
     if (typeof window !== 'undefined') {
       const stored = sessionStorage.getItem('gg_attribution');
       if (stored) {
-        attribution = JSON.parse(stored);
+        try {
+          attribution = JSON.parse(stored);
+        } catch {
+          // Ignore malformed attribution data — don't block signup
+        }
       }
     }
 
