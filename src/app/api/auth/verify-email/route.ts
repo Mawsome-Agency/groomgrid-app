@@ -2,11 +2,15 @@ import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { trackEmailVerified } from '@/lib/ga4'
 
+// Use the public app URL as redirect base — req.url resolves to localhost:3002
+// behind nginx, which produces unreachable redirects in production.
+const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://app.getgroomgrid.com'
+
 export async function GET(req: NextRequest) {
   const token = req.nextUrl.searchParams.get('token')
 
   if (!token) {
-    return NextResponse.redirect(new URL('/login?error=missing-token', req.url))
+    return NextResponse.redirect(new URL('/login?error=missing-token', appUrl))
   }
 
   try {
@@ -15,7 +19,7 @@ export async function GET(req: NextRequest) {
     })
 
     if (!record || record.expiresAt < new Date() || record.usedAt) {
-      return NextResponse.redirect(new URL('/login?error=invalid-token', req.url))
+      return NextResponse.redirect(new URL('/login?error=invalid-token', appUrl))
     }
 
     await prisma.$transaction([
@@ -32,9 +36,9 @@ export async function GET(req: NextRequest) {
     // Wire: fires once, on the success path only
     trackEmailVerified(record.userId)
 
-    return NextResponse.redirect(new URL('/login?verified=true', req.url))
+    return NextResponse.redirect(new URL('/login?verified=true', appUrl))
   } catch (error) {
     console.error('Email verification error:', error)
-    return NextResponse.redirect(new URL('/login?error=verification-failed', req.url))
+    return NextResponse.redirect(new URL('/login?error=verification-failed', appUrl))
   }
 }
