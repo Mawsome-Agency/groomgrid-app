@@ -387,7 +387,7 @@ describe('POST /api/auth/signup', () => {
   // ── (7) NEXT_PUBLIC_APP_URL fallback ─────────────────────────────────────────
 
   describe('NEXT_PUBLIC_APP_URL fallback', () => {
-    it('uses https://getgroomgrid.com when NEXT_PUBLIC_APP_URL is not set', async () => {
+    it('uses https://app.getgroomgrid.com when NEXT_PUBLIC_APP_URL is not set', async () => {
       delete process.env.NEXT_PUBLIC_APP_URL
 
       const req = makeRequest({
@@ -400,8 +400,9 @@ describe('POST /api/auth/signup', () => {
       const [, verifyUrl]: [string, string] =
         mockSendVerificationEmail.mock.calls[0]
 
+      // Fallback is app subdomain — bare getgroomgrid.com redirects break email verification links
       expect(verifyUrl).toMatch(
-        /^https:\/\/getgroomgrid\.com\/api\/auth\/verify-email\?token=[0-9a-f]{64}$/
+        /^https:\/\/app\.getgroomgrid\.com\/api\/auth\/verify-email\?token=[0-9a-f]{64}$/
       )
     })
 
