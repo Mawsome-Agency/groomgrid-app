@@ -68,6 +68,32 @@ export const PLANS: Plan[] = [
   },
 ];
 
+// Warn at startup if Stripe price IDs are missing (server-side only)
+if (typeof window === 'undefined' && process.env.NODE_ENV === 'production') {
+  const missing = PLANS.filter(p => !p.stripe_price_id).map(p => p.id)
+  if (missing.length > 0) {
+    console.error(
+      `[pricing-data] Missing Stripe price IDs for plans: ${missing.join(', ')}. ` +
+        'Set STRIPE_PRICE_SOLO, STRIPE_PRICE_SALON, STRIPE_PRICE_ENTERPRISE env vars.'
+    )
+  }
+}
+
+/**
+ * Get the Stripe price ID for a plan.
+ * Throws a clear error if the env var is not set — prevents cryptic Stripe API errors.
+ */
+export function getPlanStripeId(planId: string): string {
+  const plan = PLANS.find(p => p.id === planId)
+  if (!plan) throw new Error(`Unknown plan: ${planId}`)
+  if (!plan.stripe_price_id) {
+    throw new Error(
+      `STRIPE_PRICE_${planId.toUpperCase()} env var is not set. Cannot create checkout session.`
+    )
+  }
+  return plan.stripe_price_id
+}
+
 // Prices in cents, derived from PLANS — no manual sync needed.
 // Import this in API routes instead of hardcoding local PLAN_DATA objects.
 export const PLAN_DATA_CENTS: Record<string, { name: string; price: number }> =

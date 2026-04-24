@@ -39,6 +39,24 @@ export const authOptions: NextAuthOptions = {
   jwt: {
     maxAge: 30 * 60,      // 30 minutes
   },
+  cookies: {
+    sessionToken: {
+      name:
+        process.env.NODE_ENV === 'production'
+          ? '__Secure-next-auth.session-token'
+          : 'next-auth.session-token',
+      options: {
+        httpOnly: true,
+        sameSite: 'lax' as const,
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+        // Shared across *.getgroomgrid.com so app.getgroomgrid.com sessions
+        // are visible on getgroomgrid.com/plans and vice versa.
+        domain:
+          process.env.NODE_ENV === 'production' ? '.getgroomgrid.com' : undefined,
+      },
+    },
+  },
   callbacks: {
     async jwt({ token, user }) {
       if (user) {

@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
     // Wire: fires once, on the success path only
     trackEmailVerified(record.userId)
 
-    return NextResponse.redirect(new URL('/login?verified=true', appUrl))
+    return NextResponse.redirect(new URL('/login?verified=true&next=/plans', appUrl))
   } catch (error) {
     console.error('Email verification error:', error)
     return NextResponse.redirect(new URL('/login?error=verification-failed', appUrl))
