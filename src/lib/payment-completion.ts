@@ -15,6 +15,7 @@
 import Stripe from 'stripe';
 import prisma from '@/lib/prisma';
 import { trackCheckoutCompletedServer, trackSubscriptionStartedServer, trackPurchaseCompletedServer } from '@/lib/ga4-server';
+import { PLAN_DATA_CENTS } from '@/app/pricing/pricing-data';
 import type { Prisma } from '@prisma/client';
 
 export type PaymentEventType = 'PAYMENT_INITIATED' | 'PAYMENT_CONFIRMED' | 'COMPLETION_PROCESSED';
@@ -121,19 +122,11 @@ export async function triggerPaymentCompletionHandler(
     // Order matters for funnel tracking
     await trackCheckoutCompletedServer(clientId || userId, userId, session.id, planType, true);
 
-    // Map planType to price and display name
-    const planPriceMap: Record<string, number> = {
-      solo: 29,
-      salon: 79,
-      enterprise: 149,
-    };
-    const planNameMap: Record<string, string> = {
-      solo: 'Solo',
-      salon: 'Salon',
-      enterprise: 'Enterprise',
-    };
-    const planPrice = planPriceMap[planType] ?? 0;
-    const planName = planNameMap[planType] ?? planType;
+    // Derive price and display name from the single source of truth.
+    // PLAN_DATA_CENTS stores prices in cents — divide by 100 for GA4 revenue events.
+    const planData = PLAN_DATA_CENTS[planType];
+    const planPrice = planData ? planData.price / 100 : 0;
+    const planName = planData ? planData.name : planType;
 
     await trackPurchaseCompletedServer(clientId || userId, userId, session.id, planName, planPrice);
 

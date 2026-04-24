@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
     })
 
     // Send password reset email
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://getgroomgrid.com'
     const resetUrl = `${appUrl}/reset-password?token=${token}`
 
     await sendPasswordResetEmail(normalizedEmail, resetUrl)

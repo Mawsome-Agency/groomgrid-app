@@ -4,7 +4,7 @@ import { trackEmailVerified } from '@/lib/ga4'
 
 // Use the public app URL as redirect base — req.url resolves to localhost:3002
 // behind nginx, which produces unreachable redirects in production.
-const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://app.getgroomgrid.com'
+const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://getgroomgrid.com'
 
 export async function GET(req: NextRequest) {
   const token = req.nextUrl.searchParams.get('token')

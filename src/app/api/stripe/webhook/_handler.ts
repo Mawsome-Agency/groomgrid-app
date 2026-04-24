@@ -10,11 +10,16 @@ import { updatePaymentLockoutStatus } from '@/lib/payment-lockout';
 import type Stripe from 'stripe';
 
 /**
- * Check if event has already been processed for idempotency
+ * Check if event has already been processed for idempotency.
+ * Filters by normalized event type so PAYMENT_CONFIRMED records
+ * (which store webhookEventId, not eventId) don't cause false positives
+ * during the window between transaction commit and completion handler success.
  */
 async function isEventProcessed(eventId: string, eventType: string): Promise<boolean> {
+  const normalizedType = eventType.toUpperCase().replace(/\./g, '_');
   const existing = await prisma.paymentEvent.findFirst({
     where: {
+      eventType: normalizedType,
       payload: {
         path: ['eventId'],
         equals: eventId,
@@ -72,30 +77,24 @@ export const handleStripeEvent = async (event: Stripe.Event) => {
       if (userId && userId !== 'anonymous') {
         // Wrap related operations in a transaction for consistency
         await prisma.$transaction(async (tx) => {
-          // Create PAYMENT_CONFIRMED event to signal webhook received
-          await tx.paymentEvent.create({
-            data: {
+          // Upsert PAYMENT_CONFIRMED — idempotent on Stripe retries (unique constraint:
+          // paymentId+eventType). Uses webhookEventId (not eventId) in payload so that
+          // isEventProcessed() — which queries payload.eventId — cannot match this record
+          // before the CHECKOUT_SESSION_COMPLETED idempotency marker is written below.
+          await tx.paymentEvent.upsert({
+            where: {
+              paymentId_eventType: { paymentId, eventType: 'PAYMENT_CONFIRMED' },
+            },
+            create: {
               paymentId,
               eventType: 'PAYMENT_CONFIRMED',
               payload: {
                 userId,
                 sessionId: session.id,
-                eventId: event.id,
+                webhookEventId: event.id, // renamed from eventId — no collision with idempotency check
               },
             },
-          });
-
-          // Record event processing for idempotency
-          await tx.paymentEvent.create({
-            data: {
-              paymentId: event.id,
-              eventType: 'EVENT_PROCESSED',
-              payload: {
-                eventId: event.id,
-                originalPaymentId: paymentId,
-                processedAt: new Date().toISOString(),
-              },
-            },
+            update: {}, // no-op if already committed on a previous attempt
           });
 
           // Update payment lockout status if exists
@@ -111,11 +110,17 @@ export const handleStripeEvent = async (event: Stripe.Event) => {
           }
         });
 
-        // Trigger payment completion handler (outside transaction - it has its own)
+        // Trigger payment completion handler (outside transaction - it has its own idempotency)
         await triggerPaymentCompletionHandler({
           ...session,
           metadata: session.metadata ?? undefined,
         });
+
+        // Write idempotency marker AFTER completion handler succeeds.
+        // Placing this last closes the race window: if triggerPaymentCompletionHandler
+        // throws, Stripe retries will find no CHECKOUT_SESSION_COMPLETED record and
+        // correctly re-run the completion handler instead of silently skipping it.
+        await recordEventProcessed(event.id, event.type, paymentId);
       } else if (userId === 'anonymous') {
         console.warn(`[Webhook] checkout.session.completed with userId='anonymous' — session ${session.id} cannot be linked to a real user. This session was likely created by the legacy unauthenticated checkout endpoint.`);
       }
