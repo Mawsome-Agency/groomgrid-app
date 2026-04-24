@@ -6,6 +6,10 @@ import prisma from '@/lib/prisma';
 import { ensureEnv } from '@/lib/validation';
 import { PLANS } from '@/app/pricing/pricing-data';
 
+// Use the public app URL as redirect base — req.url resolves to localhost:3002
+// behind nginx, which produces unreachable redirects in production.
+const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://app.getgroomgrid.com';
+
 // Derive valid plan types and price data from the single source of truth.
 // Prices are stored in cents for Stripe.
 const VALID_PLANS = PLANS.map((p) => p.type) as readonly string[];
@@ -27,7 +31,7 @@ export async function GET(req: NextRequest) {
   // ── Authentication check ──────────────────────────────────────────
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
-    const loginUrl = new URL('/login', req.url);
+    const loginUrl = new URL('/login', appUrl);
     loginUrl.searchParams.set('next', '/plans');
     return NextResponse.redirect(loginUrl, 302);
   }
