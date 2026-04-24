@@ -10,16 +10,88 @@ import Step3BusinessHours, { BusinessHoursForm } from '@/components/onboarding/S
 import CompletionScreen from '@/components/onboarding/CompletionScreen';
 import { trackOnboardingStep, trackOnboardingCompleted, trackOnboardingSkipped, trackPageView } from '@/lib/ga4';
 
+// ── Skeleton loader matching the onboarding page layout ──────────────────────
+function OnboardingSkeleton() {
+  return (
+    <div
+      className="min-h-screen bg-gradient-to-br from-green-50 to-stone-50 py-12 px-4"
+      aria-busy="true"
+      aria-label="Loading onboarding"
+    >
+      <div className="max-w-2xl mx-auto">
+        {/* Logo */}
+        <div className="text-center mb-8 animate-pulse">
+          <div className="h-8 bg-stone-200 rounded w-32 mx-auto" />
+        </div>
+
+        {/* Progress indicator skeleton — 3 steps */}
+        <div className="w-full max-w-2xl mx-auto mb-8">
+          <div className="flex items-center justify-between animate-pulse">
+            {['Client', 'Appointment', 'Hours'].map((label, i) => (
+              <div key={label} className="flex-1 flex flex-col items-center">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center mb-2 ${i === 0 ? 'bg-green-500' : 'bg-stone-100'}`}>
+                  <span className={`text-sm font-semibold ${i === 0 ? 'text-white' : 'text-stone-400'}`}>{i + 1}</span>
+                </div>
+                <span className={`text-xs font-medium text-center max-w-[80px] ${i === 0 ? 'text-green-700' : 'text-stone-400'}`}>
+                  {label}
+                </span>
+              </div>
+            ))}
+          </div>
+          <div className="relative mt-2">
+            <div className="absolute top-0 left-0 h-1 bg-stone-200 w-full rounded-full" />
+          </div>
+        </div>
+
+        {/* Card skeleton */}
+        <div className="bg-white rounded-2xl shadow-xl p-8 animate-pulse">
+          {/* Title */}
+          <div className="h-7 bg-stone-200 rounded w-3/4 mb-2" />
+          <div className="h-4 bg-stone-200 rounded w-1/2 mb-6" />
+
+          {/* Form fields */}
+          <div className="space-y-4">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i}>
+                <div className="h-4 bg-stone-200 rounded w-1/4 mb-2" />
+                <div className="h-12 bg-stone-100 rounded-xl" />
+              </div>
+            ))}
+          </div>
+
+          {/* CTA button */}
+          <div className="h-12 bg-stone-200 rounded-xl w-full mt-6" />
+        </div>
+
+        {/* Skip link skeleton */}
+        <div className="text-center mt-6">
+          <div className="h-4 bg-stone-200 rounded w-64 mx-auto" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // Days in the order the business-hours API expects (index 0 = Sunday)
 const DAYS_API_ORDER = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'] as const;
+
+// Minimum time the skeleton is visible to avoid a broken-feeling flash
+const MIN_SKELETON_MS = 2000;
 
 export default function OnboardingPage() {
   const router = useRouter();
   const { data: session, status } = useSession();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [minDisplayElapsed, setMinDisplayElapsed] = useState(false);
   const [stepLoading, setStepLoading] = useState(false);
   const [stepError, setStepError] = useState<string | null>(null);
+
+  // Enforce 2-second minimum skeleton display
+  useEffect(() => {
+    const timer = setTimeout(() => setMinDisplayElapsed(true), MIN_SKELETON_MS);
+    return () => clearTimeout(timer);
+  }, []);
 
   // State for onboarding data — includes API-returned ids after Step 1
   const [clientData, setClientData] = useState<{
@@ -240,12 +312,9 @@ export default function OnboardingPage() {
     router.push('/dashboard');
   };
 
-  if (status === 'loading' || loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-stone-50 flex items-center justify-center">
-        <div className="text-center">Loading...</div>
-      </div>
-    );
+  // Show skeleton while session is resolving OR data is loading OR minimum display time hasn't elapsed
+  if (status === 'loading' || loading || !minDisplayElapsed) {
+    return <OnboardingSkeleton />;
   }
 
   return (
