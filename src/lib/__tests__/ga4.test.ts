@@ -38,6 +38,8 @@ describe('ga4.ts', () => {
     window.gtag = jest.fn();
     window.dataLayer = [];
     localStorage.clear();
+    sessionStorage.clear();
+    global.fetch = jest.fn().mockResolvedValue({ ok: true });
   });
 
   afterEach(() => {
@@ -246,6 +248,39 @@ describe('ga4.ts', () => {
         business_name: undefined,
         timestamp: expect.any(String),
       });
+    });
+
+    it('should POST signup_started to /api/analytics/track with business_name', () => {
+      trackSignupStarted('Pawsome Grooming');
+
+      expect(global.fetch).toHaveBeenCalledWith(
+        '/api/analytics/track',
+        expect.objectContaining({
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: expect.stringContaining('"eventName":"signup_started"'),
+        })
+      );
+
+      const [, options] = (global.fetch as jest.Mock).mock.calls[0];
+      const body = JSON.parse(options.body);
+      expect(body.properties).toEqual({ business_name: 'Pawsome Grooming' });
+    });
+
+    it('should include a sessionId in local track POST body', () => {
+      trackSignupStarted('Pawsome Grooming');
+
+      const [, options] = (global.fetch as jest.Mock).mock.calls[0];
+      const body = JSON.parse(options.body);
+      expect(body.sessionId).toMatch(/^sess_\d+_[a-z0-9]+$/);
+    });
+
+    it('should still POST local track even when GA4 analytics are disabled', () => {
+      delete process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID;
+      trackSignupStarted('Test Business');
+
+      expect(window.gtag).not.toHaveBeenCalled();
+      expect(global.fetch).toHaveBeenCalledWith('/api/analytics/track', expect.anything());
     });
   });
 
@@ -1259,6 +1294,45 @@ describe('ga4.ts', () => {
       trackSignupViewed();
 
       expect(window.gtag).not.toHaveBeenCalled();
+    });
+
+    it('should POST signup_viewed to /api/analytics/track for local DB storage', () => {
+      trackSignupViewed();
+
+      expect(global.fetch).toHaveBeenCalledWith(
+        '/api/analytics/track',
+        expect.objectContaining({
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: expect.stringContaining('"eventName":"signup_viewed"'),
+        })
+      );
+    });
+
+    it('should include sessionId in local track POST body', () => {
+      trackSignupViewed();
+
+      const [, options] = (global.fetch as jest.Mock).mock.calls[0];
+      const body = JSON.parse(options.body);
+      expect(body.sessionId).toMatch(/^sess_\d+_[a-z0-9]+$/);
+    });
+
+    it('should reuse existing sessionId from sessionStorage', () => {
+      sessionStorage.setItem('gg_session_id', 'sess_existing_abc123');
+      trackSignupViewed();
+
+      const [, options] = (global.fetch as jest.Mock).mock.calls[0];
+      const body = JSON.parse(options.body);
+      expect(body.sessionId).toBe('sess_existing_abc123');
+    });
+
+    it('should still POST local track even when GA4 analytics are disabled', () => {
+      delete process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID;
+      trackSignupViewed();
+
+      // gtag is skipped but local tracking still fires
+      expect(window.gtag).not.toHaveBeenCalled();
+      expect(global.fetch).toHaveBeenCalledWith('/api/analytics/track', expect.anything());
     });
   });
 
