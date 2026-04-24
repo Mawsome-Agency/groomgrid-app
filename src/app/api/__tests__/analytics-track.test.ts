@@ -181,7 +181,9 @@ describe('POST /api/analytics/track', () => {
       const body = await res.json()
 
       expect(res.status).toBe(500)
-      expect(body.error).toContain('DB connection failed')
+      // Error message should NOT leak internal details (OWASP)
+      expect(body.error).toBe('Failed to track event')
+      expect(body.error).not.toContain('DB connection')
     })
   })
 })

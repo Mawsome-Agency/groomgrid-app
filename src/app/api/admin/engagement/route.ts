@@ -1,7 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/next-auth-options'
 import prisma from '@/lib/prisma'
 
 export async function GET(req: NextRequest) {
+  // ── Auth guard ──────────────────────────────────────────────────────
+  const session = await getServerSession(authOptions)
+  if (!session?.user?.id) {
+    return NextResponse.json(
+      { error: 'Authentication required' },
+      { status: 401 },
+    )
+  }
+
   const { searchParams } = new URL(req.url)
   const limit = Math.min(parseInt(searchParams.get('limit') ?? '50', 10), 200)
   const offset = parseInt(searchParams.get('offset') ?? '0', 10)
@@ -34,7 +45,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ data, total, limit, offset })
   } catch (error: any) {
     return NextResponse.json(
-      { error: `Failed to fetch engagement data: ${error.message}` },
+      { error: 'Failed to fetch engagement data' },
       { status: 500 }
     )
   }
