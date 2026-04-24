@@ -52,6 +52,53 @@ const articleSchema = {
   },
 };
 
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'Is GroomGrid cheaper than MoeGo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'GroomGrid starts at $29/month for the Solo tier. MoeGo starts around $49/month. For independent and mobile groomers, GroomGrid is meaningfully cheaper while offering AI-powered scheduling that MoeGo lacks.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Does GroomGrid have all the features MoeGo has?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'GroomGrid covers the core features solo and small salon groomers need — scheduling, automated reminders, client/pet profiles, integrated payments, and online booking. MoeGo has more enterprise features like multi-location management, but these add complexity and cost most independent groomers do not need.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Can I import my MoeGo data into GroomGrid?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Yes. You can export your client list and pet records from MoeGo as a CSV and import them into GroomGrid. The process typically takes under an hour. GroomGrid support can assist with migration.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Is MoeGo or GroomGrid better for mobile groomers?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'GroomGrid is designed mobile-first from the ground up — it works on any device in the field, requires no desktop app, and includes route-friendly scheduling. MoeGo is mobile-accessible but was originally built for brick-and-mortar salons.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Does GroomGrid have AI features that MoeGo lacks?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Yes. GroomGrid includes AI-powered scheduling suggestions, AI breed detection from photos, and automated 3-touch reminder sequences. These are not available in MoeGo.',
+      },
+    },
+  ],
+};
+
 export default function GroomGridVsMoeGoPage() {
   return (
     <>
@@ -64,6 +111,11 @@ export default function GroomGridVsMoeGoPage() {
         id="article-schema"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
+      />
+      <Script
+        id="faq-schema"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
 
       <div className="min-h-screen bg-white text-stone-900">
