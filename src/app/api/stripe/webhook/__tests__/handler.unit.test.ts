@@ -121,17 +121,17 @@ jest.mock('@/lib/payment-completion');
 // Explicit factory so every export is a proper jest.fn() (auto-mock doesn't reliably
 // create jest spies for async functions in the node test environment)
 jest.mock('@/lib/ga4-server', () => ({
-  trackServerEvent: jest.fn(),
-  trackCheckoutCompletedServer: jest.fn(),
-  trackSubscriptionCreatedServer: jest.fn(),
-  trackSubscriptionUpdatedServer: jest.fn(),
-  trackSubscriptionCancelledServer: jest.fn(),
-  trackSubscriptionStartedServer: jest.fn(),
-  trackPaymentInitiatedServer: jest.fn(),
-  trackPaymentSuccessServer: jest.fn(),
-  trackPaymentFailedServer: jest.fn(),
-  trackABTestAssignedServer: jest.fn(),
-  trackABTestConvertedServer: jest.fn(),
+  trackServerEvent: jest.fn().mockResolvedValue(undefined),
+  trackCheckoutCompletedServer: jest.fn().mockResolvedValue(undefined),
+  trackSubscriptionCreatedServer: jest.fn().mockResolvedValue(undefined),
+  trackSubscriptionUpdatedServer: jest.fn().mockResolvedValue(undefined),
+  trackSubscriptionCancelledServer: jest.fn().mockResolvedValue(undefined),
+  trackSubscriptionStartedServer: jest.fn().mockResolvedValue(undefined),
+  trackPaymentInitiatedServer: jest.fn().mockResolvedValue(undefined),
+  trackPaymentSuccessServer: jest.fn().mockResolvedValue(undefined),
+  trackPaymentFailedServer: jest.fn().mockResolvedValue(undefined),
+  trackABTestAssignedServer: jest.fn().mockResolvedValue(undefined),
+  trackABTestConvertedServer: jest.fn().mockResolvedValue(undefined),
 }));
 jest.mock('@/lib/payment-lockout', () => ({
   updatePaymentLockoutStatus: jest.fn(),
@@ -332,7 +332,7 @@ describe('handleStripeEvent', () => {
   });
 
   describe('customer.subscription.created', () => {
-    it('should log subscription creation', async () => {
+    it('should log subscription creation and fire subscription_started tracking', async () => {
       const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
       const event = createMockStripeEvent({
         type: 'customer.subscription.created',
@@ -340,7 +340,8 @@ describe('handleStripeEvent', () => {
           object: {
             id: 'sub_new',
             status: 'active',
-            metadata: { userId: 'test_user' },
+            metadata: { userId: 'test_user', planType: 'solo' },
+            plan: { amount: 2900 },
           },
         },
       } as any);
@@ -349,6 +350,14 @@ describe('handleStripeEvent', () => {
 
       expect(consoleSpy).toHaveBeenCalledWith(
         expect.stringContaining('subscription.created for user test_user')
+      );
+      expect(ga4.trackSubscriptionStartedServer).toHaveBeenCalledWith(
+        'test_user',
+        'test_user',
+        'sub_new',
+        'solo',
+        'active',
+        2900
       );
       consoleSpy.mockRestore();
     });
