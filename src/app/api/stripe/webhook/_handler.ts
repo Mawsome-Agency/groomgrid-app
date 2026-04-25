@@ -1,5 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import {
+  trackCheckoutCompletedServer,
+  trackSubscriptionStartedServer,
   trackSubscriptionUpdatedServer,
   trackSubscriptionCancelledServer,
   trackPaymentSuccessServer,
@@ -116,6 +118,17 @@ export const handleStripeEvent = async (event: Stripe.Event) => {
           metadata: session.metadata ?? undefined,
         });
 
+        // Fire checkout_completed server-side event for GA4 + local analytics
+        const planType = session.metadata?.planType ?? 'unknown';
+        const trialStarted = session.metadata?.trialStarted === 'true';
+        await trackCheckoutCompletedServer(
+          userId,
+          userId,
+          session.id,
+          planType,
+          trialStarted
+        ).catch((err) => console.error('[Webhook] checkout_completed tracking failed:', err));
+
         // Write idempotency marker AFTER completion handler succeeds.
         // Placing this last closes the race window: if triggerPaymentCompletionHandler
         // throws, Stripe retries will find no CHECKOUT_SESSION_COMPLETED record and
@@ -131,6 +144,17 @@ export const handleStripeEvent = async (event: Stripe.Event) => {
       const userId = subscription.metadata?.userId;
       if (userId) {
         console.log(`[Webhook] subscription.created for user ${userId}: ${subscription.status}`);
+        const planType = subscription.metadata?.planType ?? 'unknown';
+        const price = (subscription as any).plan?.amount ?? 0;
+        // Fire subscription_started server-side event for GA4 + local analytics
+        await trackSubscriptionStartedServer(
+          userId,
+          userId,
+          subscription.id,
+          planType,
+          subscription.status,
+          price
+        ).catch((err) => console.error('[Webhook] subscription_started tracking failed:', err));
       }
       // Record event processing
       await recordEventProcessed(event.id, event.type, subscription.id);
