@@ -43,7 +43,7 @@ export default defineConfig({
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
-      testIgnore: ['**/dashboard.spec.ts', '**/onboarding.spec.ts'],
+      testIgnore: ['**/dashboard.spec.ts', '**/onboarding.spec.ts', '**/production-smoke.spec.ts'],
     },
 
     /**
@@ -58,6 +58,21 @@ export default defineConfig({
       },
       testMatch: ['**/dashboard.spec.ts', '**/onboarding.spec.ts'],
       dependencies: ['setup'],
+    },
+
+    /**
+     * Production smoke tests — runs against production environment
+     * ⚠️ Creates real user accounts. Use with caution.
+     */
+    {
+      name: 'production',
+      use: {
+        ...devices['Desktop Chrome'],
+        baseURL: 'https://getgroomgrid.com',
+        trace: 'on',
+        screenshot: 'on',
+      },
+      testMatch: ['**/production-smoke.spec.ts'],
     },
   ],
 });
