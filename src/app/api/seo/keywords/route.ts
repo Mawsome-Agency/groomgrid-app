@@ -47,7 +47,8 @@ export async function GET(req: NextRequest) {
     const minVolume = parseInt(searchParams.get('minVolume') || '0', 10);
 
     // Rate limiting based on IP and type
-    const ip = req.ip || req.headers.get('x-forwarded-for') || 'unknown';
+    const forwarded = req.headers.get('x-forwarded-for');
+    const ip = forwarded ? forwarded.split(',')[0].trim() : 'unknown';
     const rateLimitKey = `seo-keywords:${type}:${ip}`;
     const rateLimit = RATE_LIMITS[type as keyof typeof RATE_LIMITS] || RATE_LIMITS.competitor;
     const { allowed, retryAfter } = checkRateLimit(rateLimitKey, rateLimit.limit, rateLimit.windowMs);

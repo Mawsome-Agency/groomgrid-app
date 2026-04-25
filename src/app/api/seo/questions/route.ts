@@ -25,7 +25,8 @@ export async function GET(req: NextRequest) {
     const session = await getServerSession(authOptions);
 
     // Rate limiting by IP
-    const ip = req.ip || req.headers.get('x-forwarded-for') || 'unknown';
+    const forwarded = req.headers.get('x-forwarded-for');
+    const ip = forwarded ? forwarded.split(',')[0].trim() : 'unknown';
     const rateLimitKey = `seo-questions:${ip}`;
     const { allowed, retryAfter } = checkRateLimit(rateLimitKey, RATE_LIMIT.limit, RATE_LIMIT.windowMs);
 
