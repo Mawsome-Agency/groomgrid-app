@@ -19,6 +19,7 @@ export interface HealthReport {
   status: 'healthy' | 'degraded' | 'critical';
   timestamp: string;
   version: string;
+  buildId: string;
   environment: string;
   uptimeSeconds: number;
   checks: HealthCheckResult[];
@@ -115,10 +116,22 @@ export async function buildHealthReport(): Promise<HealthReport> {
   // Environment variable checks (sync)
   checks.push(...checkEnvironmentVars());
 
+  // Read the Next.js build ID for version change detection
+  let buildId = 'unknown';
+  try {
+    const fs = await import('fs');
+    const path = await import('path');
+    const buildIdPath = path.join(process.cwd(), '.next', 'BUILD_ID');
+    buildId = fs.readFileSync(buildIdPath, 'utf-8').trim();
+  } catch {
+    // BUILD_ID not available (dev mode or missing file)
+  }
+
   return {
     status: computeStatus(checks),
     timestamp: new Date().toISOString(),
     version: process.env.APP_VERSION || 'unknown',
+    buildId,
     environment: process.env.NODE_ENV || 'unknown',
     uptimeSeconds: Math.floor(process.uptime()),
     checks,
