@@ -70,6 +70,24 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Profile not found', errorType: 'generic' }, { status: 404 });
     }
 
+    // Trial guard: if user is on an active trial, they should select their plan
+    // via the profile PATCH endpoint (no Stripe needed). This prevents the mismatch
+    // between "No credit card required" messaging and Stripe's card demand.
+    const isOnActiveTrial =
+      profile.subscriptionStatus === 'trial' &&
+      profile.trialEndsAt &&
+      new Date(profile.trialEndsAt) > new Date();
+
+    if (isOnActiveTrial) {
+      return NextResponse.json(
+        {
+          error: 'Trial users can select a plan without payment. Use the plan selection UI instead.',
+          errorType: 'trial_active',
+        },
+        { status: 400 }
+      );
+    }
+
     const checkoutSession = await createCheckoutSession({
       userId,
       planType: planType as PlanType,
