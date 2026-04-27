@@ -80,6 +80,8 @@ function PlansPageInner() {
   const [isCheckoutInFlight, setIsCheckoutInFlight] = useState<boolean>(false);
   const planGridRef = useRef<HTMLDivElement>(null);
   const planViewedFiredRef = useRef(false);
+  const [isOnTrial, setIsOnTrial] = useState(false);
+  const [trialEndsAt, setTrialEndsAt] = useState<Date | null>(null);
 
   const coupon = searchParams.get('coupon') || undefined;
 
@@ -96,6 +98,29 @@ function PlansPageInner() {
       trialDays: 14,
     };
   };
+
+  // Fetch profile to determine trial status for authenticated users
+  useEffect(() => {
+    if (status !== 'authenticated' || !session?.user?.id) return;
+
+    const fetchProfile = async () => {
+      try {
+        const res = await fetch('/api/profile');
+        if (res.ok) {
+          const profile = await res.json();
+          const isTrial = profile.subscriptionStatus === 'trial';
+          const endsAt = profile.trialEndsAt ? new Date(profile.trialEndsAt) : null;
+          const isActive = isTrial && endsAt && endsAt > new Date();
+          setIsOnTrial(!!isActive);
+          setTrialEndsAt(endsAt);
+        }
+      } catch {
+        // Non-blocking — fall back to Stripe checkout if profile fetch fails
+      }
+    };
+
+    fetchProfile();
+  }, [status, session]);
 
   useEffect(() => {
     trackPageView('/plans', 'Plan Selection');
@@ -115,7 +140,8 @@ function PlansPageInner() {
 
   /**
    * Handle plan selection:
-   * - Authenticated users → proceed to Stripe checkout
+   * - Trial users → save plan choice to profile (no Stripe), redirect to dashboard
+   * - Non-trial authenticated users → proceed to Stripe checkout
    * - Unauthenticated users → redirect to signup with coupon preserved
    */
   const handleSelectPlan = async (plan: Plan) => {
@@ -135,8 +161,34 @@ function PlansPageInner() {
 
     setIsCheckoutInFlight(true);
 
-    // Fire client-side GA4 events before redirect
+    // Fire client-side GA4 events
     trackPlanSelected(plan.type, plan.price);
+
+    // Trial users: save plan choice directly — no Stripe checkout needed
+    if (isOnTrial) {
+      try {
+        const response = await fetch('/api/profile', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ planType: plan.type }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to save plan selection');
+        }
+
+        // Redirect to dashboard with confirmation
+        router.push(`/dashboard?plan_selected=${encodeURIComponent(plan.name)}`);
+      } catch (err: any) {
+        console.error('Plan selection error:', err);
+        setCheckoutError('Failed to save your plan selection. Please try again.');
+        setIsCheckoutInFlight(false);
+        setSelectedPlan(null);
+      }
+      return;
+    }
+
+    // Non-trial users: proceed to Stripe checkout for payment
     trackCheckoutStarted(plan.name, plan.price);
     trackBillingSummaryViewed(plan.name, plan.price * 100, true);
 
