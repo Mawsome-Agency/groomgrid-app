@@ -26,12 +26,20 @@ export async function PATCH(req: NextRequest) {
     const body = await req.json()
     const { onboardingStep, onboardingCompleted, welcomeShown, ...rest } = body
 
+    const VALID_PLAN_TYPES = ['solo', 'salon', 'enterprise']
+
     const data: Record<string, unknown> = {}
     if (onboardingStep !== undefined) data.onboardingStep = onboardingStep
     if (onboardingCompleted !== undefined) data.onboardingCompleted = onboardingCompleted
     if (welcomeShown !== undefined) data.welcomeShown = welcomeShown
     if (rest.businessName !== undefined) data.businessName = rest.businessName
     if (rest.phone !== undefined) data.phone = rest.phone
+    if (rest.planType !== undefined) {
+      if (!VALID_PLAN_TYPES.includes(rest.planType)) {
+        return NextResponse.json({ error: 'Invalid plan type' }, { status: 400 })
+      }
+      data.planType = rest.planType
+    }
 
     const profile = await prisma.profile.update({
       where: { userId: session.user.id },
