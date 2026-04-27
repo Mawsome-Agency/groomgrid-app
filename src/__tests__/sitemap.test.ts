@@ -38,6 +38,9 @@ describe('Sitemap Generation', () => {
     expect(urls).toContain('https://getgroomgrid.com/blog/free-dog-grooming-software');
     expect(urls).toContain('https://getgroomgrid.com/blog/groomgrid-vs-daysmart');
     expect(urls).toContain('https://getgroomgrid.com/blog/groomgrid-vs-pawfinity');
+    expect(urls).toContain('https://getgroomgrid.com/blog/how-much-do-dog-groomers-make');
+    expect(urls).toContain('https://getgroomgrid.com/blog/dog-grooming-business-insurance');
+    expect(urls).toContain('https://getgroomgrid.com/blog/dog-grooming-appointment-app');
   });
 
   it('should include SEO landing pages', () => {
@@ -131,7 +134,7 @@ describe('Sitemap Generation', () => {
   it('should have total entries matching all pages', () => {
     const result = sitemap();
 
-    // 4 static pages + 7 landing pages + 28 blog posts = 39 total
-    expect(result.length).toBe(39);
+    // 4 static pages + 7 landing pages + 30 blog posts = 41 total
+    expect(result.length).toBe(41);
   });
 });
