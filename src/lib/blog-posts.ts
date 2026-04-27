@@ -144,4 +144,28 @@ export const blogPosts: BlogPost[] = [
     description: 'Comparing GroomGrid vs Pawfinity for your mobile grooming business? See how AI features, mobile-first design, automated reminders, and pricing compare — and why groomers are upgrading.',
     publishedAt: '2026-04-24',
   },
+  {
+    slug: 'cat-grooming-business-guide',
+    title: 'How to Start a Cat Grooming Business: The Complete Guide',
+    description: 'Everything you need to start a cat grooming business — certifications, pricing ($80–$150/cat), handling techniques, scheduling, and the tools to manage it all.',
+    publishedAt: '2026-04-24',
+  },
+  {
+    slug: 'dog-grooming-pricing-guide',
+    title: 'Dog Grooming Pricing Guide: How Much to Charge in 2026',
+    description: 'Complete dog grooming pricing guide with average costs by breed size, service type, and region. Includes mobile vs salon pricing, add-on rates, and strategies for setting your prices.',
+    publishedAt: '2026-04-27',
+  },
+  {
+    slug: 'how-to-become-a-dog-groomer',
+    title: 'How to Become a Dog Groomer: Certification, Training & Career Guide',
+    description: 'Step-by-step guide to becoming a professional dog groomer — certification programs, training costs, apprenticeships, salary expectations, and how to start your own grooming business.',
+    publishedAt: '2026-04-27',
+  },
+  {
+    slug: 'do-you-tip-dog-groomers',
+    title: 'Do You Tip Dog Groomers? How Much & When (Complete Guide)',
+    description: 'Everything pet owners and new groomers need to know about tipping dog groomers — standard tip amounts, when to tip extra, holiday tipping, and what groomers really think about tips.',
+    publishedAt: '2026-04-27',
+  },
 ].sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
