@@ -168,4 +168,22 @@ export const blogPosts: BlogPost[] = [
     description: 'Everything pet owners and new groomers need to know about tipping dog groomers — standard tip amounts, when to tip extra, holiday tipping, and what groomers really think about tips.',
     publishedAt: '2026-04-27',
   },
+  {
+    slug: 'how-much-do-dog-groomers-make',
+    title: 'How Much Do Dog Groomers Make? Salary & Income Guide (2026)',
+    description: 'Dog groomer salary breakdown for 2026 — hourly rates, annual income, mobile vs salon pay, commission structures, and how to maximize your grooming income.',
+    publishedAt: '2026-04-27',
+  },
+  {
+    slug: 'dog-grooming-business-insurance',
+    title: 'Dog Grooming Business Insurance: What You Need & What It Costs (2026)',
+    description: 'Complete guide to dog grooming business insurance — general liability, professional liability, commercial auto, workers comp, and how much to budget.',
+    publishedAt: '2026-04-27',
+  },
+  {
+    slug: 'dog-grooming-appointment-app',
+    title: 'Best Dog Grooming Appointment App (2026): Scheduling, Reminders & Payments',
+    description: 'Compare the best dog grooming appointment apps for 2026 — scheduling, automated reminders, online booking, payment processing, and client management features.',
+    publishedAt: '2026-04-27',
+  },
 ].sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
