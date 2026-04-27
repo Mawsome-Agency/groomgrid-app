@@ -38,6 +38,13 @@ describe('Sitemap Generation', () => {
     expect(urls).toContain('https://getgroomgrid.com/blog/free-dog-grooming-software');
     expect(urls).toContain('https://getgroomgrid.com/blog/groomgrid-vs-daysmart');
     expect(urls).toContain('https://getgroomgrid.com/blog/groomgrid-vs-pawfinity');
+<<<<<<< HEAD
+=======
+    expect(urls).toContain('https://getgroomgrid.com/blog/cat-grooming-business-guide');
+    expect(urls).toContain('https://getgroomgrid.com/blog/dog-grooming-pricing-guide');
+    expect(urls).toContain('https://getgroomgrid.com/blog/how-to-become-a-dog-groomer');
+    expect(urls).toContain('https://getgroomgrid.com/blog/do-you-tip-dog-groomers');
+>>>>>>> origin/cortex/fix-ga4-event-naming-health-check
     expect(urls).toContain('https://getgroomgrid.com/blog/how-much-do-dog-groomers-make');
     expect(urls).toContain('https://getgroomgrid.com/blog/dog-grooming-business-insurance');
     expect(urls).toContain('https://getgroomgrid.com/blog/dog-grooming-appointment-app');
