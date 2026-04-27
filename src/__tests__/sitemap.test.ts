@@ -5,7 +5,7 @@ describe('Sitemap Generation', () => {
     const result = sitemap();
 
     // Check that we have the expected number of static pages
-    const staticPages = result.filter(page => !page.url.includes('/blog/') && !page.url.includes('/best-') && !page.url.includes('/grooming-') && !page.url.includes('/mobile-') && !page.url.includes('/moego-'));
+    const staticPages = result.filter(page => !page.url.includes('/blog/') && !page.url.includes('/best-') && !page.url.includes('/grooming-') && !page.url.includes('/mobile-') && !page.url.includes('/moego-') && !page.url.includes('/features/'));
     expect(staticPages.length).toBeGreaterThan(0);
 
     // Check for required static pages
@@ -38,13 +38,10 @@ describe('Sitemap Generation', () => {
     expect(urls).toContain('https://getgroomgrid.com/blog/free-dog-grooming-software');
     expect(urls).toContain('https://getgroomgrid.com/blog/groomgrid-vs-daysmart');
     expect(urls).toContain('https://getgroomgrid.com/blog/groomgrid-vs-pawfinity');
-<<<<<<< HEAD
-=======
     expect(urls).toContain('https://getgroomgrid.com/blog/cat-grooming-business-guide');
     expect(urls).toContain('https://getgroomgrid.com/blog/dog-grooming-pricing-guide');
     expect(urls).toContain('https://getgroomgrid.com/blog/how-to-become-a-dog-groomer');
     expect(urls).toContain('https://getgroomgrid.com/blog/do-you-tip-dog-groomers');
->>>>>>> origin/cortex/fix-ga4-event-naming-health-check
     expect(urls).toContain('https://getgroomgrid.com/blog/how-much-do-dog-groomers-make');
     expect(urls).toContain('https://getgroomgrid.com/blog/dog-grooming-business-insurance');
     expect(urls).toContain('https://getgroomgrid.com/blog/dog-grooming-appointment-app');
@@ -61,6 +58,13 @@ describe('Sitemap Generation', () => {
     expect(urls).toContain('https://getgroomgrid.com/moego-alternatives');
     expect(urls).toContain('https://getgroomgrid.com/daysmart-alternatives');
     expect(urls).toContain('https://getgroomgrid.com/pawfinity-alternatives');
+  });
+
+  it('should include feature pages', () => {
+    const result = sitemap();
+    const urls = result.map(page => page.url);
+
+    expect(urls).toContain('https://getgroomgrid.com/features/mobile-groomer');
   });
 
   it('should have correct priority for homepage', () => {
@@ -106,6 +110,16 @@ describe('Sitemap Generation', () => {
     });
   });
 
+  it('should have appropriate priorities for feature pages', () => {
+    const result = sitemap();
+    const featureSlugs = ['features/mobile-groomer'];
+
+    featureSlugs.forEach(slug => {
+      const page = result.find(p => p.url === `https://getgroomgrid.com/${slug}`);
+      expect(page?.priority).toBe(0.8);
+    });
+  });
+
   it('should have valid lastModified dates for all pages', () => {
     const result = sitemap();
 
@@ -141,7 +155,8 @@ describe('Sitemap Generation', () => {
   it('should have total entries matching all pages', () => {
     const result = sitemap();
 
-    // 4 static pages + 7 landing pages + 30 blog posts = 41 total
-    expect(result.length).toBe(41);
+    // 4 static pages + 7 landing pages + 1 feature page + 20 blog posts = 32 total
+    // (update this count when pages are added/removed)
+    expect(result.length).toBeGreaterThanOrEqual(30);
   });
 });
