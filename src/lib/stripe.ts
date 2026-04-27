@@ -68,6 +68,9 @@ export async function createCheckoutSession({
     customer_email: customerEmail,
     mode: 'subscription',
     payment_method_types: ['card'],
+    // Only collect payment method when payment is actually due.
+    // For trial subscriptions, this lets Stripe skip the card form when possible.
+    payment_method_collection: 'if_required',
     line_items: [
       {
         price: priceId,
@@ -91,7 +94,7 @@ export async function createCheckoutSession({
     },
     success_url: `${process.env.NEXT_PUBLIC_APP_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/checkout/cancel?plan=${planType}`,
-    billing_address_collection: 'required',
+    billing_address_collection: 'auto',
     ...discountFields,
     // Note: customer_update requires an existing Stripe customer ID.
     // New users don't have one yet — add to billing portal flow instead.

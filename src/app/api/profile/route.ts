@@ -41,6 +41,24 @@ export async function PATCH(req: NextRequest) {
       data.planType = rest.planType
     }
 
+    // When a trial user selects a plan, ensure their trial dates are consistent.
+    // If trialEndsAt is missing or in the past, reset it to 14 days from now.
+    // This shouldn't normally happen (signup sets trialEndsAt), but defends against
+    // edge cases where the profile was created without proper trial dates.
+    if (rest.planType !== undefined) {
+      const currentProfile = await prisma.profile.findUnique({
+        where: { userId: session.user.id },
+      })
+      if (currentProfile?.subscriptionStatus === 'trial') {
+        const now = new Date()
+        if (!currentProfile.trialEndsAt || new Date(currentProfile.trialEndsAt) <= now) {
+          const trialEndsAt = new Date()
+          trialEndsAt.setDate(trialEndsAt.getDate() + 14)
+          data.trialEndsAt = trialEndsAt
+        }
+      }
+    }
+
     const profile = await prisma.profile.update({
       where: { userId: session.user.id },
       data,

@@ -113,9 +113,15 @@ function PlansPageInner() {
           const isActive = isTrial && endsAt && endsAt > new Date();
           setIsOnTrial(!!isActive);
           setTrialEndsAt(endsAt);
+        } else {
+          // Profile fetch failed — default to trial-safe behavior.
+          // ALL authenticated users start as trial users, so this is the safe default
+          // that prevents accidentally sending them to Stripe (which demands a card).
+          setIsOnTrial(true);
         }
       } catch {
-        // Non-blocking — fall back to Stripe checkout if profile fetch fails
+        // Network error — default to trial-safe behavior for the same reason.
+        setIsOnTrial(true);
       }
     };
 
@@ -214,6 +220,13 @@ function PlansPageInner() {
         setIsCheckoutInFlight(false);
         router.push(`/checkout/error?error_type=${errorType}&decline_code=${declineCode}`);
         setSelectedPlan(null);
+        return;
+      }
+
+      // Trial plan selection (no Stripe) — redirect to dashboard
+      if (data.trial) {
+        setIsCheckoutInFlight(false);
+        router.push(`/dashboard?plan_selected=${encodeURIComponent(plan.name)}`);
         return;
       }
 
