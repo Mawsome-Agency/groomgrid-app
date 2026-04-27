@@ -70,6 +70,28 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Profile not found', errorType: 'generic' }, { status: 404 });
     }
 
+    // Trial guard: if user is on an active trial, save plan choice directly to
+    // their profile — no Stripe checkout needed. This makes "No credit card required"
+    // actually true. The user will be prompted for payment when their trial ends.
+    const isOnActiveTrial =
+      profile.subscriptionStatus === 'trial' &&
+      profile.trialEndsAt &&
+      new Date(profile.trialEndsAt) > new Date();
+
+    if (isOnActiveTrial) {
+      // Update plan type on the profile without touching Stripe
+      await prisma.profile.update({
+        where: { userId },
+        data: { planType: planType as PlanType },
+      });
+
+      return NextResponse.json({
+        trial: true,
+        planType,
+        message: 'Plan selected for your trial period. No payment required until trial ends.',
+      });
+    }
+
     const checkoutSession = await createCheckoutSession({
       userId,
       planType: planType as PlanType,

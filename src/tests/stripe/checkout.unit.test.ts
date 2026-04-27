@@ -22,6 +22,7 @@ jest.mock('@/lib/prisma', () => ({
     },
     profile: {
       findUnique: jest.fn(),
+      update: jest.fn(),
     },
   },
 }));
@@ -629,5 +630,110 @@ describe('ensureIdempotentLockout — edge cases', () => {
     expect(mockFindFirstLockout).toHaveBeenCalledWith({
       where: { userId: 'user-xyz', paymentId: 'enterprise' },
     });
+  });
+});
+
+// ─────────────────────────────────────────────
+// Trial guard — prevents Stripe checkout for trial users
+// ─────────────────────────────────────────────
+describe('POST /api/checkout — trial guard', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockFindFirstLockout.mockResolvedValue(null);
+  });
+
+  it('returns 200 with trial:true for active trial users — plan saved without Stripe', async () => {
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + 10);
+
+    // Mock prisma.profile.update (used in the trial path)
+    const mockUpdate = jest.fn().mockResolvedValue({ id: 'profile-1', planType: 'solo' });
+    (prisma as any).profile.update = mockUpdate;
+
+    mockFindUniqueProfile.mockResolvedValue({
+      id: 'profile-1',
+      userId: 'user-123',
+      businessName: 'Happy Paws',
+      subscriptionStatus: 'trial',
+      trialEndsAt: futureDate,
+    } as any);
+
+    const req = makeRequest({ userId: 'user-123', planType: 'solo' });
+    const res = await POST(req);
+    const body = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(body.trial).toBe(true);
+    expect(body.planType).toBe('solo');
+    expect(mockCreateCheckoutSession).not.toHaveBeenCalled();
+    expect(mockUpdate).toHaveBeenCalledWith({
+      where: { userId: 'user-123' },
+      data: { planType: 'solo' },
+    });
+  });
+
+  it('allows checkout when trial has expired (past trialEndsAt)', async () => {
+    const pastDate = new Date();
+    pastDate.setDate(pastDate.getDate() - 1);
+
+    mockFindUniqueProfile.mockResolvedValue({
+      id: 'profile-1',
+      userId: 'user-123',
+      businessName: 'Happy Paws',
+      subscriptionStatus: 'trial',
+      trialEndsAt: pastDate,
+    } as any);
+    mockCreateCheckoutSession.mockResolvedValue({
+      id: 'cs_test_123',
+      url: 'https://checkout.stripe.com/test',
+    } as any);
+    mockTrackPayment.mockResolvedValue(undefined);
+
+    const req = makeRequest({ userId: 'user-123', planType: 'solo' });
+    const res = await POST(req);
+
+    expect(res.status).toBe(200);
+    expect(mockCreateCheckoutSession).toHaveBeenCalled();
+  });
+
+  it('allows checkout when subscriptionStatus is not trial', async () => {
+    mockFindUniqueProfile.mockResolvedValue({
+      id: 'profile-1',
+      userId: 'user-123',
+      businessName: 'Happy Paws',
+      subscriptionStatus: 'active',
+    } as any);
+    mockCreateCheckoutSession.mockResolvedValue({
+      id: 'cs_test_123',
+      url: 'https://checkout.stripe.com/test',
+    } as any);
+    mockTrackPayment.mockResolvedValue(undefined);
+
+    const req = makeRequest({ userId: 'user-123', planType: 'solo' });
+    const res = await POST(req);
+
+    expect(res.status).toBe(200);
+    expect(mockCreateCheckoutSession).toHaveBeenCalled();
+  });
+
+  it('allows checkout when trialEndsAt is null', async () => {
+    mockFindUniqueProfile.mockResolvedValue({
+      id: 'profile-1',
+      userId: 'user-123',
+      businessName: 'Happy Paws',
+      subscriptionStatus: 'trial',
+      trialEndsAt: null,
+    } as any);
+    mockCreateCheckoutSession.mockResolvedValue({
+      id: 'cs_test_123',
+      url: 'https://checkout.stripe.com/test',
+    } as any);
+    mockTrackPayment.mockResolvedValue(undefined);
+
+    const req = makeRequest({ userId: 'user-123', planType: 'solo' });
+    const res = await POST(req);
+
+    expect(res.status).toBe(200);
+    expect(mockCreateCheckoutSession).toHaveBeenCalled();
   });
 });

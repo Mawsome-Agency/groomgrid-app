@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
-import { Calendar, Users, DollarSign, Plus, LogOut, Settings, Menu, X, AlertCircle, RefreshCw } from 'lucide-react';
+import { Calendar, Users, DollarSign, Plus, LogOut, Settings, Menu, X, AlertCircle, RefreshCw, CheckCircle, CreditCard } from 'lucide-react';
 import { trackPageView, trackDashboardFirstView } from '@/lib/ga4';
 import PaymentProcessingBanner from '@/components/PaymentProcessingBanner';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
@@ -33,6 +33,7 @@ const FETCH_TIMEOUT = 15000; // 15 seconds
 
 export default function DashboardPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { data: session, status } = useSession();
   const [profile, setProfile] = useState<any>(null);
   const [todayAppointments, setTodayAppointments] = useState<Appointment[]>([]);
@@ -42,6 +43,10 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<DashboardError | null>(null);
   const [isRetrying, setIsRetrying] = useState(false);
+
+  // Plan selection confirmation (from /plans redirect for trial users)
+  const planSelectedName = searchParams.get('plan_selected');
+  const [showPlanConfirmation, setShowPlanConfirmation] = useState(!!planSelectedName);
 
   useEffect(() => {
     trackPageView('/dashboard', 'Dashboard');
@@ -350,6 +355,29 @@ export default function DashboardPage() {
             {/* Payment Processing Banner */}
             <PaymentProcessingBanner />
 
+            {/* Plan Selection Confirmation (trial users who just picked a plan) */}
+            {showPlanConfirmation && planSelectedName && (
+              <div className="bg-blue-500 text-white rounded-2xl p-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <CheckCircle className="w-6 h-6 flex-shrink-0" />
+                    <div>
+                      <h2 className="text-lg font-semibold">{planSelectedName} Plan Selected!</h2>
+                      <p className="text-blue-100 text-sm">
+                        Your 14-day free trial is active. No credit card required until your trial ends.
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setShowPlanConfirmation(false)}
+                    className="text-blue-200 hover:text-white text-sm font-medium ml-4"
+                  >
+                    Dismiss
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* Trial Banner */}
             {isTrial && (
               <div className="bg-green-500 text-white rounded-2xl p-6">
@@ -358,13 +386,17 @@ export default function DashboardPage() {
                     <h2 className="text-lg font-semibold mb-1">Free Trial Active</h2>
                     <p className="text-green-100 text-sm">
                       {trialDaysLeft} day{trialDaysLeft !== 1 ? 's' : ''} remaining
+                      {profile?.plan_type && profile.plan_type !== 'solo' && (
+                        <> · {profile.plan_type.charAt(0).toUpperCase() + profile.plan_type.slice(1)} plan</>
+                      )}
                     </p>
                   </div>
                   <a
-                    href="/settings"
-                    className="px-4 py-2 bg-white text-green-600 rounded-lg text-sm font-medium hover:bg-green-50 transition-colors"
+                    href="/plans"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-white text-green-600 rounded-lg text-sm font-medium hover:bg-green-50 transition-colors"
                   >
-                    Manage Subscription
+                    <CreditCard className="w-4 h-4" />
+                    {trialDaysLeft <= 3 ? 'Set Up Payment Now' : 'Set Up Payment'}
                   </a>
                 </div>
               </div>

@@ -53,14 +53,34 @@ export async function GET(req: NextRequest) {
     ensureEnv('stripe');
     ensureEnv('app');
 
-    // Look up profile for business name
+    // Look up profile for business name and trial status
     const profile = await prisma.profile.findUnique({ where: { userId: session.user.id } });
     if (!profile) {
       return NextResponse.json({ error: 'Profile not found. Please complete signup first.' }, { status: 404 });
     }
 
-    // Use the shared createCheckoutSession so metadata, trial, and URLs
-    // are consistent with the POST /api/checkout flow
+    // Trial guard: trial users should select plans WITHOUT Stripe checkout.
+    // All new users start with a trial — they pick a plan, it saves to their profile,
+    // and they only pay when the trial ends. This makes "No credit card required" true.
+    const isOnActiveTrial =
+      profile.subscriptionStatus === 'trial' &&
+      profile.trialEndsAt &&
+      new Date(profile.trialEndsAt) > new Date();
+
+    if (isOnActiveTrial) {
+      // Save plan choice directly to profile — no Stripe session needed
+      await prisma.profile.update({
+        where: { userId: session.user.id },
+        data: { planType: validPlan },
+      });
+      // Redirect to dashboard with plan confirmation
+      return NextResponse.redirect(
+        `${appUrl}/dashboard?plan_selected=${encodeURIComponent(PLAN_DATA[validPlan].name)}`,
+        302,
+      );
+    }
+
+    // Non-trial users: proceed to Stripe checkout for payment
     const checkoutSession = await createCheckoutSession({
       userId: session.user.id,
       planType: validPlan,

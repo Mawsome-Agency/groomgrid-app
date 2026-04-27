@@ -1,65 +1,45 @@
-# GroomGrid Engineering Plan — Updated April 24, 2026
+# Fix Checkout Funnel: Remove Credit Card Requirement for Trial Signup
 
-## Current Status
+## Problem
+Homepage, signup, plans, and welcome pages all promise "No credit card required" and "14-day free trial."
+But ALL 20 checkout sessions expired unpaid — Stripe subscription mode ALWAYS collects card info, even with trial_period_days.
 
-### Production Health
-- ✅ All endpoints returning 200 (landing, app, plans, signup)
-- ✅ PM2 stable (restart counter reset to 0)
-- ✅ Memory limit increased to 700MB (was 450MB)
-- ✅ Coupon validation fix deployed (PR #174)
+## Root Cause
+1. `GET /api/checkout/session` has NO trial guard — always creates Stripe checkout session
+2. Plans page profile fetch failure silently falls through to Stripe checkout
+3. `POST /api/checkout` returns error for trial users instead of handling plan selection gracefully
+4. `createCheckoutSession()` uses `mode: 'subscription'` which Stripe always requires card for
 
-### Critical Metrics
-- **Paying subscribers: 0** — All 6 DB users are test accounts
-- **Completed checkouts: 0** — No real transactions processed
-- **Stale checkout sessions: 2** — From test webhooks, need cleanup
-- **Failed payment intents: 2** — $27 each, stuck in "requires_payment_method"
+## Fix Strategy
+Make "No credit card required" actually true:
+- Trial users select plans WITHOUT touching Stripe — just save planType to profile
+- Only send users to Stripe when their trial ends and they need to pay
 
-### Known Issues
-1. ~~Invalid coupon codes crash checkout~~ → **FIXED** (PR #174)
-2. PM2 ecosystem.config.js outdated (wrong path, wrong port) — needs cleanup
-3. `/plans` route occasionally throws `InvariantError: client reference manifest` — intermittent, likely memory-related
-4. No 500.html error page — Next.js falls back to default error
+## File Changes
 
-## Immediate Priority: First Paying Subscriber
+### 1. `src/app/api/checkout/session/route.ts` (GET)
+- Add trial guard: check profile before creating Stripe session
+- If user has active trial, redirect to `/plans` instead of Stripe
 
-### Step 1: Verify Checkout Flow (IN PROGRESS)
-- [ ] Test end-to-end signup → Stripe checkout → webhook → subscription activation
-- [ ] Test with valid coupon BETA50 (50% off)
-- [ ] Test with invalid coupon (should gracefully fall back)
-- [ ] Test with no coupon
-- [ ] Verify webhook processes checkout.session.completed
+### 2. `src/app/plans/page.tsx`
+- Fix profile fetch failure: default `isOnTrial=true` for authenticated users when profile fetch fails
+- All authenticated users start as trial users, so this is the safe default
+- Handle `trial_active` errorType from checkout API gracefully
 
-### Step 2: Clean Up Stripe
-- [ ] Expire stale checkout sessions
-- [ ] Investigate and resolve $27 payment intents
+### 3. `src/app/api/checkout/route.ts` (POST)
+- Instead of returning 400 error for trial users, update their plan via profile
+- Return success with `{ trial: true, planType }` so client knows to redirect to dashboard
 
-### Step 3: Infrastructure Cleanup
-- [ ] Fix PM2 ecosystem.config.js (update paths, ports)
-- [ ] Add 500.html error page
-- [ ] Set up basic uptime monitoring
+### 4. `src/app/api/profile/route.ts` (PATCH)
+- When `planType` is updated, ensure `trialEndsAt` is set if not already
+- Trial users selecting a plan should keep `subscriptionStatus: 'trial'`
 
-## Stalled Missions — Restructured
+### 5. `src/lib/stripe.ts`
+- Add `payment_method_collection: 'if_required'` to `createCheckoutSession`
+- For trial subscriptions, this lets Stripe skip card collection when possible
 
-### Mission: Complete MVP → "Verify Checkout & First Subscriber"
-- 36/40 done, but the 4 remaining are critical for revenue
-- Focus: End-to-end checkout verification, Stripe data cleanup, PM2 config
-
-### Mission: Post-MVP → Descoped
-- Remove nice-to-haves, keep only: transactional email, basic monitoring
-- Email: Mailgun is configured, need welcome/password-reset/subscription-confirmation templates
-- Monitoring: Basic health checks (uptime + error rate)
-
-### Mission: PR Triage → Close Out
-- Review remaining 3 PRs
-- Admin pipeline status page PR awaiting review
-
-### Mission: Unblock MVP → Replaced
-- Original blockers resolved
-- New focus: Get first paying subscriber through the door
-
-## Architecture Notes
-- Single Next.js app on port 3002 serving both getgroomgrid.com and app.getgroomgrid.com
-- PostgreSQL on the same droplet (1GB RAM, 25GB disk)
-- PM2 process management with nginx reverse proxy
-- SSL via Certbot (wildcard *.getgroomgrid.com)
-- Stripe live mode with webhook at /api/stripe/webhook
+## Testing
+- Verify trial user on /plans can select plan without seeing Stripe
+- Verify GET /api/checkout/session redirects trial users away from Stripe
+- Verify profile PATCH correctly saves plan selection with trial dates
+- Verify promo code flow still works for non-trial users
