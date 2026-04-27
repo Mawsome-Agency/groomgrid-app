@@ -86,10 +86,12 @@ describe('health-check utilities', () => {
       process.env.STRIPE_PRICE_SOLO = 'price_test_solo';
       process.env.STRIPE_PRICE_SALON = 'price_test_salon';
       process.env.STRIPE_PRICE_ENTERPRISE = 'price_test_enterprise';
+      process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID = 'G-TEST123';
+      process.env.GA4_API_SECRET = 'test_api_secret';
 
       const results = checkEnvironmentVars();
 
-      expect(results).toHaveLength(10); // 6 core + 4 Stripe
+      expect(results).toHaveLength(12); // 6 core + 2 analytics + 4 Stripe
       for (const result of results) {
         expect(result.status).toBe('pass');
       }
@@ -118,6 +120,8 @@ describe('health-check utilities', () => {
       process.env.NEXT_PUBLIC_APP_URL = 'http://localhost:3000';
       process.env.MAILGUN_API_KEY = 'key-test123';
       process.env.MAILGUN_DOMAIN = 'sandbox.mailgun.org';
+      process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID = 'G-TEST123';
+      process.env.GA4_API_SECRET = 'test_api_secret';
 
       const results = checkEnvironmentVars();
       const failures = results.filter((r) => r.status === 'fail');
@@ -166,6 +170,8 @@ describe('health-check utilities', () => {
       process.env.NEXT_PUBLIC_APP_URL = 'http://localhost:3000';
       process.env.MAILGUN_API_KEY = 'key-test123';
       process.env.MAILGUN_DOMAIN = 'sandbox.mailgun.org';
+      process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID = 'G-TEST123';
+      process.env.GA4_API_SECRET = 'test_api_secret';
       delete process.env.MAILGUN_FROM_EMAIL;
 
       const results = checkEnvironmentVars();
@@ -303,6 +309,8 @@ describe('health-check utilities', () => {
       process.env.NEXT_PUBLIC_APP_URL = 'http://localhost:3000';
       process.env.MAILGUN_API_KEY = 'key-test123';
       process.env.MAILGUN_DOMAIN = 'sandbox.mailgun.org';
+      process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID = 'G-TEST123';
+      process.env.GA4_API_SECRET = 'test_api_secret';
 
       const report = await buildHealthReport();
 
