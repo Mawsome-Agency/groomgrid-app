@@ -35,6 +35,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // SEO landing pages (root-level)
   const landingPages: MetadataRoute.Sitemap = [
     'best-dog-grooming-software',
+    'cat-grooming-software',
     'grooming-business-operations',
     'mobile-grooming-business',
     'mobile-grooming-software',
