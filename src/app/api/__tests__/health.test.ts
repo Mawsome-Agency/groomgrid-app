@@ -82,10 +82,14 @@ describe('health-check utilities', () => {
       process.env.NEXT_PUBLIC_APP_URL = 'http://localhost:3000';
       process.env.MAILGUN_API_KEY = 'key-test123';
       process.env.MAILGUN_DOMAIN = 'sandbox.mailgun.org';
+      process.env.STRIPE_SECRET_KEY = 'sk_test_123';
+      process.env.STRIPE_PRICE_SOLO = 'price_test_solo';
+      process.env.STRIPE_PRICE_SALON = 'price_test_salon';
+      process.env.STRIPE_PRICE_ENTERPRISE = 'price_test_enterprise';
 
       const results = checkEnvironmentVars();
 
-      expect(results).toHaveLength(6);
+      expect(results).toHaveLength(10); // 6 core + 4 Stripe
       for (const result of results) {
         expect(result.status).toBe('pass');
       }

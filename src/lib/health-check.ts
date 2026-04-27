@@ -73,6 +73,14 @@ export function checkEnvironmentVars(): HealthCheckResult[] {
     // defaults to hello@email.mawsome.agency
   ];
 
+  // Stripe checkout vars — required for paid plan signup funnel
+  const stripeVars: Array<{ name: string; label: string }> = [
+    { name: 'STRIPE_SECRET_KEY', label: 'Stripe secret key' },
+    { name: 'STRIPE_PRICE_SOLO', label: 'Stripe Solo price ID' },
+    { name: 'STRIPE_PRICE_SALON', label: 'Stripe Salon price ID' },
+    { name: 'STRIPE_PRICE_ENTERPRISE', label: 'Stripe Enterprise price ID' },
+  ];
+
   for (const { name, label } of criticalVars) {
     const value = process.env[name];
     if (!value) {
@@ -80,6 +88,24 @@ export function checkEnvironmentVars(): HealthCheckResult[] {
         name: `env:${name}`,
         status: 'fail',
         message: `${label} (${name}) is not set`,
+      });
+    } else {
+      checks.push({
+        name: `env:${name}`,
+        status: 'pass',
+        message: `${label} is configured`,
+      });
+    }
+  }
+
+  // Stripe vars — fail blocks checkout but app still serves pages
+  for (const { name, label } of stripeVars) {
+    const value = process.env[name];
+    if (!value) {
+      checks.push({
+        name: `env:${name}`,
+        status: 'fail',
+        message: `${label} (${name}) is not set — checkout will fail`,
       });
     } else {
       checks.push({
