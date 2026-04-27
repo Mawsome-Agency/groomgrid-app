@@ -22,6 +22,7 @@ jest.mock('@/lib/prisma', () => ({
     },
     profile: {
       findUnique: jest.fn(),
+      update: jest.fn(),
     },
   },
 }));
@@ -641,9 +642,13 @@ describe('POST /api/checkout — trial guard', () => {
     mockFindFirstLockout.mockResolvedValue(null);
   });
 
-  it('returns 400 with trial_active errorType when user is on active trial', async () => {
+  it('returns 200 with trial:true for active trial users — plan saved without Stripe', async () => {
     const futureDate = new Date();
     futureDate.setDate(futureDate.getDate() + 10);
+
+    // Mock prisma.profile.update (used in the trial path)
+    const mockUpdate = jest.fn().mockResolvedValue({ id: 'profile-1', planType: 'solo' });
+    (prisma as any).profile.update = mockUpdate;
 
     mockFindUniqueProfile.mockResolvedValue({
       id: 'profile-1',
@@ -657,10 +662,14 @@ describe('POST /api/checkout — trial guard', () => {
     const res = await POST(req);
     const body = await res.json();
 
-    expect(res.status).toBe(400);
-    expect(body.errorType).toBe('trial_active');
-    expect(body.error).toContain('Trial users');
+    expect(res.status).toBe(200);
+    expect(body.trial).toBe(true);
+    expect(body.planType).toBe('solo');
     expect(mockCreateCheckoutSession).not.toHaveBeenCalled();
+    expect(mockUpdate).toHaveBeenCalledWith({
+      where: { userId: 'user-123' },
+      data: { planType: 'solo' },
+    });
   });
 
   it('allows checkout when trial has expired (past trialEndsAt)', async () => {
