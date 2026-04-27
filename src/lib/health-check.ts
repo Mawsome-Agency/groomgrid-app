@@ -98,6 +98,29 @@ export function checkEnvironmentVars(): HealthCheckResult[] {
     }
   }
 
+  // GA4 analytics vars — required for server-side funnel tracking (checkout_completed, subscription events)
+  const analyticsVars: Array<{ name: string; label: string }> = [
+    { name: 'NEXT_PUBLIC_GA4_MEASUREMENT_ID', label: 'GA4 Measurement ID' },
+    { name: 'GA4_API_SECRET', label: 'GA4 Measurement Protocol API secret' },
+  ];
+
+  for (const { name, label } of analyticsVars) {
+    const value = process.env[name];
+    if (!value) {
+      checks.push({
+        name: `env:${name}`,
+        status: 'fail',
+        message: `${label} (${name}) is not set — server-side GA4 events will not fire`,
+      });
+    } else {
+      checks.push({
+        name: `env:${name}`,
+        status: 'pass',
+        message: `${label} is configured`,
+      });
+    }
+  }
+
   // Stripe vars — fail blocks checkout but app still serves pages
   for (const { name, label } of stripeVars) {
     const value = process.env[name];

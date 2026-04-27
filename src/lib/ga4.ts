@@ -57,7 +57,7 @@ function postToLocalTrack(eventName: string, properties?: Record<string, unknown
 
 // Fires when user lands on /signup page (page load, not form submit)
 export function trackSignupViewed() {
-  trackEvent('signup_started');
+  trackEvent('signup_viewed');
   postToLocalTrack('signup_viewed');
 }
 

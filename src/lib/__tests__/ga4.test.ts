@@ -1296,10 +1296,10 @@ describe('ga4.ts', () => {
       process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID = 'G-TEST123';
     });
 
-    it('should fire signup_started event with no extra params', () => {
+    it('should fire signup_viewed event with no extra params', () => {
       trackSignupViewed();
 
-      expect(window.gtag).toHaveBeenCalledWith('event', 'signup_started', {});
+      expect(window.gtag).toHaveBeenCalledWith('event', 'signup_viewed', {});
     });
 
     it('should not fire if analytics disabled', () => {
