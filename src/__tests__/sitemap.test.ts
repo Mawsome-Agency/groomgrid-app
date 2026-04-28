@@ -52,6 +52,7 @@ describe('Sitemap Generation', () => {
     const urls = result.map(page => page.url);
 
     expect(urls).toContain('https://getgroomgrid.com/best-dog-grooming-software');
+    expect(urls).toContain('https://getgroomgrid.com/cat-grooming-software');
     expect(urls).toContain('https://getgroomgrid.com/grooming-business-operations');
     expect(urls).toContain('https://getgroomgrid.com/mobile-grooming-business');
     expect(urls).toContain('https://getgroomgrid.com/mobile-grooming-software');
@@ -59,6 +60,7 @@ describe('Sitemap Generation', () => {
     expect(urls).toContain('https://getgroomgrid.com/daysmart-alternatives');
     expect(urls).toContain('https://getgroomgrid.com/pawfinity-alternatives');
     expect(urls).toContain('https://getgroomgrid.com/pet-grooming-business-software');
+    expect(urls).toContain('https://getgroomgrid.com/123-pet-grooming-software-alternatives');
   });
 
   it('should include feature pages', () => {
@@ -103,7 +105,7 @@ describe('Sitemap Generation', () => {
 
   it('should have appropriate priorities for landing pages', () => {
     const result = sitemap();
-    const landingSlugs = ['best-dog-grooming-software', 'grooming-business-operations', 'mobile-grooming-business', 'mobile-grooming-software', 'moego-alternatives', 'daysmart-alternatives', 'pawfinity-alternatives', 'pet-grooming-business-software'];
+    const landingSlugs = ['best-dog-grooming-software', 'cat-grooming-software', 'grooming-business-operations', 'mobile-grooming-business', 'mobile-grooming-software', 'moego-alternatives', 'daysmart-alternatives', 'pawfinity-alternatives', 'pet-grooming-business-software', '123-pet-grooming-software-alternatives'];
     
     landingSlugs.forEach(slug => {
       const page = result.find(p => p.url === `https://getgroomgrid.com/${slug}`);
@@ -156,7 +158,7 @@ describe('Sitemap Generation', () => {
   it('should have total entries matching all pages', () => {
     const result = sitemap();
 
-    // 4 static pages + 7 landing pages + 1 feature page + 20 blog posts = 32 total
+    // 4 static pages + 8 landing pages + 1 feature page + 20 blog posts = 33 total
     // (update this count when pages are added/removed)
     expect(result.length).toBeGreaterThanOrEqual(30);
   });

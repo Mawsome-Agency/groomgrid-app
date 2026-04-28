@@ -43,6 +43,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     'daysmart-alternatives',
     'pawfinity-alternatives',
     'pet-grooming-business-software',
+    '123-pet-grooming-software-alternatives',
   ].map((slug) => ({
     url: `${baseUrl}/${slug}`,
     lastModified: new Date(),
