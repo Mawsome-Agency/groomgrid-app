@@ -371,7 +371,7 @@ export default function FreeDogGroomingSoftwarePage() {
         <RelatedLinks
           heading="Skip the DIY hacks. Try the real thing free."
           links={[
-          { href: '/signup?coupon=BETA50', category: 'Software Guide', title: 'Dog Grooming Software: The 2026 Buyer's Guide' },
+          { href: '/signup?coupon=BETA50', category: 'Software Guide', title: 'Dog Grooming Software: The 2026 Buyer\'s Guide' },
           { href: '/blog/reduce-no-shows-dog-grooming', category: 'Operations', title: 'How to Reduce No-Shows in Your Dog Grooming Business' },
           { href: '/blog/is-dog-grooming-a-profitable-business', category: 'Business', title: 'Is Dog Grooming a Profitable Business? Real Numbers' }
           ]}

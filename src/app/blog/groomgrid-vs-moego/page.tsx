@@ -354,7 +354,7 @@ export default function GroomGridVsMoeGoPage() {
         <RelatedLinks
           heading="Try GroomGrid free — 50% off your first month"
           links={[
-          { href: '/signup?coupon=BETA50', category: 'Software', title: 'Dog Grooming Software: The 2026 Buyer's Guide' },
+          { href: '/signup?coupon=BETA50', category: 'Software', title: 'Dog Grooming Software: The 2026 Buyer\'s Guide' },
           { href: '/blog/reduce-no-shows-dog-grooming', category: 'Operations', title: 'How to Reduce No-Shows in Your Dog Grooming Business' }
           ]}
           columns={3}

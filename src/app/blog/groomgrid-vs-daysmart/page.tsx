@@ -446,7 +446,7 @@ export default function GroomGridVsDaySmartPage() {
           heading="Try GroomGrid free — 50% off your first month"
           links={[
           { href: '/signup?coupon=BETA50', category: 'Comparison', title: 'GroomGrid vs MoeGo: Which is Right for You?' },
-          { href: '/blog/dog-grooming-software', category: 'Software', title: 'Dog Grooming Software: The 2026 Buyer's Guide' }
+          { href: '/blog/dog-grooming-software', category: 'Software', title: 'Dog Grooming Software: The 2026 Buyer\'s Guide' }
           ]}
           columns={3}
         />

@@ -400,7 +400,7 @@ export default function MobileGroomingSoftwarePage() {
         <RelatedLinks
           heading="Mobile grooming software that works as hard as you do"
           links={[
-          { href: '/signup?coupon=BETA50', category: "Buyer's Guide", title: 'Best Dog Grooming Software for 2026: Full Comparison' },
+          { href: '/signup?coupon=BETA50', category: "Buyer\'s Guide", title: 'Best Dog Grooming Software for 2026: Full Comparison' },
           { href: '/blog/how-to-start-a-mobile-dog-grooming-business', category: 'Business Guide', title: 'How to Start a Mobile Dog Grooming Business' },
           { href: '/features/mobile-groomer', category: 'Feature Spotlight', title: 'See GroomGrid Mobile Groomer Tools in Action' },
           { href: '/blog/reduce-no-shows-dog-grooming', category: 'Operations', title: 'How to Reduce No-Shows in Your Dog Grooming Business' }

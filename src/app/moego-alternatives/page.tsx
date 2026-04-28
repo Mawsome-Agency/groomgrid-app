@@ -380,8 +380,8 @@ export default function MoeGoAlternativesPage() {
           heading="The MoeGo alternative built for groomers who do not need enterprise pricing"
           links={[
           { href: '/signup?coupon=BETA50', category: 'Alternatives', title: 'DaySmart Alternatives: Best Pet Grooming Software for 2026' },
-          { href: '/best-dog-grooming-software', category: 'Buyer's Guide', title: 'Best Dog Grooming Software for 2026: Full Comparison' },
-          { href: '/mobile-grooming-software', category: 'Mobile Groomers', title: 'Mobile Grooming Software: The Van Groomer's Complete Guide' }
+          { href: '/best-dog-grooming-software', category: 'Buyer\'s Guide', title: 'Best Dog Grooming Software for 2026: Full Comparison' },
+          { href: '/mobile-grooming-software', category: 'Mobile Groomers', title: 'Mobile Grooming Software: The Van Groomer\'s Complete Guide' }
           ]}
           columns={3}
         />

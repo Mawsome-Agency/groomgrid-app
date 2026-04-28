@@ -544,7 +544,7 @@ export default function CatGroomingSoftwarePage() {
           links={[
           { href: '/signup?coupon=BETA50', category: 'Mobile Groomers', title: 'Mobile Grooming Software for Van Groomers' },
           { href: '/blog/cat-grooming-business-guide', category: 'Business Guide', title: 'How to Start a Cat Grooming Business' },
-          { href: '/best-dog-grooming-software', category: 'Buyer's Guide', title: 'Best Dog Grooming Software for 2026' }
+          { href: '/best-dog-grooming-software', category: 'Buyer\'s Guide', title: 'Best Dog Grooming Software for 2026' }
           ]}
           columns={3}
         />
