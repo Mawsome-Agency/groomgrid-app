@@ -97,6 +97,53 @@ describe('health-check utilities', () => {
       }
     });
 
+    it('returns degraded for missing GA4_API_SECRET (not fail)', () => {
+      process.env.DATABASE_URL = 'postgresql://test:test@localhost:5432/test';
+      process.env.NEXTAUTH_URL = 'http://localhost:3000';
+      process.env.NEXTAUTH_SECRET = 'test-secret';
+      process.env.NEXT_PUBLIC_APP_URL = 'http://localhost:3000';
+      process.env.MAILGUN_API_KEY = 'key-test123';
+      process.env.MAILGUN_DOMAIN = 'sandbox.mailgun.org';
+      process.env.STRIPE_SECRET_KEY = 'sk_test_123';
+      process.env.STRIPE_PRICE_SOLO = 'price_test_solo';
+      process.env.STRIPE_PRICE_SALON = 'price_test_salon';
+      process.env.STRIPE_PRICE_ENTERPRISE = 'price_test_enterprise';
+      process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID = 'G-TEST123';
+      delete process.env.GA4_API_SECRET;
+
+      const results = checkEnvironmentVars();
+      const ga4Check = results.find((r) => r.name === 'env:GA4_API_SECRET');
+
+      expect(ga4Check).toBeDefined();
+      expect(ga4Check!.status).toBe('degraded');
+      expect(ga4Check!.message).toContain('GA4_API_SECRET');
+
+      // Core vars should still pass
+      const coreFailures = results.filter((r) => r.status === 'fail');
+      expect(coreFailures).toHaveLength(0);
+    });
+
+    it('returns degraded for missing NEXT_PUBLIC_GA4_MEASUREMENT_ID', () => {
+      process.env.DATABASE_URL = 'postgresql://test:test@localhost:5432/test';
+      process.env.NEXTAUTH_URL = 'http://localhost:3000';
+      process.env.NEXTAUTH_SECRET = 'test-secret';
+      process.env.NEXT_PUBLIC_APP_URL = 'http://localhost:3000';
+      process.env.MAILGUN_API_KEY = 'key-test123';
+      process.env.MAILGUN_DOMAIN = 'sandbox.mailgun.org';
+      process.env.STRIPE_SECRET_KEY = 'sk_test_123';
+      process.env.STRIPE_PRICE_SOLO = 'price_test_solo';
+      process.env.STRIPE_PRICE_SALON = 'price_test_salon';
+      process.env.STRIPE_PRICE_ENTERPRISE = 'price_test_enterprise';
+      delete process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID;
+      process.env.GA4_API_SECRET = 'test_api_secret';
+
+      const results = checkEnvironmentVars();
+      const ga4IdCheck = results.find((r) => r.name === 'env:NEXT_PUBLIC_GA4_MEASUREMENT_ID');
+
+      expect(ga4IdCheck).toBeDefined();
+      expect(ga4IdCheck!.status).toBe('degraded');
+    });
+
     it('returns fail for missing DATABASE_URL', () => {
       delete process.env.DATABASE_URL;
       process.env.NEXTAUTH_URL = 'http://localhost:3000';

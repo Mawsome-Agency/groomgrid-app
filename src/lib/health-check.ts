@@ -98,8 +98,9 @@ export function checkEnvironmentVars(): HealthCheckResult[] {
     }
   }
 
-  // GA4 analytics vars — NOT critical; app works without them, just analytics won't fire.
-  // We track them as "degraded" so health endpoint returns 200 not 503.
+  // GA4 analytics vars — required for server-side funnel tracking (checkout_completed, subscription events)
+  // These are NOT critical — the app works without them, just analytics won't fire.
+  // We track them as separate "degraded" checks so health endpoint returns 200 not 503.
   const analyticsVars: Array<{ name: string; label: string }> = [
     { name: 'NEXT_PUBLIC_GA4_MEASUREMENT_ID', label: 'GA4 Measurement ID' },
     { name: 'GA4_API_SECRET', label: 'GA4 Measurement Protocol API secret' },
