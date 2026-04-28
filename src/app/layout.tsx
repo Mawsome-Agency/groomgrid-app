@@ -13,16 +13,16 @@ import DeploymentVersionCheck from '@/components/deployment/DeploymentVersionChe
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'GroomGrid - Pet Grooming Business Management',
+  title: 'Pet Grooming Software for Mobile Groomers & Salons | GroomGrid',
   description:
-    'Stop losing money to no-shows and double bookings. AI-powered scheduling, client records, automated reminders, and payments — built for pet groomers.',
+    'Pet grooming software with AI-powered scheduling, automated reminders, and payment processing. Built for mobile groomers and salons. Start your free trial.',
   alternates: {
     canonical: 'https://getgroomgrid.com',
   },
   openGraph: {
-    title: 'GroomGrid - Pet Grooming Business Management',
+    title: 'Pet Grooming Software for Mobile Groomers & Salons | GroomGrid',
     description:
-      'Stop losing money to no-shows and double bookings. AI-powered scheduling, client records, automated reminders, and payments — built for pet groomers.',
+      'Pet grooming software with AI-powered scheduling, automated reminders, and payment processing. Built for mobile groomers and salons. Start your free trial.',
     url: 'https://getgroomgrid.com',
     siteName: 'GroomGrid',
     type: 'website',
@@ -55,11 +55,6 @@ const schemaOrg = JSON.stringify({
       url: 'https://getgroomgrid.com',
       name: 'GroomGrid',
       publisher: { '@id': 'https://getgroomgrid.com/#organization' },
-      potentialAction: {
-        '@type': 'SearchAction',
-        target: 'https://getgroomgrid.com/blog?q={search_term_string}',
-        'query-input': 'required name=search_term_string',
-      },
     },
     {
       '@type': 'SoftwareApplication',
