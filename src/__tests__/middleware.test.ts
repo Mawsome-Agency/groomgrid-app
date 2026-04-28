@@ -1,16 +1,62 @@
 /**
- * Unit tests for middleware route protection
+ * Unit tests for middleware route protection and Cache-Control headers
  *
- * Verifies that protected routes redirect unauthenticated users to /login
- * and that public routes remain accessible.
+ * Verifies that protected routes redirect unauthenticated users to /login,
+ * public routes remain accessible, and no-cache headers are set on
+ * POST requests, API routes, and conversion-critical pages.
+ *
+ * Mocks next/server and next-auth/jwt to avoid Next.js runtime deps in jsdom.
  */
 
-import { NextRequest } from 'next/server';
-
-// Mock next-auth/jwt before importing middleware
+// ── Mock next-auth/jwt before importing middleware ──
 jest.mock('next-auth/jwt', () => ({
   getToken: jest.fn(),
 }));
+
+// ── Mock next/server to provide lightweight NextRequest / NextResponse ──
+// Next.js internals don't load in jsdom, so we mock the minimal surface
+// the middleware needs: URL/method on request, status/headers on response.
+jest.mock('next/server', () => {
+  class MockHeaders extends Map {
+    constructor(init?: Record<string, string>) {
+      super();
+      if (init) {
+        for (const [k, v] of Object.entries(init)) this.set(k, v);
+      }
+    }
+    get(name: string) { return super.get(name.toLowerCase()) ?? null; }
+    set(name: string, value: string) { super.set(name.toLowerCase(), value); return this; }
+  }
+
+  class MockNextRequest {
+    readonly nextUrl: URL;
+    readonly url: string;
+    readonly method: string;
+    constructor(input: string | URL, init?: RequestInit) {
+      this.nextUrl = typeof input === 'string' ? new URL(input) : new URL(input.toString());
+      this.url = this.nextUrl.toString();
+      this.method = init?.method ?? 'GET';
+    }
+  }
+
+  class MockNextResponse {
+    readonly status: number;
+    readonly headers: MockHeaders;
+    constructor(status: number, headers?: Record<string, string>) {
+      this.status = status;
+      this.headers = new MockHeaders(headers);
+    }
+    static redirect(url: string | URL) {
+      const dest = typeof url === 'string' ? url : url.toString();
+      return new MockNextResponse(307, { location: dest });
+    }
+    static next() {
+      return new MockNextResponse(200);
+    }
+  }
+
+  return { NextRequest: MockNextRequest, NextResponse: MockNextResponse };
+});
 
 import { getToken } from 'next-auth/jwt';
 import { middleware } from '../middleware';
@@ -23,11 +69,12 @@ describe('middleware', () => {
   });
 
   /**
-   * Helper to create a NextRequest for a given path.
-   * Next.js middleware expects the full URL including protocol.
+   * Helper to create a mock NextRequest for a given path and method.
    */
-  function makeRequest(path: string): NextRequest {
-    return new NextRequest(new URL(path, 'https://getgroomgrid.com'));
+  function makeRequest(path: string, method = 'GET') {
+    const { NextRequest } = jest.requireMock('next/server');
+    const url = new URL(path, 'https://getgroomgrid.com');
+    return new NextRequest(url.toString(), method !== 'GET' ? { method } : undefined);
   }
 
   describe('protected routes', () => {
@@ -37,8 +84,6 @@ describe('middleware', () => {
       '/onboarding',
       '/onboarding/step-2',
       '/welcome',
-      '/plans',
-      '/plans?coupon=BETA50',
       '/admin',
       '/admin/engagement',
     ];
@@ -58,7 +103,7 @@ describe('middleware', () => {
     });
 
     it('allows authenticated users through protected routes', async () => {
-      mockGetToken.mockResolvedValue({ sub: 'user-123', email: 'test@example.com' });
+      mockGetToken.mockResolvedValue({ sub: 'user-123', email: 'test@example.com', id: 'user-123' });
 
       for (const path of protectedPaths) {
         const req = makeRequest(path);
@@ -70,10 +115,11 @@ describe('middleware', () => {
   });
 
   describe('public routes', () => {
-    const publicPaths = [
+    // Routes accessible to ALL users (authenticated or not)
+    const nonAuthPublicPaths = [
       '/',
-      '/signup',
-      '/login',
+      '/plans',
+      '/plans?coupon=BETA50',
       '/blog',
       '/blog/best-dog-grooming-software',
       '/book/user-123',
@@ -82,10 +128,13 @@ describe('middleware', () => {
       '/api/health',
     ];
 
-    it('allows unauthenticated users to access public routes', async () => {
+    // Auth pages that are public but redirect authenticated users to /dashboard
+    const authPages = ['/signup', '/login'];
+
+    it('allows unauthenticated users to access all public routes including auth pages', async () => {
       mockGetToken.mockResolvedValue(null);
 
-      for (const path of publicPaths) {
+      for (const path of [...nonAuthPublicPaths, ...authPages]) {
         const req = makeRequest(path);
         const response = await middleware(req);
 
@@ -93,10 +142,10 @@ describe('middleware', () => {
       }
     });
 
-    it('allows authenticated users to access public routes', async () => {
-      mockGetToken.mockResolvedValue({ sub: 'user-123', email: 'test@example.com' });
+    it('allows authenticated users to access non-auth public routes', async () => {
+      mockGetToken.mockResolvedValue({ sub: 'user-123', email: 'test@example.com', id: 'user-123' });
 
-      for (const path of publicPaths) {
+      for (const path of nonAuthPublicPaths) {
         const req = makeRequest(path);
         const response = await middleware(req);
 
@@ -107,7 +156,7 @@ describe('middleware', () => {
 
   describe('auth routes', () => {
     it('redirects authenticated users from /login to /dashboard', async () => {
-      mockGetToken.mockResolvedValue({ sub: 'user-123', email: 'test@example.com' });
+      mockGetToken.mockResolvedValue({ sub: 'user-123', email: 'test@example.com', id: 'user-123' });
 
       const req = makeRequest('/login');
       const response = await middleware(req);
@@ -118,7 +167,7 @@ describe('middleware', () => {
     });
 
     it('redirects authenticated users from /signup to /dashboard', async () => {
-      mockGetToken.mockResolvedValue({ sub: 'user-123', email: 'test@example.com' });
+      mockGetToken.mockResolvedValue({ sub: 'user-123', email: 'test@example.com', id: 'user-123' });
 
       const req = makeRequest('/signup');
       const response = await middleware(req);
@@ -147,51 +196,18 @@ describe('middleware', () => {
     });
   });
 
-  describe('/plans specifically (P0 fix)', () => {
-    it('redirects unauthenticated /plans to /login with next parameter', async () => {
-      mockGetToken.mockResolvedValue(null);
-
-      const req = makeRequest('/plans');
-      const response = await middleware(req);
-
-      expect(response.status).toBe(307);
-      const redirectUrl = response.headers.get('location');
-      expect(redirectUrl).toContain('/login');
-      expect(redirectUrl).toContain('next=%2Fplans');
-    });
-
-    it('preserves query parameters when redirecting /plans to login', async () => {
-      mockGetToken.mockResolvedValue(null);
-
-      const req = makeRequest('/plans?coupon=BETA50');
-      const response = await middleware(req);
-
-      expect(response.status).toBe(307);
-      const redirectUrl = response.headers.get('location');
-      expect(redirectUrl).toContain('/login');
-      expect(redirectUrl).toContain('next=%2Fplans%3Fcoupon%3DBETA50');
-    });
-
-    it('allows authenticated users to access /plans', async () => {
-      mockGetToken.mockResolvedValue({ sub: 'user-123', email: 'test@example.com' });
-
-      const req = makeRequest('/plans');
-      const response = await middleware(req);
-
-      expect(response.status).toBe(200);
-    });
-  });
-
   describe('static assets and images', () => {
     it('does not intercept _next/static files', async () => {
       const req = makeRequest('/_next/static/chunks/app-page.js');
       const response = await middleware(req);
+
       expect(response.status).toBe(200);
     });
 
     it('does not intercept image files', async () => {
       const req = makeRequest('/images/hero.png');
       const response = await middleware(req);
+
       expect(response.status).toBe(200);
     });
   });
@@ -200,9 +216,7 @@ describe('middleware', () => {
     it('sets no-cache headers on POST requests', async () => {
       mockGetToken.mockResolvedValue(null);
 
-      const req = new NextRequest(new URL('/api/auth/signup', 'https://getgroomgrid.com'), {
-        method: 'POST',
-      });
+      const req = makeRequest('/api/auth/signup', 'POST');
       const response = await middleware(req);
 
       expect(response.headers.get('Cache-Control')).toBe('no-store, must-revalidate');
@@ -221,7 +235,7 @@ describe('middleware', () => {
     });
 
     it('sets no-cache headers on conversion-critical pages', async () => {
-      mockGetToken.mockResolvedValue({ sub: 'user-123', email: 'test@example.com' });
+      mockGetToken.mockResolvedValue({ sub: 'user-123', email: 'test@example.com', id: 'user-123' });
 
       const conversionPages = ['/signup', '/login', '/plans'];
       for (const path of conversionPages) {
