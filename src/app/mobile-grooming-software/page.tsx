@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Script from 'next/script';
+import RelatedLinks from '@/components/marketing/RelatedLinks';
+import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
   title: 'Mobile Grooming Software for Van Groomers: 2026 Guide | GroomGrid',
@@ -394,83 +396,20 @@ export default function MobileGroomingSoftwarePage() {
           </div>
         </section>
 
-        {/* ── Bottom CTA ── */}
-        <section className="px-6 py-16 bg-green-600 text-white">
-          <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-3xl font-extrabold mb-4">
-              Mobile grooming software that works as hard as you do
-            </h2>
-            <p className="text-green-100 text-lg mb-8 leading-relaxed max-w-xl mx-auto">
-              Scheduling, reminders, payments, and pet profiles — all from your phone, all starting
-              at $29/month. Try GroomGrid free for 14 days. No credit card required.
-            </p>
-            <Link
-              href="/signup?coupon=BETA50"
-              className="px-8 py-4 rounded-xl bg-white text-green-700 font-bold text-lg hover:bg-green-50 transition-colors shadow-md inline-block"
-            >
-              Start Your Free Trial →
-            </Link>
-            <p className="text-green-200 text-sm mt-4">14-day free trial · Solo tier from $29/mo · No credit card</p>
-          </div>
-        </section>
-
-        {/* ── Related Articles ── */}
-        <section className="px-6 py-12 max-w-5xl mx-auto">
-          <h2 className="text-xl font-bold text-stone-800 mb-6">Related Articles</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <Link
-              href="/best-dog-grooming-software"
-              className="group p-5 border border-stone-200 rounded-xl hover:border-green-300 hover:shadow-md transition-all"
-            >
-              <p className="text-sm text-green-600 font-semibold mb-1">Buyer&apos;s Guide</p>
-              <h3 className="font-bold text-stone-800 group-hover:text-green-600 transition-colors text-sm">
-                Best Dog Grooming Software for 2026: Full Comparison
-              </h3>
-            </Link>
-            <Link
-              href="/blog/how-to-start-a-mobile-dog-grooming-business"
-              className="group p-5 border border-stone-200 rounded-xl hover:border-green-300 hover:shadow-md transition-all"
-            >
-              <p className="text-sm text-green-600 font-semibold mb-1">Business Guide</p>
-              <h3 className="font-bold text-stone-800 group-hover:text-green-600 transition-colors text-sm">
-                How to Start a Mobile Dog Grooming Business
-              </h3>
-            </Link>
-            <Link
-              href="/blog/reduce-no-shows-dog-grooming"
-              className="group p-5 border border-stone-200 rounded-xl hover:border-green-300 hover:shadow-md transition-all"
-            >
-              <p className="text-sm text-green-600 font-semibold mb-1">Operations</p>
-              <h3 className="font-bold text-stone-800 group-hover:text-green-600 transition-colors text-sm">
-                How to Reduce No-Shows in Your Dog Grooming Business
-              </h3>
-            </Link>
-          </div>
-        </section>
+        {/* ── Related Links ── */}
+        <RelatedLinks
+          heading="Mobile grooming software that works as hard as you do"
+          links={[
+          { href: '/signup?coupon=BETA50', category: 'Buyer's Guide', title: 'Best Dog Grooming Software for 2026: Full Comparison' },
+          { href: '/blog/how-to-start-a-mobile-dog-grooming-business', category: 'Business Guide', title: 'How to Start a Mobile Dog Grooming Business' },
+          { href: '/features/mobile-groomer', category: 'Feature Spotlight', title: 'See GroomGrid Mobile Groomer Tools in Action' },
+          { href: '/blog/reduce-no-shows-dog-grooming', category: 'Operations', title: 'How to Reduce No-Shows in Your Dog Grooming Business' }
+          ]}
+          columns={3}
+        />
 
         {/* ── Footer ── */}
-        <footer className="px-6 py-8 max-w-5xl mx-auto border-t border-stone-100">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-stone-400">
-            <Link href="/" className="font-bold text-green-600">
-              GroomGrid 🐾
-            </Link>
-            <div className="flex gap-6">
-              <Link href="/grooming-business-operations/" className="hover:text-stone-600 transition-colors">
-                Operations Hub
-              </Link>
-              <Link href="/mobile-grooming-business/" className="hover:text-stone-600 transition-colors">
-                Mobile Grooming
-              </Link>
-              <Link href="/plans" className="hover:text-stone-600 transition-colors">
-                Pricing
-              </Link>
-              <Link href="/signup" className="hover:text-stone-600 transition-colors">
-                Sign Up
-              </Link>
-            </div>
-            <p>© {new Date().getFullYear()} GroomGrid. All rights reserved.</p>
-          </div>
-        </footer>
+        <SiteFooter />
       </div>
     </>
   );

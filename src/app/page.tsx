@@ -345,6 +345,7 @@ export default function HomePage() {
             { href: '/daysmart-alternatives', category: 'Alternatives', title: 'DaySmart Alternatives' },
             { href: '/pawfinity-alternatives', category: 'Alternatives', title: 'Pawfinity Alternatives' },
             { href: '/blog/cat-grooming-business-guide', category: 'Business Guide', title: 'Cat Grooming Business Guide' },
+            { href: '/features/mobile-groomer', category: 'Feature Spotlight', title: 'Mobile Groomer Tools' },
           ].map(({ href, category, title }) => (
             <Link
               key={href}
