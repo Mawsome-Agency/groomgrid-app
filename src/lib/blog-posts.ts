@@ -186,4 +186,10 @@ export const blogPosts: BlogPost[] = [
     description: 'Compare the best dog grooming appointment apps for 2026 — scheduling, automated reminders, online booking, payment processing, and client management features.',
     publishedAt: '2026-04-27',
   },
+  {
+    slug: 'dog-grooming-business-plan-template',
+    title: 'Dog Grooming Business Plan Template: Free Download for 2026',
+    description: 'Free dog grooming business plan template with executive summary, market analysis, financial projections, and operational plan. Downloadable structure for mobile, salon, and home-based grooming businesses.',
+    publishedAt: '2026-04-28',
+  },
 ].sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
