@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Script from 'next/script';
+import RelatedLinks from '@/components/marketing/RelatedLinks';
+import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
   title: 'Cat Grooming Software Built for Feline Specialists | GroomGrid',
@@ -536,67 +538,16 @@ export default function CatGroomingSoftwarePage() {
           </div>
         </section>
 
-        {/* Bottom CTA */}
-        <section className="px-6 py-16 bg-green-600 text-white">
-          <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-3xl font-extrabold mb-4">
-              Ready to Stop Fighting Dog-First Software?
-            </h2>
-            <p className="text-green-100 text-lg mb-8 leading-relaxed max-w-xl mx-auto">
-              Join cat grooming specialists who&#8217;ve found software that actually understands
-              their business. 14-day free trial, no credit card, set up in under 5 minutes.
-            </p>
-            <Link
-              href="/signup?coupon=BETA50"
-              className="px-8 py-4 rounded-xl bg-white text-green-700 font-bold text-lg hover:bg-green-50 transition-colors shadow-md inline-block"
-            >
-              Start Your Free Trial &#x2192;
-            </Link>
-            <div className="mt-6 flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-green-200">
-              <span>&#10003; No credit card required</span>
-              <span>&#10003; Cat-specific fields from day one</span>
-              <span>&#10003; Works on any phone</span>
-            </div>
-            <div className="mt-2 flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-green-200">
-              <span>&#10003; Import your existing client data easily</span>
-              <span>&#10003; Cancel anytime &#8212; no data lock-in</span>
-            </div>
-          </div>
-        </section>
-
-        {/* Related Resources */}
-        <section className="px-6 py-12 max-w-5xl mx-auto">
-          <h2 className="text-xl font-bold text-stone-800 mb-6">Related Resources</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <Link
-              href="/mobile-grooming-software"
-              className="group p-5 border border-stone-200 rounded-xl hover:border-green-300 hover:shadow-md transition-all"
-            >
-              <p className="text-sm text-green-600 font-semibold mb-1">Mobile Groomers</p>
-              <h3 className="font-bold text-stone-800 group-hover:text-green-600 transition-colors text-sm">
-                Mobile Grooming Software for Van Groomers
-              </h3>
-            </Link>
-            <Link
-              href="/blog/cat-grooming-business-guide"
-              className="group p-5 border border-stone-200 rounded-xl hover:border-green-300 hover:shadow-md transition-all"
-            >
-              <p className="text-sm text-green-600 font-semibold mb-1">Business Guide</p>
-              <h3 className="font-bold text-stone-800 group-hover:text-green-600 transition-colors text-sm">
-                How to Start a Cat Grooming Business
-              </h3>
-            </Link>
-            <Link
-              href="/best-dog-grooming-software"
-              className="group p-5 border border-stone-200 rounded-xl hover:border-green-300 hover:shadow-md transition-all"
-            >
-              <p className="text-sm text-green-600 font-semibold mb-1">Buyer&#8217;s Guide</p>
-              <h3 className="font-bold text-stone-800 group-hover:text-green-600 transition-colors text-sm">
-                Best Dog Grooming Software for 2026
-              </h3>
-            </Link>
-          </div>
-        </section>
+        {/* ── Related Links ── */}
+        <RelatedLinks
+          heading="Ready to Stop Fighting Dog-First Software?"
+          links={[
+          { href: '/signup?coupon=BETA50', category: 'Mobile Groomers', title: 'Mobile Grooming Software for Van Groomers' },
+          { href: '/blog/cat-grooming-business-guide', category: 'Business Guide', title: 'How to Start a Cat Grooming Business' },
+          { href: '/best-dog-grooming-software', category: 'Buyer's Guide', title: 'Best Dog Grooming Software for 2026' }
+          ]}
+          columns={3}
+        />
 
         {/* Footer Features Bar */}
         <section className="px-6 py-8 bg-stone-50 border-t border-stone-100">
@@ -613,25 +564,7 @@ export default function CatGroomingSoftwarePage() {
         </section>
 
         {/* Footer */}
-        <footer className="px-6 py-8 max-w-5xl mx-auto border-t border-stone-100">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-stone-400">
-            <Link href="/" className="font-bold text-green-600">
-              GroomGrid &#x1f43e;
-            </Link>
-            <div className="flex gap-6">
-              <Link href="/mobile-grooming-software" className="hover:text-stone-600 transition-colors">
-                Mobile Grooming
-              </Link>
-              <Link href="/plans" className="hover:text-stone-600 transition-colors">
-                Pricing
-              </Link>
-              <Link href="/signup" className="hover:text-stone-600 transition-colors">
-                Sign Up
-              </Link>
-            </div>
-            <p>&#169; {new Date().getFullYear()} GroomGrid. All rights reserved.</p>
-          </div>
-        </footer>
+        <SiteFooter links={[{ href: '/mobile-grooming-software', label: 'Mobile Grooming' }, { href: '/plans', label: 'Pricing' }, { href: '/signup', label: 'Sign Up' }]} />
       </div>
     </>
   );

@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Script from 'next/script';
+import RelatedLinks from '@/components/marketing/RelatedLinks';
+import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
   title: 'How Much Does It Cost to Start a Dog Grooming Business? | GroomGrid',
@@ -259,63 +261,18 @@ export default function HowMuchToStartDogGroomingBusinessPage() {
           </div>
         </section>
 
-        {/* ── Signup CTA ── */}
-        <section className="px-6 py-16 bg-green-600 text-white">
-          <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-3xl font-extrabold mb-4">
-              One startup cost that pays for itself fast
-            </h2>
-            <p className="text-green-100 text-lg mb-8 leading-relaxed">
-              GroomGrid handles your bookings, reminders, deposits, and client records from day one.
-              Prevent a single no-show and it&apos;s paid for. Try it free with 50% off your first month.
-            </p>
-            <Link
-              href="/signup?coupon=BETA50"
-              className="px-8 py-4 rounded-xl bg-white text-green-700 font-bold text-lg hover:bg-green-50 transition-colors shadow-md inline-block"
-            >
-              Start Free Trial →
-            </Link>
-          </div>
-        </section>
-
-        {/* ── Related Articles ── */}
-        <section className="px-6 py-12 max-w-5xl mx-auto">
-          <h2 className="text-xl font-bold text-stone-800 mb-6">Related Articles</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Link
-              href="/blog/is-dog-grooming-a-profitable-business"
-              className="group p-5 border border-stone-200 rounded-xl hover:border-green-300 hover:shadow-md transition-all"
-            >
-              <p className="text-sm text-green-600 font-semibold mb-1">Business</p>
-              <h3 className="font-bold text-stone-800 group-hover:text-green-600 transition-colors">
-                Is Dog Grooming a Profitable Business? Real Numbers, Real Talk
-              </h3>
-            </Link>
-            <Link
-              href="/blog/dog-grooming-tools-equipment-list"
-              className="group p-5 border border-stone-200 rounded-xl hover:border-green-300 hover:shadow-md transition-all"
-            >
-              <p className="text-sm text-green-600 font-semibold mb-1">Equipment</p>
-              <h3 className="font-bold text-stone-800 group-hover:text-green-600 transition-colors">
-                Dog Grooming Tools &amp; Equipment List: The Complete Professional Checklist
-              </h3>
-            </Link>
-          </div>
-        </section>
+        {/* ── Related Links ── */}
+        <RelatedLinks
+          heading="One startup cost that pays for itself fast"
+          links={[
+          { href: '/signup?coupon=BETA50', category: 'Business', title: 'Is Dog Grooming a Profitable Business? Real Numbers, Real Talk' },
+          { href: '/blog/dog-grooming-tools-equipment-list', category: 'Equipment', title: 'Dog Grooming Tools & Equipment List: The Complete Professional Checklist' }
+          ]}
+          columns={3}
+        />
 
         {/* ── Footer ── */}
-        <footer className="px-6 py-8 max-w-5xl mx-auto border-t border-stone-100 mt-0">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-stone-400">
-            <Link href="/" className="font-bold text-green-600">GroomGrid 🐾</Link>
-            <div className="flex gap-6">
-              <Link href="/grooming-business-operations/" className="hover:text-stone-600 transition-colors">Operations Hub</Link>
-              <Link href="/mobile-grooming-business/" className="hover:text-stone-600 transition-colors">Mobile Grooming</Link>
-              <Link href="/plans" className="hover:text-stone-600 transition-colors">Pricing</Link>
-              <Link href="/signup?coupon=BETA50" className="hover:text-stone-600 transition-colors">Sign Up</Link>
-            </div>
-            <p>© {new Date().getFullYear()} GroomGrid. All rights reserved.</p>
-          </div>
-        </footer>
+        <SiteFooter links={[{ href: '/grooming-business-operations/', label: 'Operations Hub' }, { href: '/mobile-grooming-business/', label: 'Mobile Grooming' }, { href: '/plans', label: 'Pricing' }, { href: '/signup?coupon=BETA50', label: 'Sign Up' }]} />
       </div>
     </>
   );

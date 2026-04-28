@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Script from 'next/script';
+import RelatedLinks from '@/components/marketing/RelatedLinks';
+import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
   title: 'Mobile Grooming Features Built for Van Life | GroomGrid',
@@ -538,75 +540,19 @@ export default function MobileGroomerFeaturePage() {
           </div>
         </section>
 
-        {/* ── FAQ ── */}
-        <section data-section="faq" className="px-6 py-16 max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold text-stone-800 mb-8">
-            Frequently Asked Questions
-          </h2>
-          <div className="space-y-6">
-            {faqData.map((item) => (
-              <div key={item.question} className="border border-stone-200 rounded-xl p-6 bg-white">
-                <h3 className="font-bold text-stone-800 mb-3">{item.question}</h3>
-                <p className="text-stone-600 leading-relaxed text-sm">{item.answer}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* ── Related Articles ── */}
-        <section className="px-6 py-12 max-w-5xl mx-auto">
-          <h2 className="text-xl font-bold text-stone-800 mb-6">Related Resources</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <Link
-              href="/mobile-grooming-software"
-              className="group p-5 border border-stone-200 rounded-xl hover:border-green-300 hover:shadow-md transition-all"
-            >
-              <p className="text-sm text-green-600 font-semibold mb-1">Overview</p>
-              <h3 className="font-bold text-stone-800 group-hover:text-green-600 transition-colors text-sm">
-                Mobile Grooming Software Built for the Van
-              </h3>
-            </Link>
-            <Link
-              href="/blog/how-to-start-a-mobile-dog-grooming-business"
-              className="group p-5 border border-stone-200 rounded-xl hover:border-green-300 hover:shadow-md transition-all"
-            >
-              <p className="text-sm text-green-600 font-semibold mb-1">Business Guide</p>
-              <h3 className="font-bold text-stone-800 group-hover:text-green-600 transition-colors text-sm">
-                How to Start a Mobile Dog Grooming Business
-              </h3>
-            </Link>
-            <Link
-              href="/best-dog-grooming-software"
-              className="group p-5 border border-stone-200 rounded-xl hover:border-green-300 hover:shadow-md transition-all"
-            >
-              <p className="text-sm text-green-600 font-semibold mb-1">Comparison</p>
-              <h3 className="font-bold text-stone-800 group-hover:text-green-600 transition-colors text-sm">
-                Best Dog Grooming Software for 2026
-              </h3>
-            </Link>
-          </div>
-        </section>
+        {/* ── Related Links ── */}
+        <RelatedLinks
+          heading="Frequently Asked Questions"
+          links={[
+          { href: '/mobile-grooming-software', category: 'Overview', title: 'Mobile Grooming Software Built for the Van' },
+          { href: '/blog/how-to-start-a-mobile-dog-grooming-business', category: 'Business Guide', title: 'How to Start a Mobile Dog Grooming Business' },
+          { href: '/best-dog-grooming-software', category: 'Comparison', title: 'Best Dog Grooming Software for 2026' }
+          ]}
+          columns={3}
+        />
 
         {/* ── Footer ── */}
-        <footer className="px-6 py-8 max-w-5xl mx-auto border-t border-stone-100">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-stone-400">
-            <Link href="/" className="font-bold text-green-600">
-              GroomGrid 🐾
-            </Link>
-            <div className="flex gap-6">
-              <Link href="/mobile-grooming-software" className="hover:text-stone-600 transition-colors">
-                Mobile Software
-              </Link>
-              <Link href="/plans" className="hover:text-stone-600 transition-colors">
-                Pricing
-              </Link>
-              <Link href="/signup" className="hover:text-stone-600 transition-colors">
-                Sign Up
-              </Link>
-            </div>
-            <p>© {new Date().getFullYear()} GroomGrid. All rights reserved.</p>
-          </div>
-        </footer>
+        <SiteFooter links={[{ href: '/mobile-grooming-software', label: 'Mobile Software' }, { href: '/plans', label: 'Pricing' }, { href: '/signup', label: 'Sign Up' }]} />
       </div>
     </>
   );

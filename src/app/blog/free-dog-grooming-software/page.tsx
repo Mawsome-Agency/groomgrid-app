@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Script from 'next/script';
+import RelatedLinks from '@/components/marketing/RelatedLinks';
+import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
   title: 'Free Dog Grooming Software 2026: Reviews, Hidden Costs & Better Alternatives | GroomGrid',
@@ -365,54 +367,19 @@ export default function FreeDogGroomingSoftwarePage() {
           </div>
         </section>
 
-        {/* Bottom CTA */}
-        <section className="px-6 py-16 bg-green-600 text-white">
-          <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-3xl font-extrabold mb-4">Skip the DIY hacks. Try the real thing free.</h2>
-            <p className="text-green-100 text-lg mb-8 leading-relaxed max-w-xl mx-auto">
-              GroomGrid gives you AI scheduling, automated reminders, pet profiles, and integrated
-              payments — starting at $29/month. Try it free for 14 days with no credit card required.
-              One recovered no-show pays for the whole month.
-            </p>
-            <Link href="/signup?coupon=BETA50" className="px-8 py-4 rounded-xl bg-white text-green-700 font-bold text-lg hover:bg-green-50 transition-colors shadow-md inline-block">
-              Try GroomGrid Free →
-            </Link>
-            <p className="text-green-200 text-sm mt-4">14-day free trial · No credit card required</p>
-          </div>
-        </section>
-
-        {/* Related Articles */}
-        <section className="px-6 py-12 max-w-5xl mx-auto">
-          <h2 className="text-xl font-bold text-stone-800 mb-6">Related Articles</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <Link href="/blog/dog-grooming-software" className="group p-5 border border-stone-200 rounded-xl hover:border-green-300 hover:shadow-md transition-all">
-              <p className="text-sm text-green-600 font-semibold mb-1">Software Guide</p>
-              <h3 className="font-bold text-stone-800 group-hover:text-green-600 transition-colors text-sm">Dog Grooming Software: The 2026 Buyer&apos;s Guide</h3>
-            </Link>
-            <Link href="/blog/reduce-no-shows-dog-grooming" className="group p-5 border border-stone-200 rounded-xl hover:border-green-300 hover:shadow-md transition-all">
-              <p className="text-sm text-green-600 font-semibold mb-1">Operations</p>
-              <h3 className="font-bold text-stone-800 group-hover:text-green-600 transition-colors text-sm">How to Reduce No-Shows in Your Dog Grooming Business</h3>
-            </Link>
-            <Link href="/blog/is-dog-grooming-a-profitable-business" className="group p-5 border border-stone-200 rounded-xl hover:border-green-300 hover:shadow-md transition-all">
-              <p className="text-sm text-green-600 font-semibold mb-1">Business</p>
-              <h3 className="font-bold text-stone-800 group-hover:text-green-600 transition-colors text-sm">Is Dog Grooming a Profitable Business? Real Numbers</h3>
-            </Link>
-          </div>
-        </section>
+        {/* ── Related Links ── */}
+        <RelatedLinks
+          heading="Skip the DIY hacks. Try the real thing free."
+          links={[
+          { href: '/signup?coupon=BETA50', category: 'Software Guide', title: 'Dog Grooming Software: The 2026 Buyer's Guide' },
+          { href: '/blog/reduce-no-shows-dog-grooming', category: 'Operations', title: 'How to Reduce No-Shows in Your Dog Grooming Business' },
+          { href: '/blog/is-dog-grooming-a-profitable-business', category: 'Business', title: 'Is Dog Grooming a Profitable Business? Real Numbers' }
+          ]}
+          columns={3}
+        />
 
         {/* Footer */}
-        <footer className="px-6 py-8 max-w-5xl mx-auto border-t border-stone-100">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-stone-400">
-            <Link href="/" className="font-bold text-green-600">GroomGrid 🐾</Link>
-            <div className="flex gap-6">
-              <Link href="/grooming-business-operations/" className="hover:text-stone-600 transition-colors">Operations Hub</Link>
-              <Link href="/mobile-grooming-business/" className="hover:text-stone-600 transition-colors">Mobile Grooming</Link>
-              <Link href="/plans" className="hover:text-stone-600 transition-colors">Pricing</Link>
-              <Link href="/signup" className="hover:text-stone-600 transition-colors">Sign Up</Link>
-            </div>
-            <p>© {new Date().getFullYear()} GroomGrid. All rights reserved.</p>
-          </div>
-        </footer>
+        <SiteFooter />
       </div>
     </>
   );
