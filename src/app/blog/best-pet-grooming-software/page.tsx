@@ -286,7 +286,7 @@ export default function BestPetGroomingSoftwarePage() {
           heading="Start with the best-rated option for independent groomers"
           links={[
           { href: '/signup?coupon=BETA50', category: 'Comparison', title: 'GroomGrid vs MoeGo: An Honest Comparison' },
-          { href: '/blog/pet-grooming-software', category: 'Software Guide', title: 'Pet Grooming Software: The Complete Beginner's Guide' }
+          { href: '/blog/pet-grooming-software', category: 'Software Guide', title: 'Pet Grooming Software: The Complete Beginner\'s Guide' }
           ]}
           columns={3}
         />

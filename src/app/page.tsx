@@ -340,7 +340,7 @@ export default function HomePage() {
             { href: '/cat-grooming-software', category: 'Cat Groomers', title: 'Cat Grooming Software' },
             { href: '/mobile-grooming-software', category: 'Mobile Groomers', title: 'Mobile Grooming Software' },
             { href: '/plans', category: 'Pricing', title: 'See All Plans' },
-            { href: '/best-dog-grooming-software', category: "Buyer's Guide", title: 'Best Dog Grooming Software' },
+            { href: '/best-dog-grooming-software', category: "Buyer\'s Guide", title: 'Best Dog Grooming Software' },
             { href: '/moego-alternatives', category: 'Alternatives', title: 'MoeGo Alternatives' },
             { href: '/daysmart-alternatives', category: 'Alternatives', title: 'DaySmart Alternatives' },
             { href: '/pawfinity-alternatives', category: 'Alternatives', title: 'Pawfinity Alternatives' },

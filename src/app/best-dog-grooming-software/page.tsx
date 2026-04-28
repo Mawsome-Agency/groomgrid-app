@@ -442,7 +442,7 @@ export default function BestDogGroomingSoftwarePage() {
           links={[
           { href: '/signup?coupon=BETA50', category: 'Alternatives', title: 'MoeGo Alternatives: Best Pet Grooming Software for 2026' },
           { href: '/daysmart-alternatives', category: 'Alternatives', title: 'DaySmart Alternatives: Best Pet Grooming Software for 2026' },
-          { href: '/mobile-grooming-software', category: 'Mobile Groomers', title: 'Mobile Grooming Software: The Van Groomer's Complete Guide' }
+          { href: '/mobile-grooming-software', category: 'Mobile Groomers', title: 'Mobile Grooming Software: The Van Groomer\'s Complete Guide' }
           ]}
           columns={3}
         />

@@ -333,7 +333,7 @@ export default function DaySmartAlternativesPage() {
           links={[
           { href: '/signup?coupon=BETA50', category: 'Comparison', title: 'GroomGrid vs MoeGo: Which Dog Grooming Software is Right for You?' },
           { href: '/pawfinity-alternatives', category: 'Alternatives', title: 'Pawfinity Alternatives: Best Pet Grooming Software for 2026' },
-          { href: '/blog/dog-grooming-software', category: 'Software Guide', title: 'Dog Grooming Software: The 2026 Buyer's Guide' }
+          { href: '/blog/dog-grooming-software', category: 'Software Guide', title: 'Dog Grooming Software: The 2026 Buyer\'s Guide' }
           ]}
           columns={3}
         />

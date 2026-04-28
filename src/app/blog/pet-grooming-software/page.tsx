@@ -253,7 +253,7 @@ export default function PetGroomingSoftwarePage() {
         <RelatedLinks
           heading="Ready to run your grooming business smarter?"
           links={[
-          { href: '/signup?coupon=BETA50', category: 'Software', title: 'Dog Grooming Software: The 2026 Buyer's Guide' },
+          { href: '/signup?coupon=BETA50', category: 'Software', title: 'Dog Grooming Software: The 2026 Buyer\'s Guide' },
           { href: '/blog/dog-grooming-business-management', category: 'Operations', title: 'Dog Grooming Business Management: The Complete Guide' }
           ]}
           columns={3}
