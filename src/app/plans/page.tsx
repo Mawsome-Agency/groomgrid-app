@@ -308,8 +308,8 @@ function PlansPageInner() {
 
         {/* Hero Section */}
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-stone-900 mb-4">Choose Your Plan</h2>
-          <p className="text-xl text-stone-600">All plans include a 14-day free trial — no credit card required</p>
+          <h2 className="text-4xl font-bold text-stone-900 mb-4">Pick Your Plan — Cancel Anytime</h2>
+          <p className="text-xl text-stone-600">14-day free trial on every plan. No credit card to start.</p>
         </div>
 
         {/* Checkout Error Alert */}

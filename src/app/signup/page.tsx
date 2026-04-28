@@ -26,8 +26,8 @@ import './signup.css';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-// Social proof: plausible growing number, deterministic per session
-const BASE_COUNT = 47;
+// Social proof: plausible count for early-stage product
+const BASE_COUNT = 22;
 
 const BENEFITS = [
   { icon: Calendar, label: 'Smart scheduling — no more double-bookings' },
@@ -273,7 +273,7 @@ function SignupPageInner() {
               <Users className="w-5 h-5 flex-shrink-0" aria-hidden="true" />
               <p className="text-sm font-medium">
                 <span className="text-lg font-bold" aria-live="polite">{groomerCount}</span>
-                {' '}groomers joined this week
+                {' '}groomers signed up this month
               </p>
             </div>
 
@@ -313,12 +313,12 @@ function SignupPageInner() {
               <Users className="w-4 h-4 text-green-500 flex-shrink-0" aria-hidden="true" />
               <span>
                 <strong className="text-stone-800" aria-live="polite">{groomerCount}</strong>
-                {' '}groomers joined this week
+                {' '}groomers signed up this month
               </span>
             </div>
 
-            <h1 className="text-2xl font-bold text-stone-900 mb-1">Create Account</h1>
-            <p className="text-stone-600 text-sm">Start your 14-day free trial</p>
+            <h1 className="text-2xl font-bold text-stone-900 mb-1">Start Your Free Trial</h1>
+            <p className="text-stone-600 text-sm">14 days free · No credit card · Cancel anytime</p>
           </div>
 
           {/* Mobile benefits (compact row) */}
@@ -349,36 +349,7 @@ function SignupPageInner() {
           </div>
 
           <form ref={formRef} onSubmit={handleSubmit} className="space-y-4" noValidate>
-            {/* Business Name */}
-            <div>
-              <label htmlFor="businessName" className="block text-sm font-medium text-stone-700 mb-1">
-                Business Name
-              </label>
-              <div className="relative">
-                <Building className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-stone-500" />
-                <input
-                  id="businessName"
-                  name="businessName"
-                  type="text"
-                  value={formData.businessName}
-                  onChange={(e) => handleFieldChange('businessName', e.target.value)}
-                  onBlur={(e) => handleBlur('businessName', e.target.value)}
-                  onFocus={() => clearFieldError('businessName')}
-                  placeholder="e.g., Paws on Wheels"
-                  required
-                  disabled={loading}
-                  aria-invalid={!!errors.businessName}
-                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all disabled:bg-stone-50 disabled:cursor-not-allowed"
-                />
-              </div>
-              {errors.businessName && (
-                <p className="text-red-600 text-xs mt-1" role="alert" aria-live="polite">
-                  {errors.businessName}
-                </p>
-              )}
-            </div>
-
-            {/* Email */}
+            {/* Email — first field = lowest friction */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-stone-700 mb-1">
                 Email Address
@@ -445,6 +416,35 @@ function SignupPageInner() {
                 </p>
               )}
               <PasswordStrengthMeter password={formData.password} />
+            </div>
+
+            {/* Business Name — last field (optional-ish, lower friction) */}
+            <div>
+              <label htmlFor="businessName" className="block text-sm font-medium text-stone-700 mb-1">
+                Business Name <span className="text-stone-400 font-normal">(or just your name)</span>
+              </label>
+              <div className="relative">
+                <Building className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-stone-500" />
+                <input
+                  id="businessName"
+                  name="businessName"
+                  type="text"
+                  value={formData.businessName}
+                  onChange={(e) => handleFieldChange('businessName', e.target.value)}
+                  onBlur={(e) => handleBlur('businessName', e.target.value)}
+                  onFocus={() => clearFieldError('businessName')}
+                  placeholder="e.g., Paws on Wheels"
+                  required
+                  disabled={loading}
+                  aria-invalid={!!errors.businessName}
+                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all disabled:bg-stone-50 disabled:cursor-not-allowed"
+                />
+              </div>
+              {errors.businessName && (
+                <p className="text-red-600 text-xs mt-1" role="alert" aria-live="polite">
+                  {errors.businessName}
+                </p>
+              )}
             </div>
 
             {/* Submit button */}

@@ -80,7 +80,7 @@ export default function PlanCard({ plan, selected, onSelect, isLoading, isDimmed
           isLoading && "opacity-50 cursor-not-allowed"
         )}
       >
-        {selected ? 'Selected' : 'Choose Plan'}
+        {selected ? 'Selected' : plan.popular ? 'Start Free Trial' : 'Choose Plan'}
       </button>
 
       {/* Trust Signal: No Hidden Fees */}
