@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Script from 'next/script';
+import RelatedLinks from '@/components/marketing/RelatedLinks';
+import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
   title: 'How to Reduce No-Shows in Your Dog Grooming Business | GroomGrid',
@@ -305,74 +307,18 @@ export default function ReduceNoShowsDogGroomingPage() {
           </ol>
         </section>
 
-        {/* ── Signup CTA ── */}
-        <section className="px-6 py-16 bg-green-600 text-white">
-          <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-3xl font-extrabold mb-4">
-              Stop losing revenue to no-shows
-            </h2>
-            <p className="text-green-100 text-lg mb-8 leading-relaxed">
-              GroomGrid sends automated reminders at 72 hours, 24 hours, and 2 hours before every
-              appointment — and lets clients confirm or cancel in one tap. Most groomers cut
-              no-shows in half within 30 days. Try it free.
-            </p>
-            <Link
-              href="/signup"
-              className="px-8 py-4 rounded-xl bg-white text-green-700 font-bold text-lg hover:bg-green-50 transition-colors shadow-md inline-block"
-            >
-              Try GroomGrid Free →
-            </Link>
-          </div>
-        </section>
-
-        {/* ── Related Articles ── */}
-        <section className="px-6 py-12 max-w-5xl mx-auto">
-          <h2 className="text-xl font-bold text-stone-800 mb-6">Related Articles</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Link
-              href="/blog/dog-grooming-business-management"
-              className="group p-5 border border-stone-200 rounded-xl hover:border-green-300 hover:shadow-md transition-all"
-            >
-              <p className="text-sm text-green-600 font-semibold mb-1">Business Management</p>
-              <h3 className="font-bold text-stone-800 group-hover:text-green-600 transition-colors">
-                Dog Grooming Business Management: Run the Business, Not Just the Grooms
-              </h3>
-            </Link>
-            <Link
-              href="/blog/is-dog-grooming-a-profitable-business"
-              className="group p-5 border border-stone-200 rounded-xl hover:border-green-300 hover:shadow-md transition-all"
-            >
-              <p className="text-sm text-green-600 font-semibold mb-1">Business</p>
-              <h3 className="font-bold text-stone-800 group-hover:text-green-600 transition-colors">
-                Is Dog Grooming a Profitable Business? Real Numbers, Real Talk
-              </h3>
-            </Link>
-          </div>
-        </section>
+        {/* ── Related Links ── */}
+        <RelatedLinks
+          heading="Stop losing revenue to no-shows"
+          links={[
+          { href: '/signup', category: 'Business Management', title: 'Dog Grooming Business Management: Run the Business, Not Just the Grooms' },
+          { href: '/blog/is-dog-grooming-a-profitable-business', category: 'Business', title: 'Is Dog Grooming a Profitable Business? Real Numbers, Real Talk' }
+          ]}
+          columns={3}
+        />
 
         {/* ── Footer ── */}
-        <footer className="px-6 py-8 max-w-5xl mx-auto border-t border-stone-100 mt-0">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-stone-400">
-            <Link href="/" className="font-bold text-green-600">
-              GroomGrid 🐾
-            </Link>
-            <div className="flex gap-6">
-              <Link href="/grooming-business-operations/" className="hover:text-stone-600 transition-colors">
-                Operations Hub
-              </Link>
-              <Link href="/mobile-grooming-business/" className="hover:text-stone-600 transition-colors">
-                Mobile Grooming
-              </Link>
-              <Link href="/plans" className="hover:text-stone-600 transition-colors">
-                Pricing
-              </Link>
-              <Link href="/signup" className="hover:text-stone-600 transition-colors">
-                Sign Up
-              </Link>
-            </div>
-            <p>© {new Date().getFullYear()} GroomGrid. All rights reserved.</p>
-          </div>
-        </footer>
+        <SiteFooter />
       </div>
     </>
   );
