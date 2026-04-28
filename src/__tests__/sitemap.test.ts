@@ -58,6 +58,7 @@ describe('Sitemap Generation', () => {
     expect(urls).toContain('https://getgroomgrid.com/moego-alternatives');
     expect(urls).toContain('https://getgroomgrid.com/daysmart-alternatives');
     expect(urls).toContain('https://getgroomgrid.com/pawfinity-alternatives');
+    expect(urls).toContain('https://getgroomgrid.com/pet-grooming-business-software');
   });
 
   it('should include feature pages', () => {
@@ -102,7 +103,7 @@ describe('Sitemap Generation', () => {
 
   it('should have appropriate priorities for landing pages', () => {
     const result = sitemap();
-    const landingSlugs = ['best-dog-grooming-software', 'grooming-business-operations', 'mobile-grooming-business', 'mobile-grooming-software', 'moego-alternatives', 'daysmart-alternatives', 'pawfinity-alternatives'];
+    const landingSlugs = ['best-dog-grooming-software', 'grooming-business-operations', 'mobile-grooming-business', 'mobile-grooming-software', 'moego-alternatives', 'daysmart-alternatives', 'pawfinity-alternatives', 'pet-grooming-business-software'];
     
     landingSlugs.forEach(slug => {
       const page = result.find(p => p.url === `https://getgroomgrid.com/${slug}`);
