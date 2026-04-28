@@ -9,7 +9,7 @@
 
 export interface HealthCheckResult {
   name: string;
-  status: 'pass' | 'fail';
+  status: 'pass' | 'fail' | 'degraded';
   message: string;
   latencyMs?: number;
   details?: Record<string, unknown>;
@@ -98,7 +98,8 @@ export function checkEnvironmentVars(): HealthCheckResult[] {
     }
   }
 
-  // GA4 analytics vars — required for server-side funnel tracking (checkout_completed, subscription events)
+  // GA4 analytics vars — NOT critical; app works without them, just analytics won't fire.
+  // We track them as "degraded" so health endpoint returns 200 not 503.
   const analyticsVars: Array<{ name: string; label: string }> = [
     { name: 'NEXT_PUBLIC_GA4_MEASUREMENT_ID', label: 'GA4 Measurement ID' },
     { name: 'GA4_API_SECRET', label: 'GA4 Measurement Protocol API secret' },
@@ -109,7 +110,7 @@ export function checkEnvironmentVars(): HealthCheckResult[] {
     if (!value) {
       checks.push({
         name: `env:${name}`,
-        status: 'fail',
+        status: 'degraded',
         message: `${label} (${name}) is not set — server-side GA4 events will not fire`,
       });
     } else {
@@ -145,11 +146,15 @@ export function checkEnvironmentVars(): HealthCheckResult[] {
 /**
  * Compute aggregate status from individual check results.
  * - All pass → healthy
- * - Any fail → critical (for MVP, degraded is unused but reserved)
+ * - Any fail (core infra like DB, auth, Stripe) → critical
+ * - Any degraded (optional like analytics) → degraded
+ * - Mixed fail + degraded → critical (fail takes precedence)
  */
 export function computeStatus(checks: HealthCheckResult[]): 'healthy' | 'degraded' | 'critical' {
   const failures = checks.filter((c) => c.status === 'fail').length;
+  const degraded = checks.filter((c) => c.status === 'degraded').length;
   if (failures > 0) return 'critical';
+  if (degraded > 0) return 'degraded';
   return 'healthy';
 }
 
