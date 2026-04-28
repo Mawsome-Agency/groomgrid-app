@@ -327,6 +327,39 @@ export default function HomePage() {
         <p className="text-green-200 text-sm mt-4">No credit card required · Cancel anytime</p>
       </section>
 
+      {/* ── Explore GroomGrid ── */}
+      <section
+        ref={revealRef(0)}
+        className="scroll-reveal px-6 py-12 max-w-5xl mx-auto"
+      >
+        <h2 className="text-xl font-bold text-stone-800 mb-6">
+          Find the Right Tool for Your Grooming Business
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[
+            { href: '/cat-grooming-software', category: 'Cat Groomers', title: 'Cat Grooming Software' },
+            { href: '/mobile-grooming-software', category: 'Mobile Groomers', title: 'Mobile Grooming Software' },
+            { href: '/plans', category: 'Pricing', title: 'See All Plans' },
+            { href: '/best-dog-grooming-software', category: "Buyer's Guide", title: 'Best Dog Grooming Software' },
+            { href: '/moego-alternatives', category: 'Alternatives', title: 'MoeGo Alternatives' },
+            { href: '/daysmart-alternatives', category: 'Alternatives', title: 'DaySmart Alternatives' },
+            { href: '/pawfinity-alternatives', category: 'Alternatives', title: 'Pawfinity Alternatives' },
+            { href: '/blog/cat-grooming-business-guide', category: 'Business Guide', title: 'Cat Grooming Business Guide' },
+          ].map(({ href, category, title }) => (
+            <Link
+              key={href}
+              href={href}
+              className="group p-5 border border-stone-200 rounded-xl hover:border-green-300 hover:shadow-md transition-all"
+            >
+              <p className="text-sm text-green-600 font-semibold mb-1">{category}</p>
+              <h3 className="font-bold text-stone-800 group-hover:text-green-600 transition-colors text-sm">
+                {title}
+              </h3>
+            </Link>
+          ))}
+        </div>
+      </section>
+
       {/* ── Footer ── */}
       <footer className="px-6 py-8 text-center text-stone-400 text-sm border-t border-stone-100">
         <p className="mb-2">
