@@ -250,6 +250,7 @@ describe('HomePage', () => {
       { href: '/daysmart-alternatives', category: 'Alternatives', title: 'DaySmart Alternatives' },
       { href: '/pawfinity-alternatives', category: 'Alternatives', title: 'Pawfinity Alternatives' },
       { href: '/blog/cat-grooming-business-guide', category: 'Business Guide', title: 'Cat Grooming Business Guide' },
+      { href: '/features/mobile-groomer', category: 'Feature Spotlight', title: 'Mobile Groomer Tools' },
     ];
 
     it('renders an Explore section with heading "Find the Right Tool"', () => {
@@ -261,7 +262,7 @@ describe('HomePage', () => {
     it('renders exactly 8 explore link cards', () => {
       const { container } = render(<HomePage />);
       const exploreCards = container.querySelectorAll('section a.group.border-stone-200.rounded-xl');
-      expect(exploreCards.length).toBe(8);
+      expect(exploreCards.length).toBe(9);
     });
 
     it('each explore link card has the correct href', () => {
@@ -292,7 +293,7 @@ describe('HomePage', () => {
     it('explore section uses the card styling pattern from reference pages', () => {
       const { container } = render(<HomePage />);
       const cards = container.querySelectorAll('a.group.border-stone-200.rounded-xl');
-      expect(cards.length).toBe(8);
+      expect(cards.length).toBe(9);
       cards.forEach((card) => {
         expect(card.className).toContain('hover:border-green-300');
       });
