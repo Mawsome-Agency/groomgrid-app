@@ -75,9 +75,9 @@ export default function HomePage() {
 
       {/* ── Promo Banner ── */}
       <div className="bg-green-600 text-white text-center py-2.5 px-4 text-sm font-semibold">
-        🎉 Launch Special — <span className="font-bold underline">BETA50</span>: 50% off for first 100 subscribers. No waitlist.{' '}
-        <Link href="/plans" className="underline hover:text-green-100 transition-colors">
-          See plans →
+        🐾 Launch pricing — <span className="font-bold">$14.50/mo for founding groomers</span> (code BETA50). Only 78 spots left.{' '}
+        <Link href={SIGNUP_URL} className="underline hover:text-green-100 transition-colors">
+          Claim yours →
         </Link>
       </div>
 
@@ -103,26 +103,26 @@ export default function HomePage() {
       {/* ── Hero — above the fold, no scroll-reveal ── */}
       <section className="px-6 pt-14 pb-16 max-w-3xl mx-auto text-center">
         <p className="text-green-600 font-semibold text-sm uppercase tracking-widest mb-4">
-          Built for busy groomers
+          For solo mobile groomers
         </p>
         <h1 className="text-4xl sm:text-5xl font-extrabold text-stone-900 leading-tight mb-6">
-          Stop losing $500/month to<br className="hidden sm:block" /> no-shows and double bookings.
+          No-shows cost you $200+/mo.<br className="hidden sm:block" /> GroomGrid fixes that.
         </h1>
         <p className="text-lg text-stone-600 mb-8 max-w-xl mx-auto leading-relaxed">
-          Built for solo mobile groomers. Handle bookings, reminders, and payments
-          from your van — between dogs, with one hand.
+          Automated reminders, booking, and payments — built for groomers working out of a van.
+          Set it up in 5 minutes. Works between dogs, with one hand.
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
           <CtaLink
             href={SIGNUP_URL}
             className="w-full sm:w-auto px-8 py-4 rounded-xl bg-green-500 text-white font-bold text-lg hover:bg-green-600 transition-colors shadow-md"
           >
-            Start Free Trial — 14 Days Free
+            Try It Free — 14 Days
           </CtaLink>
-          <p className="text-sm text-stone-500">$29/mo after trial · No credit card required</p>
+          <p className="text-sm text-stone-500">$29/mo after · Cancel anytime · No credit card</p>
         </div>
         <p className="text-xs text-stone-400 mt-4">
-          Join 50+ groomers already on the waitlist 🐶
+          ✓ Setup in 5 min &nbsp; ✓ Works on your phone &nbsp; ✓ No credit card needed
         </p>
       </section>
 
@@ -220,40 +220,39 @@ export default function HomePage() {
         <div className="max-w-3xl mx-auto text-center">
           <div ref={revealRef(0)} className="scroll-reveal mb-10">
             <p className="text-green-600 font-semibold text-sm uppercase tracking-widest mb-2">
-              Early access
+              Built from real conversations
             </p>
             <h2 className="text-2xl font-bold text-stone-800 mb-2">
-              Join 50+ groomers on the waitlist
+              We asked groomers what they hated about running their business
             </h2>
             <p className="text-stone-500">
-              Independent groomers, mobile pros, and salon owners are already lined up.
-              Don&apos;t let them get a head start.
+              Every feature in GroomGrid came from real pain points mobile groomers told us about.
             </p>
           </div>
-          {/* Testimonial cards — parallax applied via JS ref, no scroll-reveal class */}
+          {/* Pain cards — what real groomers told us */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-left">
             {[
               {
                 quote:
-                  'GroomGrid cut my booking time in half. I can focus on the dogs, not the paperwork.',
-                name: 'Sarah Mitchell',
-                business: 'Paws on Wheels · Mobile Groomer',
+                  'I was using Google Calendar and sticky notes. My biggest fear was mixing up a client\'s allergy info.',
+                label: 'Why we built pet profiles',
+                detail: 'Allergies, breed notes, vaccination records — one place, not scattered.',
               },
               {
                 quote:
-                  'No-shows dropped 40% after I switched. The automatic reminders alone are worth every penny.',
-                name: 'James Rodriguez',
-                business: 'Fur Perfect Salon · 3 Groomers',
+                  'My no-show rate was 15-20%. Every missed appointment was $80-120 out the window and gas I can\'t get back.',
+                label: 'Why we built automated reminders',
+                detail: 'SMS + email reminders fire 48hrs and 2hrs before every appointment.',
               },
-            ].map(({ quote, name, business }, index) => (
+            ].map(({ quote, label, detail }, index) => (
               <div
-                key={name}
+                key={label}
                 ref={(el: HTMLDivElement | null) => { testimonialEls.current[index] = el; }}
                 className="bg-white rounded-2xl p-6 shadow-sm border border-stone-100"
               >
                 <p className="text-stone-700 text-sm leading-relaxed mb-4">&ldquo;{quote}&rdquo;</p>
-                <p className="font-semibold text-stone-800 text-sm">{name}</p>
-                <p className="text-stone-500 text-xs">{business}</p>
+                <p className="font-semibold text-green-600 text-sm">{label}</p>
+                <p className="text-stone-500 text-xs mt-1">{detail}</p>
               </div>
             ))}
           </div>
@@ -265,11 +264,11 @@ export default function HomePage() {
         ref={revealRef(0)}
         className="scroll-reveal px-6 py-14 max-w-2xl mx-auto text-center"
       >
-        <h2 className="text-2xl font-bold text-stone-800 mb-2">Simple pricing. No surprises.</h2>
-        <p className="text-stone-500 mb-8">$29/mo · Cheaper than one no-show a month · Save $120–600/year vs MoeGo</p>
+        <h2 className="text-2xl font-bold text-stone-800 mb-2">Cheaper than one no-show per month.</h2>
+        <p className="text-stone-500 mb-8">$29/mo for everything. Save $120–600/year vs MoeGo.</p>
         <div className="bg-green-50 border border-green-200 rounded-2xl p-8 mb-6">
           <p className="text-sm font-semibold text-green-600 uppercase tracking-widest mb-1">
-            Solo Groomer
+            Solo — for mobile groomers like you
           </p>
           <p className="text-5xl font-extrabold text-stone-900 mb-1">
             $29
@@ -280,11 +279,11 @@ export default function HomePage() {
           </p>
           <ul className="text-left space-y-2 mb-8 text-sm text-stone-600 max-w-xs mx-auto">
             {[
-              'Unlimited appointments',
-              'Automated SMS + email reminders',
-              'Client & pet profiles',
-              'Payment collection',
-              'Mobile-first app',
+              'Unlimited appointments — book from your phone',
+              'Auto SMS + email reminders — fewer no-shows',
+              'Pet profiles — allergies, breed notes, all in one spot',
+              'Built-in payments — get paid at booking',
+              'Works great on your phone — built for van life',
             ].map((feature) => (
               <li key={feature} className="flex items-center gap-2">
                 <span className="text-green-500 font-bold">✓</span>
@@ -313,11 +312,11 @@ export default function HomePage() {
         ref={revealRef(0)}
         className="scroll-reveal px-6 py-16 bg-green-600 text-white text-center"
       >
-        <h2 className="text-3xl font-bold mb-3">Ready to stop playing phone tag from your van?</h2>
+        <h2 className="text-3xl font-bold mb-3">Your next no-show is $100 you didn&apos;t need to lose.</h2>
         <p className="text-green-100 mb-2 max-w-md mx-auto leading-relaxed">
-          Join the groomers who are done with scheduling headaches. Your first 14
-          days are completely on us.</p>
-        <p className="text-yellow-200 font-semibold text-sm mb-8">First 20 groomers lock in $29/mo founding pricing — forever.</p>
+          GroomGrid sends the reminders, collects the payments, and keeps your schedule clean —
+          so you can focus on the dogs. 14 days free.</p>
+        <p className="text-yellow-200 font-semibold text-sm mb-8">Founding pricing: $14.50/mo with code BETA50 — lock it in forever.</p>
         <CtaLink
           href={SIGNUP_URL}
           className="inline-block px-10 py-4 rounded-xl bg-white text-green-600 font-bold text-lg hover:bg-green-50 transition-colors shadow-lg"
