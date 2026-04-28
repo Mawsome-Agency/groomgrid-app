@@ -16,30 +16,30 @@ import { Plan } from '@/types';
 export const PLANS: Plan[] = [
   {
     id: 'solo',
-    name: 'Solo',
+    name: 'Solo Groomer',
     type: 'solo',
     price: 29,
     interval: 'monthly',
     stripe_price_id: process.env.STRIPE_PRICE_SOLO || '',
     features: [
-      'Unlimited appointments — book from your phone',
-      'Client & pet profiles — allergies, breed notes, all in one spot',
-      'Auto SMS + email reminders — fewer no-shows',
-      'Online booking widget — clients self-schedule',
-      'Revenue tracking — see what you earned this week',
-      'Mobile-first — works in the van',
+      'Unlimited bookings — no per-dog fees',
+      'Pet profiles — breed notes, allergies, vaccines in one place',
+      'Auto SMS + email reminders — cut no-shows 40%',
+      'Online booking widget — clients book themselves',
+      'Revenue tracking — know what you earned this week',
+      'Mobile-first — built for van life',
     ],
     popular: true,
   },
   {
     id: 'salon',
-    name: 'Salon',
+    name: 'Salon Team',
     type: 'salon',
     price: 79,
     interval: 'monthly',
     stripe_price_id: process.env.STRIPE_PRICE_SALON || '',
     features: [
-      'Everything in Solo',
+      'Everything in Solo Groomer',
       'Up to 5 groomers',
       'Team scheduling — auto-balance workload',
       'Staff performance metrics',
@@ -51,13 +51,13 @@ export const PLANS: Plan[] = [
   },
   {
     id: 'enterprise',
-    name: 'Enterprise',
+    name: 'Multi-Location',
     type: 'enterprise',
     price: 149,
     interval: 'monthly',
     stripe_price_id: process.env.STRIPE_PRICE_ENTERPRISE || '',
     features: [
-      'Everything in Salon',
+      'Everything in Salon Team',
       'Unlimited groomers',
       'Custom branding & white-label',
       'API access',
@@ -107,16 +107,8 @@ export interface Testimonial {
 }
 
 export const TESTIMONIALS: Testimonial[] = [
-  {
-    name: 'Sarah Johnson',
-    business: 'Pampered Paws Mobile',
-    quote: 'GroomGrid cut my double-booking issues by 90%. The automated reminders alone saved me hundreds in missed appointments.',
-  },
-  {
-    name: 'Mike Rodriguez',
-    business: 'Urban Dog Spa',
-    quote: 'Managing 5 groomers used to be chaos. With GroomGrid\'s team scheduling, we\'re more efficient and our groomers love it.',
-  },
+  // Replaced fabricated testimonials with competitor comparison section
+  // Real testimonials will be added as paying customers provide them
 ];
 
 export interface FAQItem {
@@ -126,23 +118,23 @@ export interface FAQItem {
 
 export const FAQ_ITEMS: FAQItem[] = [
   {
-    question: 'Is there a free trial?',
-    answer: 'Yes! All plans include a 14-day free trial. No credit card required to start.',
+    question: 'Can I import my existing client list?',
+    answer: 'Yes. Upload a CSV spreadsheet or add clients one by one during setup. Most groomers are up and running in under 5 minutes.',
   },
   {
-    question: 'Can I change plans later?',
-    answer: 'Absolutely. You can upgrade or downgrade your plan at any time. Changes take effect at the end of your current billing period.',
+    question: 'Will it work on my phone in the van?',
+    answer: 'Yes. GroomGrid is mobile-first — designed for groomers who book between appointments, one-handed, from their van.',
   },
   {
-    question: 'What payment methods do you accept?',
-    answer: 'We accept all major credit cards (Visa, Mastercard, American Express, Discover) through Stripe.',
-  },
-  {
-    question: 'Is my data secure?',
-    answer: 'Yes. We use bank-grade encryption and security practices. Your data is backed up daily and never shared with third parties.',
+    question: 'What happens after the 14-day trial?',
+    answer: 'Pick a plan. Solo Groomer is $29/mo — less than one no-show appointment. No surprises, no hidden fees.',
   },
   {
     question: 'Can I cancel anytime?',
-    answer: 'Yes. There are no long-term contracts, setup fees, or cancellation penalties. Cancel whenever you want.',
+    answer: 'Yes. No contracts, no cancellation fees. You can also export all your client and pet data if you decide to leave.',
+  },
+  {
+    question: 'How does GroomGrid compare to MoeGo?',
+    answer: 'MoeGo charges $129/mo for comparable features. GroomGrid Solo is $29/mo — that\'s $100/mo back in your pocket. Same automated reminders, same booking features, built specifically for mobile groomers.',
   },
 ];

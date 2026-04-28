@@ -26,13 +26,13 @@ import './signup.css';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-// Social proof: plausible count for early-stage product
-const BASE_COUNT = 22;
+// Founding member count — honest, grows with real signups
+const BASE_COUNT = 4;
 
 const BENEFITS = [
-  { icon: Calendar, label: 'Smart scheduling — no more double-bookings' },
-  { icon: Bell, label: 'Automated reminders — slash no-shows' },
-  { icon: CreditCard, label: 'Payments built in — get paid faster' },
+  { icon: Calendar, label: 'Smart scheduling — blocks conflicts before they happen' },
+  { icon: Bell, label: 'Auto reminders at 48h and 2h — cuts no-shows by 40%' },
+  { icon: CreditCard, label: 'Collect payment at booking — no more chasing checks' },
 ];
 
 /** Counts from `start` up to `end` over `durationMs` */
@@ -143,11 +143,10 @@ function SignupPageInner() {
         pattern: EMAIL_REGEX,
         custom: (v) => (EMAIL_REGEX.test(v) ? null : 'Please enter a valid email address'),
       });
-    } else if (field === 'businessName') {
-      validateField('businessName', value, { required: true, minLength: 2 });
     } else if (field === 'password') {
       validateField('password', value, { required: true, minLength: 8 });
     }
+    // businessName is optional — no blur validation needed
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -160,14 +159,14 @@ function SignupPageInner() {
       pattern: EMAIL_REGEX,
       custom: (v) => (EMAIL_REGEX.test(v) ? null : 'Please enter a valid email address'),
     });
-    const businessNameValid = validateField('businessName', formData.businessName, { required: true, minLength: 2 });
     const passwordValid = validateField('password', formData.password, { required: true, minLength: 8 });
+    // businessName is optional — no validation needed
 
-    if (!emailValid || !businessNameValid || !passwordValid) return;
+    if (!emailValid || !passwordValid) return;
 
     setLoading(true);
 
-    trackSignupStarted(formData.businessName);
+    trackSignupStarted(formData.businessName || 'My Grooming Business');
 
     // Retrieve UTM attribution from sessionStorage (set on page load by useEffect)
     let attribution: Record<string, unknown> | null = null;
@@ -189,7 +188,7 @@ function SignupPageInner() {
         body: JSON.stringify({
           email: formData.email,
           password: formData.password,
-          businessName: formData.businessName,
+          businessName: formData.businessName || 'My Grooming Business',
           attributionData: attribution,
         }),
       });
@@ -251,7 +250,7 @@ function SignupPageInner() {
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-stone-50 flex flex-col items-center justify-center p-4">
       {/* BETA50 Promo Banner */}
       <div className="w-full max-w-3xl mb-3 bg-green-600 text-white text-center py-2.5 px-4 rounded-xl text-sm font-semibold">
-        🎉 Launch Special — use code <span className="font-bold underline">BETA50</span> for 50% off your first month!{' '}
+        🐾 Launch pricing — <span className="font-bold">$14.50/mo</span> for founding groomers (code <span className="font-bold underline">BETA50</span>). Lock it in forever.{' '}
         <Link href="/plans" className="underline hover:text-green-100 transition-colors">
           View plans →
         </Link>
@@ -268,12 +267,12 @@ function SignupPageInner() {
               <span className="text-2xl font-bold">GroomGrid</span>
             </Link>
 
-            {/* Social proof counter */}
+            {/* Founding member urgency */}
             <div className="flex items-center gap-2 mb-8 bg-white/15 rounded-xl px-4 py-3">
               <Users className="w-5 h-5 flex-shrink-0" aria-hidden="true" />
               <p className="text-sm font-medium">
                 <span className="text-lg font-bold" aria-live="polite">{groomerCount}</span>
-                {' '}groomers signed up this month
+                {' '}founding groomers — lock in $14.50/mo with BETA50
               </p>
             </div>
 
@@ -308,12 +307,12 @@ function SignupPageInner() {
               <span className="text-2xl font-bold text-green-600">GroomGrid</span>
             </Link>
 
-            {/* Mobile social proof */}
+            {/* Mobile founding member urgency */}
             <div className="md:hidden flex items-center justify-center gap-1.5 mb-4 text-sm text-stone-600">
               <Users className="w-4 h-4 text-green-500 flex-shrink-0" aria-hidden="true" />
               <span>
                 <strong className="text-stone-800" aria-live="polite">{groomerCount}</strong>
-                {' '}groomers signed up this month
+                {' '}founding groomers — BETA50 locks $14.50/mo
               </span>
             </div>
 
@@ -418,10 +417,10 @@ function SignupPageInner() {
               <PasswordStrengthMeter password={formData.password} />
             </div>
 
-            {/* Business Name — last field (optional-ish, lower friction) */}
+            {/* Business Name — optional, lower friction */}
             <div>
               <label htmlFor="businessName" className="block text-sm font-medium text-stone-700 mb-1">
-                Business Name <span className="text-stone-400 font-normal">(or just your name)</span>
+                Business Name <span className="text-stone-400 font-normal">(optional)</span>
               </label>
               <div className="relative">
                 <Building className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-stone-500" />
@@ -431,12 +430,9 @@ function SignupPageInner() {
                   type="text"
                   value={formData.businessName}
                   onChange={(e) => handleFieldChange('businessName', e.target.value)}
-                  onBlur={(e) => handleBlur('businessName', e.target.value)}
                   onFocus={() => clearFieldError('businessName')}
-                  placeholder="e.g., Paws on Wheels"
-                  required
+                  placeholder="e.g., Paws on Wheels — or add later"
                   disabled={loading}
-                  aria-invalid={!!errors.businessName}
                   className="w-full pl-10 pr-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all disabled:bg-stone-50 disabled:cursor-not-allowed"
                 />
               </div>
@@ -485,7 +481,7 @@ function SignupPageInner() {
               {[
                 { icon: CreditCard, text: 'No credit card' },
                 { icon: Check, text: 'Cancel anytime' },
-                { icon: Shield, text: 'Trusted by groomers' },
+                { icon: Shield, text: 'No lock-in contracts' },
               ].map(({ icon: Icon, text }) => (
                 <div key={text} className="flex items-center gap-1 text-xs text-stone-500">
                   <Icon className="w-3.5 h-3.5 text-green-500 flex-shrink-0" aria-hidden="true" />

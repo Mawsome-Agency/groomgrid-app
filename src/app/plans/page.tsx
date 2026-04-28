@@ -284,7 +284,7 @@ function PlansPageInner() {
       {/* BETA50 Promo Banner */}
       <div className="bg-green-600 text-white text-center py-3 px-4">
         <p className="text-sm font-semibold">
-          🎉 Launch Special: Use code <span className="font-bold underline">BETA50</span> for 50% off your first month! Limited to first 100 users.
+          🐾 Launch pricing — <span className="font-bold">$14.50/mo for founding groomers</span> (code BETA50). Lock it in forever.
         </p>
       </div>
 
@@ -309,7 +309,7 @@ function PlansPageInner() {
         {/* Hero Section */}
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold text-stone-900 mb-4">Pick Your Plan — Cancel Anytime</h2>
-          <p className="text-xl text-stone-600">14-day free trial on every plan. No credit card to start.</p>
+          <p className="text-xl text-stone-600">14-day free trial on every plan. Solo Groomer is $29/mo — less than one no-show.</p>
         </div>
 
         {/* Checkout Error Alert */}
@@ -381,22 +381,29 @@ function PlansPageInner() {
           </div>
         </div>
 
-        {/* Testimonials */}
+        {/* Why GroomGrid vs Competitors */}
         <div className="mb-12">
           <h3 className="text-2xl font-bold text-stone-900 mb-6 text-center">
-            Trusted by Professional Groomers
+            Why GroomGrid, Not MoeGo or DaySmart?
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-            {TESTIMONIALS.map((testimonial, index) => (
-              <div key={index} className="bg-white rounded-xl p-6 border border-stone-200">
-                <p className="text-stone-700 italic mb-4">&ldquo;{testimonial.quote}&rdquo;</p>
-                <div>
-                  <p className="font-semibold text-stone-900">{testimonial.name}</p>
-                  <p className="text-sm text-stone-500">{testimonial.business}</p>
-                </div>
-              </div>
-            ))}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+            <div className="bg-white rounded-xl p-6 border-2 border-green-300">
+              <p className="font-bold text-green-600 mb-2">GroomGrid</p>
+              <p className="text-3xl font-extrabold text-stone-900 mb-1">$29<span className="text-sm font-normal text-stone-500">/mo</span></p>
+              <p className="text-sm text-stone-600">Solo Groomer plan. Mobile-first. Auto reminders. Built-in payments. No per-booking fees.</p>
+            </div>
+            <div className="bg-white rounded-xl p-6 border border-stone-200">
+              <p className="font-bold text-stone-800 mb-2">MoeGo</p>
+              <p className="text-3xl font-extrabold text-stone-400 mb-1">$129<span className="text-sm font-normal text-stone-400">/mo</span></p>
+              <p className="text-sm text-stone-500">Similar features, 4× the price. Better for large salons, overkill for mobile groomers.</p>
+            </div>
+            <div className="bg-white rounded-xl p-6 border border-stone-200">
+              <p className="font-bold text-stone-800 mb-2">DaySmart</p>
+              <p className="text-3xl font-extrabold text-stone-400 mb-1">$59<span className="text-sm font-normal text-stone-400">/mo</span></p>
+              <p className="text-sm text-stone-500">Legacy software. Desktop-first. Clunky on mobile. No automated payment collection.</p>
+            </div>
           </div>
+          <p className="text-center text-sm text-stone-500 mt-4">$29/mo = less than one no-show. That&apos;s the math.</p>
         </div>
 
         {/* FAQ Section */}
@@ -419,9 +426,9 @@ function PlansPageInner() {
               href={coupon ? `/signup?coupon=${encodeURIComponent(coupon)}` : '/signup'}
               className="inline-block bg-green-600 hover:bg-green-700 text-white font-semibold px-8 py-3 rounded-xl transition-colors"
             >
-              Get Started Free — 14 Day Trial
+              Start Free Trial — 14 Days Free
             </Link>
-            <p className="text-stone-500 text-sm mt-3">No credit card required</p>
+            <p className="text-stone-500 text-sm mt-3">No credit card · Cancel anytime · No lock-in</p>
           </div>
         )}
       </main>

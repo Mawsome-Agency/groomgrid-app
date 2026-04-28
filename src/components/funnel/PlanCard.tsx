@@ -39,7 +39,7 @@ export default function PlanCard({ plan, selected, onSelect, isLoading, isDimmed
         <div className="absolute -top-3 left-1/2 -translate-x-1/2">
           <span className="inline-flex items-center gap-1 px-3 py-1 bg-green-500 text-white text-xs font-semibold rounded-full">
             <Star className="w-3 h-3" />
-            Most Popular
+            Best for solo groomers
           </span>
         </div>
       )}
@@ -82,6 +82,13 @@ export default function PlanCard({ plan, selected, onSelect, isLoading, isDimmed
       >
         {selected ? 'Selected' : plan.popular ? 'Start Free Trial' : 'Choose Plan'}
       </button>
+
+      {/* Solo plan price anchor */}
+      {plan.id === 'solo' && (
+        <p className="text-xs text-center text-stone-400 mt-2">
+          Less than one no-show · $100/mo cheaper than MoeGo
+        </p>
+      )}
 
       {/* Trust Signal: No Hidden Fees */}
       <NoHiddenFeesSeal className="justify-center" />
