@@ -68,9 +68,9 @@ export async function createCheckoutSession({
     customer_email: customerEmail,
     mode: 'subscription',
     payment_method_types: ['card'],
-    // Only collect payment method when payment is actually due.
-    // For trial subscriptions, this lets Stripe skip the card form when possible.
-    payment_method_collection: 'if_required',
+    // Always collect payment method during checkout.
+    // Stripe trials require card on file — subscription will start with trial_period_days.
+    payment_method_collection: 'always',
     line_items: [
       {
         price: priceId,

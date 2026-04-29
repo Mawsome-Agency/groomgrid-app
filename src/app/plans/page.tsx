@@ -170,31 +170,7 @@ function PlansPageInner() {
     // Fire client-side GA4 events
     trackPlanSelected(plan.type, plan.price);
 
-    // Trial users: save plan choice directly — no Stripe checkout needed
-    if (isOnTrial) {
-      try {
-        const response = await fetch('/api/profile', {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ planType: plan.type }),
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to save plan selection');
-        }
-
-        // Redirect to dashboard with confirmation
-        router.push(`/dashboard?plan_selected=${encodeURIComponent(plan.name)}`);
-      } catch (err: any) {
-        console.error('Plan selection error:', err);
-        setCheckoutError('Failed to save your plan selection. Please try again.');
-        setIsCheckoutInFlight(false);
-        setSelectedPlan(null);
-      }
-      return;
-    }
-
-    // Non-trial users: proceed to Stripe checkout for payment
+    // All authenticated users proceed to Stripe checkout (trial users will see $0 today)
     trackCheckoutStarted(plan.name, plan.price);
     trackBillingSummaryViewed(plan.name, plan.price * 100, true);
 
@@ -223,13 +199,7 @@ function PlansPageInner() {
         return;
       }
 
-      // Trial plan selection (no Stripe) — redirect to dashboard
-      if (data.trial) {
-        setIsCheckoutInFlight(false);
-        router.push(`/dashboard?plan_selected=${encodeURIComponent(plan.name)}`);
-        return;
-      }
-
+      // Stripe checkout URL received — redirect to checkout
       if (data.url) {
         setIsCheckoutInFlight(false);
         window.location.href = data.url;

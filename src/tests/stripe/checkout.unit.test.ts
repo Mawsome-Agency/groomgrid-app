@@ -415,9 +415,9 @@ describe('POST /api/checkout', () => {
 
   // ── Plan data coverage ──────────────────────
   it.each([
-    ['solo', 'Solo', 2900],
-    ['salon', 'Salon', 7900],
-    ['enterprise', 'Enterprise', 14900],
+    ['solo', 'Solo Groomer', 2900],
+    ['salon', 'Salon Team', 7900],
+    ['enterprise', 'Multi-Location', 14900],
   ])('passes correct planData for plan "%s"', async (planType, planName, price) => {
     const req = makeRequest({ userId: 'user-123', planType });
     await POST(req);
@@ -642,13 +642,9 @@ describe('POST /api/checkout — trial guard', () => {
     mockFindFirstLockout.mockResolvedValue(null);
   });
 
-  it('returns 200 with trial:true for active trial users — plan saved without Stripe', async () => {
+  it('allows checkout for active trial users — all users go through Stripe', async () => {
     const futureDate = new Date();
     futureDate.setDate(futureDate.getDate() + 10);
-
-    // Mock prisma.profile.update (used in the trial path)
-    const mockUpdate = jest.fn().mockResolvedValue({ id: 'profile-1', planType: 'solo' });
-    (prisma as any).profile.update = mockUpdate;
 
     mockFindUniqueProfile.mockResolvedValue({
       id: 'profile-1',
@@ -657,19 +653,20 @@ describe('POST /api/checkout — trial guard', () => {
       subscriptionStatus: 'trial',
       trialEndsAt: futureDate,
     } as any);
+    mockCreateCheckoutSession.mockResolvedValue({
+      id: 'cs_test_123',
+      url: 'https://checkout.stripe.com/test',
+    } as any);
+    mockTrackPayment.mockResolvedValue(undefined);
 
     const req = makeRequest({ userId: 'user-123', planType: 'solo' });
     const res = await POST(req);
     const body = await res.json();
 
     expect(res.status).toBe(200);
-    expect(body.trial).toBe(true);
-    expect(body.planType).toBe('solo');
-    expect(mockCreateCheckoutSession).not.toHaveBeenCalled();
-    expect(mockUpdate).toHaveBeenCalledWith({
-      where: { userId: 'user-123' },
-      data: { planType: 'solo' },
-    });
+    expect(body.url).toBe('https://checkout.stripe.com/test');
+    expect(mockCreateCheckoutSession).toHaveBeenCalled();
+    // Trial users now go through Stripe checkout to collect payment method
   });
 
   it('allows checkout when trial has expired (past trialEndsAt)', async () => {

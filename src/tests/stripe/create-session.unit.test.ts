@@ -147,7 +147,7 @@ describe('createCheckoutSession params — Bug 1 & 2 interface contract', () => 
     await POST(req);
 
     const [args] = mockCreateCheckoutSession.mock.calls[0];
-    expect(args.planData).toEqual({ name: 'Solo', price: 2900 });
+    expect(args.planData).toEqual({ name: 'Solo Groomer', price: 2900 });
   });
 
   it('params object matches CreateCheckoutSessionParams shape — no extra Stripe-internal fields', async () => {
@@ -207,9 +207,9 @@ describe('session creation response shape', () => {
   });
 
   it.each([
-    ['solo',       { name: 'Solo',       price: 2900  }],
-    ['salon',      { name: 'Salon',      price: 7900  }],
-    ['enterprise', { name: 'Enterprise', price: 14900 }],
+    ['solo',       { name: 'Solo Groomer',   price: 2900  }],
+    ['salon',      { name: 'Salon Team',     price: 7900  }],
+    ['enterprise', { name: 'Multi-Location', price: 14900 }],
   ])('passes correct planData for %s plan', async (planType, expectedPlanData) => {
     const req = makeReq({ userId: 'user-123', planType });
     await POST(req);
