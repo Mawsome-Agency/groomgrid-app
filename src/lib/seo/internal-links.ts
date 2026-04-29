@@ -166,6 +166,7 @@ export const topicClusters: TopicCluster[] = [
       { slug: 'dog-grooming-appointment-app', title: 'Best Dog Grooming Appointment App', type: 'blog', path: '/blog/dog-grooming-appointment-app' },
       { slug: '123-pet-grooming-software-alternatives', title: '123 Pet Grooming Software Alternatives', type: 'landing', path: '/123-pet-grooming-software-alternatives' },
       { slug: 'pet-grooming-business-software', title: 'Pet Grooming Business Software', type: 'landing', path: '/pet-grooming-business-software' },
+      { slug: 'dog-grooming-scheduling-software', title: 'Dog Grooming Scheduling Software', type: 'landing', path: '/dog-grooming-scheduling-software' },
     ],
   },
   {

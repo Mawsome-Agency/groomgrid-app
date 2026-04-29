@@ -4,6 +4,7 @@ import Script from 'next/script';
 import PageBreadcrumbs from '@/components/marketing/PageBreadcrumbs';
 import PageRelatedLinks from '@/components/marketing/PageRelatedLinks';
 import SiteFooter from '@/components/marketing/SiteFooter';
+import { generateBreadcrumbListSchema, generateOpenGraph } from '@/lib/seo/schema';
 
 export const metadata: Metadata = {
   title: 'Dog Grooming Scheduling Software — Easy Booking & Reminders | GroomGrid',
@@ -12,13 +13,11 @@ export const metadata: Metadata = {
   alternates: {
     canonical: 'https://getgroomgrid.com/dog-grooming-scheduling-software',
   },
-  openGraph: {
-    title: 'Dog Grooming Scheduling Software — Easy Booking & Reminders',
-    description:
-      'Grooming scheduling software that auto-sends reminders, blocks double bookings, and works from your phone. Try free 14 days.',
-    url: 'https://getgroomgrid.com/dog-grooming-scheduling-software',
-    type: 'article',
-  },
+  openGraph: generateOpenGraph(
+    'Dog Grooming Scheduling Software — Easy Booking & Reminders',
+    'Grooming scheduling software that auto-sends reminders, blocks double bookings, and works from your phone. Try free 14 days.',
+    'https://getgroomgrid.com/dog-grooming-scheduling-software'
+  ),
 };
 
 const serviceSchema = {
@@ -26,7 +25,7 @@ const serviceSchema = {
   '@type': 'Service',
   name: 'GroomGrid Dog Grooming Scheduling Software',
   description:
-    'AI-powered scheduling software for dog grooming businesses. Auto-reminders, conflict blocking, 2-tap booking, and mobile-first design.',
+    'AI-powered scheduling software for dog groomers with automated reminders, conflict blocking, and mobile-first booking.',
   provider: {
     '@type': 'Organization',
     name: 'GroomGrid',
@@ -42,7 +41,7 @@ const serviceSchema = {
       price: '29',
       priceCurrency: 'USD',
       billingIncrement: 'P1M',
-      description: 'Scheduling software for solo groomers — 2-tap booking, auto reminders, conflict blocking, and mobile access.',
+      description: 'Scheduling software for solo groomers with reminders, online booking, and mobile access.',
     },
     {
       '@type': 'Offer',
@@ -50,26 +49,7 @@ const serviceSchema = {
       price: '79',
       priceCurrency: 'USD',
       billingIncrement: 'P1M',
-      description: 'Scheduling software for salons — multi-staff calendars, team scheduling, and advanced booking management.',
-    },
-  ],
-};
-
-const breadcrumbSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'BreadcrumbList',
-  itemListElement: [
-    {
-      '@type': 'ListItem',
-      position: 1,
-      name: 'Home',
-      item: 'https://getgroomgrid.com',
-    },
-    {
-      '@type': 'ListItem',
-      position: 2,
-      name: 'Dog Grooming Scheduling Software',
-      item: 'https://getgroomgrid.com/dog-grooming-scheduling-software',
+      description: 'Multi-staff scheduling with team coordination, waitlist management, and advanced conflict detection.',
     },
   ],
 };
@@ -80,158 +60,313 @@ const faqSchema = {
   mainEntity: [
     {
       '@type': 'Question',
-      name: 'What is the best scheduling software for dog groomers?',
+      name: 'How does GroomGrid prevent double bookings?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'GroomGrid is the best scheduling software for dog groomers in 2026. It offers 2-tap booking, automated SMS/email reminders, smart conflict blocking to prevent double bookings, and a mobile-first design that works perfectly from any phone. Solo plans start at $29/month with a 14-day free trial.',
+        text: 'GroomGrid uses intelligent conflict detection that checks groomer availability, appointment duration, and buffer time between appointments. When a client tries to book a slot that overlaps with an existing appointment, the system automatically blocks the request and suggests the next available time. For multi-groomer salons, it tracks each groomer\'s schedule separately.',
       },
     },
     {
       '@type': 'Question',
-      name: 'How does grooming scheduling software prevent double bookings?',
+      name: 'Can clients book appointments online 24/7?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Grooming scheduling software prevents double bookings through real-time conflict detection. When a client books online or you add an appointment manually, the system instantly checks for overlapping time slots and blocks the booking if there is a conflict. GroomGrid also shows a visual calendar view that makes scheduling conflicts immediately obvious.',
+        text: 'Yes. Every GroomGrid account includes a personalized booking page (yourname.getgroomgrid.com) that clients can access anytime. They can see your real-time availability, select services, choose preferred times, and receive instant confirmation—all without calling you. You control which services are bookable online and can require deposits for certain appointment types.',
       },
     },
     {
       '@type': 'Question',
-      name: 'Can clients book appointments online with grooming scheduling software?',
+      name: 'How do the automated reminders work?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Yes — GroomGrid includes a branded online booking page that clients can access 24/7. They select their preferred service, choose from available time slots, enter their pet information, and receive instant confirmation. The booking syncs directly to your calendar, and automated reminders fire without any manual work from you.',
+        text: 'GroomGrid sends a sequence of automated SMS and email reminders: 48 hours before (confirmation request), 24 hours before (friendly reminder with prep instructions), and 2 hours before (final reminder). Clients can confirm, reschedule, or cancel with one tap. Studies show this 3-touch reminder system reduces no-shows by 30-40%.',
       },
     },
     {
       '@type': 'Question',
-      name: 'How much does dog grooming scheduling software cost?',
+      name: 'Is there a mobile app for managing my schedule on the go?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Dog grooming scheduling software typically costs $29–$79 per month. GroomGrid starts at $29/month for solo groomers (includes unlimited appointments, auto reminders, and online booking) and $79/month for salons with team scheduling. Use code BETA50 for 50% off your first month.',
+        text: 'GroomGrid is built mobile-first, so the entire platform works perfectly from any smartphone browser—no separate app download required. Check your schedule, add appointments, view pet profiles, and send reminders all from your phone. For mobile groomers working from a van, this means full schedule access without touching a laptop.',
       },
     },
     {
       '@type': 'Question',
-      name: 'Do automated reminders really reduce no-shows?',
+      name: 'Can I set different appointment durations for different services?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Yes — automated reminders reduce no-shows by 30–40% on average. GroomGrid sends a 3-touch reminder sequence: SMS and email 48 hours before, another 24 hours before, and a final SMS 2 hours before the appointment. Clients can confirm, reschedule, or cancel with one tap, giving you time to fill any open slots.',
+        text: 'Absolutely. Configure default durations for each service type—nail trims (15 min), bath and brush (45 min), full groom small dog (60 min), full groom large dog (90 min), etc. When clients book online or you add appointments manually, the system automatically reserves the correct amount of time. You can also override durations for specific appointments if needed.',
       },
     },
     {
       '@type': 'Question',
-      name: 'Can I manage my schedule from my phone?',
+      name: 'How much does GroomGrid scheduling software cost?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Absolutely. GroomGrid is built mobile-first, meaning every feature works perfectly from a smartphone. You can view your daily schedule, add new appointments, check pet profiles before arrival, and send reminders — all without touching a laptop. This is essential for mobile groomers working from vans.',
+        text: 'GroomGrid starts at $29/month for the Solo plan, which includes unlimited scheduling, automated reminders, online booking, and mobile access. The Salon plan at $79/month adds multi-staff scheduling, waitlist management, and team coordination features. Both plans include a 14-day free trial, and you can use code BETA50 for 50% off your first month.',
       },
     },
     {
       '@type': 'Question',
-      name: 'How does scheduling software handle different appointment lengths?',
+      name: 'Does GroomGrid have a waitlist feature?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'GroomGrid lets you set default durations for each service type (e.g., 45 min for a bath, 90 min for a full groom, 120 min for a large breed). When booking, the system automatically reserves the correct amount of time and prevents appointments from being scheduled too close together. You can also customize durations for individual appointments.',
+        text: 'Yes. When you\'re fully booked, clients can join a waitlist for their preferred date/time. If an appointment cancels, GroomGrid automatically notifies waitlisted clients in order and gives them a time window to claim the slot. This fills gaps in your schedule without manual outreach, recovering revenue that would otherwise be lost.',
       },
     },
   ],
 };
 
 export default function DogGroomingSchedulingSoftwarePage() {
+  const breadcrumbSchema = generateBreadcrumbListSchema('dog-grooming-scheduling-software');
+
   const painPoints = [
     {
       icon: '📅',
-      problem: 'Double bookings wreck your day',
-      solution:
-        'GroomGrid blocks conflicts before they happen. When you try to book an overlapping slot, the system warns you instantly. Visual calendar view makes overlaps obvious at a glance.',
+      problem: 'Double bookings and calendar chaos',
+      solution: 'Intelligent conflict detection blocks overlapping appointments automatically. Multi-staff salons see each groomer\'s schedule separately—no more accidental double-bookings.',
     },
     {
       icon: '🚫',
-      problem: 'No-shows cost you $75-120 each',
-      solution:
-        'Automated 3-touch reminder sequence (48h, 24h, 2h before) cuts no-shows by 30-40%. Clients can confirm, reschedule, or cancel with one tap. You get notified immediately so you can fill the slot.',
+      problem: 'No-shows wasting your time',
+      solution: 'Automated 3-touch reminder sequence (48h, 24h, 2h) reduces no-shows by 30-40%. Clients confirm or reschedule with one tap, giving you time to fill gaps.',
+    },
+    {
+      icon: '📞',
+      problem: 'Phone tag and endless scheduling calls',
+      solution: '24/7 online booking lets clients see your availability and book instantly. Your personalized booking page handles the back-and-forth so you can focus on grooming.',
+    },
+    {
+      icon: '📋',
+      problem: 'Scattered notes and client info',
+      solution: 'Every appointment links to a complete pet profile—breed, size, allergies, behavioral notes, and full grooming history accessible in seconds.',
+    },
+    {
+      icon: '💸',
+      problem: 'Chasing payments after appointments',
+      solution: 'Require deposits at booking, send payment links via SMS, or store cards on file. Get paid before the client leaves—no more awkward follow-ups.',
     },
     {
       icon: '📱',
-      problem: 'Desktop scheduling apps do not work on the road',
-      solution:
-        'GroomGrid is built mobile-first. Check your schedule, book appointments, and send reminders from any phone. Works perfectly on a 6-inch screen — no pinching and zooming required.',
-    },
-    {
-      icon: '✍️',
-      problem: 'Clients texting "any openings this week?"',
-      solution:
-        'Give clients a branded online booking page (yourname.getgroomgrid.com). They book themselves 24/7, see only available slots, and get instant confirmation. You stop being the scheduling secretary.',
-    },
-    {
-      icon: '⏰',
-      problem: 'Manual scheduling eats your evenings',
-      solution:
-        'AI scheduling assistant builds your week for you. Set your working hours, services, and travel zones — GroomGrid suggests optimal appointment placement to minimize gaps and drive time.',
+      problem: 'Desktop-only software that doesn\'t work in the field',
+      solution: 'Mobile-first design means full schedule access from any phone. Check appointments, view pet profiles, and manage your day—even from a grooming van.',
     },
   ];
 
   const features = [
     {
       title: '2-Tap Booking',
-      description:
-        'Book appointments in literally two taps. Select the client, pick a time slot, done. The system auto-fills pet details, service history, and preferred durations.',
-      badge: 'Fastest',
+      description: 'Add appointments in seconds with intelligent defaults. GroomGrid suggests durations based on service type and pre-fills client info from your database.',
+      badge: 'Fast',
     },
     {
-      title: 'Conflict Blocking',
-      description:
-        'Try to double-book yourself and GroomGrid stops you. Real-time overlap detection prevents scheduling conflicts before they become angry client conversations.',
-      badge: 'Smart',
-    },
-    {
-      title: 'Auto 3-Touch Reminders',
-      description:
-        'SMS and email reminders fire automatically at 48 hours, 24 hours, and 2 hours before each appointment. Clients confirm with one tap. No-shows drop 30-40%.',
+      title: 'Auto SMS & Email Reminders',
+      description: '3-touch reminder sequence sent automatically. Clients confirm with one tap. Included in every plan—no extra fees for reminder credits.',
       badge: 'Included',
     },
     {
-      title: 'Online Booking Page',
-      description:
-        'Your branded booking page (yourname.getgroomgrid.com) lets clients self-schedule 24/7. They see only available slots — no more "are you free Thursday?" texts.',
-      badge: 'Revenue Tool',
+      title: 'Conflict Blocking',
+      description: 'Smart detection prevents double bookings by checking groomer availability, service duration, and buffer time. Never overbook again.',
+      badge: 'Smart',
     },
     {
       title: 'Mobile-First Design',
-      description:
-        'Every screen is optimized for your phone. Large tap targets, swipe-friendly navigation, and offline access so you can check schedules without cellular service.',
-      badge: 'Van-Ready',
+      description: 'Full scheduling power on any device. Large tap targets, fast loading, and offline access so you can check your schedule anywhere.',
+      badge: 'Mobile',
     },
     {
-      title: 'AI Scheduling Assistant',
-      description:
-        'Tell GroomGrid your service area and working hours. The AI suggests efficient daily routes that minimize drive time and maximize appointment density.',
-      badge: 'AI-Powered',
+      title: '24/7 Online Booking',
+      description: 'Your personalized booking page works while you sleep. Clients see real-time availability and book instantly—no phone calls required.',
+      badge: 'Revenue',
     },
     {
-      title: 'Custom Durations by Service',
-      description:
-        'Set default appointment lengths for each service type — bath (45 min), full groom (90 min), large breed (120 min). No more manual time calculations.',
+      title: 'Waitlist Management',
+      description: 'When appointments cancel, waitlisted clients get notified automatically. Fill gaps in your schedule without lifting a finger.',
+      badge: 'Auto',
+    },
+    {
+      title: 'Service-Based Durations',
+      description: 'Set custom appointment lengths by service type. Nail trims (15 min), full grooms (60-90 min), de-shedding treatments—GroomGrid tracks it all.',
       badge: 'Flexible',
     },
     {
-      title: 'Buffer Time Controls',
-      description:
-        'Automatically build buffer time between appointments — for cleanup, travel, or just catching your breath. Set custom buffers by service type.',
-      badge: 'Sanity-Saving',
+      title: 'Abandoned Booking Recovery',
+      description: 'When clients start but don\'t finish booking, GroomGrid sends a gentle reminder automatically—recovering appointments that would be lost.',
+      badge: 'Growth',
     },
   ];
 
-  const comparisonRows = [
-    { feature: 'Starting price', groomgrid: '$29/mo', moego: '$49+/mo', daysmart: '$49+/mo', pawfinity: '$40/mo' },
-    { feature: '2-tap booking', groomgrid: '✓', moego: '✓', daysmart: '—', pawfinity: '✓' },
-    { feature: 'Conflict blocking', groomgrid: '✓', moego: '✓', daysmart: '✓', pawfinity: '✓' },
-    { feature: 'Automated SMS reminders', groomgrid: 'Included', moego: 'Included', daysmart: 'Add-on', pawfinity: 'Included' },
-    { feature: 'Online booking page', groomgrid: '✓', moego: '✓', daysmart: '✓', pawfinity: '✓' },
-    { feature: 'Mobile-first design', groomgrid: '✓', moego: '✓', daysmart: '—', pawfinity: 'Partial' },
-    { feature: 'AI scheduling assistant', groomgrid: '✓', moego: '—', daysmart: '—', pawfinity: '—' },
-    { feature: 'Custom appointment durations', groomgrid: '✓', moego: '✓', daysmart: '✓', pawfinity: '✓' },
-    { feature: 'Free trial', groomgrid: '14 days', moego: '—', daysmart: '—', pawfinity: '7 days' },
+  const schedulingDeepDive = [
+    {
+      icon: '🗺️',
+      title: 'Smart Route Building',
+      description: 'For mobile groomers, GroomGrid optimizes your daily route to minimize drive time between appointments. See your full day mapped out with travel estimates.',
+    },
+    {
+      icon: '🌐',
+      title: '24/7 Online Booking',
+      description: 'Your booking page never sleeps. Capture appointments at 11 PM when pet owners finally remember to schedule. No more "I\'ll call you back tomorrow."',
+    },
+    {
+      icon: '🔄',
+      title: 'Gap Filling & Waitlist',
+      description: 'Cancellations happen. Your waitlist automatically notifies interested clients and fills empty slots—protecting your revenue without manual work.',
+    },
+    {
+      icon: '⏱️',
+      title: 'Custom Service Durations',
+      description: 'Set realistic appointment times for every service. A nail trim isn\'t a full groom—GroomGrid reserves the right amount of time for each appointment type.',
+    },
+  ];
+
+  const comparisonData = [
+    {
+      feature: 'Automated SMS Reminders',
+      groomgrid: true,
+      moego: true,
+      daysmart: true,
+      pawfinity: false,
+    },
+    {
+      feature: 'Online Booking Page',
+      groomgrid: true,
+      moego: true,
+      daysmart: true,
+      pawfinity: true,
+    },
+    {
+      feature: 'Double Booking Prevention',
+      groomgrid: true,
+      moego: true,
+      daysmart: true,
+      pawfinity: true,
+    },
+    {
+      feature: 'Mobile-First Design',
+      groomgrid: true,
+      moego: false,
+      daysmart: false,
+      pawfinity: false,
+    },
+    {
+      feature: 'Waitlist Management',
+      groomgrid: true,
+      moego: true,
+      daysmart: true,
+      pawfinity: false,
+    },
+    {
+      feature: 'Abandoned Booking Recovery',
+      groomgrid: true,
+      moego: false,
+      daysmart: false,
+      pawfinity: false,
+    },
+    {
+      feature: 'Service-Based Durations',
+      groomgrid: true,
+      moego: true,
+      daysmart: true,
+      pawfinity: true,
+    },
+    {
+      feature: 'Included Reminder Credits',
+      groomgrid: 'Unlimited',
+      moego: 'Limited',
+      daysmart: 'Limited',
+      pawfinity: 'Limited',
+    },
+    {
+      feature: 'Starting Price',
+      groomgrid: '$29/mo',
+      moego: '$49/mo',
+      daysmart: '$69/mo',
+      pawfinity: '$35/mo',
+    },
+  ];
+
+  const roiStats = [
+    {
+      number: '30–40%',
+      unit: 'fewer no-shows',
+      detail: 'Automated reminders recover 2-3 appointments per month. At $65-90 per groom, that\'s $130-270 in protected revenue monthly.',
+    },
+    {
+      number: '5+',
+      unit: 'hours saved weekly',
+      detail: 'Online booking eliminates scheduling calls. Mobile access means no more driving back to check the computer. Time is money.',
+    },
+    {
+      number: '$240+',
+      unit: 'saved annually vs MoeGo',
+      detail: 'GroomGrid Solo at $29/mo vs MoeGo\'s $49+/mo. Same core scheduling features—lower price, no setup fees.',
+    },
+  ];
+
+  const gettingStartedSteps = [
+    {
+      step: '1',
+      title: 'Sign up free',
+      body: 'Create your account in 60 seconds. No credit card required—your 14-day trial starts immediately with full scheduling access.',
+    },
+    {
+      step: '2',
+      title: 'Set your services & durations',
+      body: 'Add your service menu with custom durations. Nail trim (15 min), small dog full groom (60 min), large dog (90 min)—you control the schedule.',
+    },
+    {
+      step: '3',
+      title: 'Import existing clients',
+      body: 'Upload your client list via CSV or add them manually. Historical grooming notes can be imported or entered over time.',
+    },
+    {
+      step: '4',
+      title: 'Share your booking link',
+      body: 'Get your personalized booking page (yourname.getgroomgrid.com). Add it to Instagram, Facebook, business cards, and email signature.',
+    },
+    {
+      step: '5',
+      title: 'Connect payments',
+      body: 'Link your bank via Stripe in 5 minutes. Accept deposits at booking, send payment links, and get paid before the client leaves.',
+    },
+  ];
+
+  const faqItems = [
+    {
+      question: 'How does GroomGrid prevent double bookings?',
+      answer:
+        'GroomGrid uses intelligent conflict detection that checks groomer availability, appointment duration, and buffer time between appointments. When a client tries to book a slot that overlaps with an existing appointment, the system automatically blocks the request and suggests the next available time. For multi-groomer salons, it tracks each groomer\'s schedule separately.',
+    },
+    {
+      question: 'Can clients book appointments online 24/7?',
+      answer:
+        'Yes. Every GroomGrid account includes a personalized booking page (yourname.getgroomgrid.com) that clients can access anytime. They can see your real-time availability, select services, choose preferred times, and receive instant confirmation—all without calling you. You control which services are bookable online and can require deposits for certain appointment types.',
+    },
+    {
+      question: 'How do the automated reminders work?',
+      answer:
+        'GroomGrid sends a sequence of automated SMS and email reminders: 48 hours before (confirmation request), 24 hours before (friendly reminder with prep instructions), and 2 hours before (final reminder). Clients can confirm, reschedule, or cancel with one tap. Studies show this 3-touch reminder system reduces no-shows by 30-40%.',
+    },
+    {
+      question: 'Is there a mobile app for managing my schedule on the go?',
+      answer:
+        'GroomGrid is built mobile-first, so the entire platform works perfectly from any smartphone browser—no separate app download required. Check your schedule, add appointments, view pet profiles, and send reminders all from your phone. For mobile groomers working from a van, this means full schedule access without touching a laptop.',
+    },
+    {
+      question: 'Can I set different appointment durations for different services?',
+      answer:
+        'Absolutely. Configure default durations for each service type—nail trims (15 min), bath and brush (45 min), full groom small dog (60 min), full groom large dog (90 min), etc. When clients book online or you add appointments manually, the system automatically reserves the correct amount of time. You can also override durations for specific appointments if needed.',
+    },
+    {
+      question: 'How much does GroomGrid scheduling software cost?',
+      answer:
+        'GroomGrid starts at $29/month for the Solo plan, which includes unlimited scheduling, automated reminders, online booking, and mobile access. The Salon plan at $79/month adds multi-staff scheduling, waitlist management, and team coordination features. Both plans include a 14-day free trial, and you can use code BETA50 for 50% off your first month.',
+    },
+    {
+      question: 'Does GroomGrid have a waitlist feature?',
+      answer:
+        'Yes. When you\'re fully booked, clients can join a waitlist for their preferred date/time. If an appointment cancels, GroomGrid automatically notifies waitlisted clients in order and gives them a time window to claim the slot. This fills gaps in your schedule without manual outreach, recovering revenue that would otherwise be lost.',
+    },
   ];
 
   return (
@@ -242,14 +377,14 @@ export default function DogGroomingSchedulingSoftwarePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }}
       />
       <Script
-        id="breadcrumb-schema"
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
-      />
-      <Script
         id="faq-schema"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
+      <Script
+        id="breadcrumb-schema"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
 
       <div className="min-h-screen bg-white text-stone-900">
@@ -261,6 +396,7 @@ export default function DogGroomingSchedulingSoftwarePage() {
           <Link
             href="/signup?coupon=BETA50"
             className="px-4 py-2 rounded-lg bg-green-500 text-white text-sm font-semibold hover:bg-green-600 transition-colors"
+            data-cta="nav-trial"
           >
             Start Free Trial
           </Link>
@@ -274,44 +410,45 @@ export default function DogGroomingSchedulingSoftwarePage() {
         {/* ── Hero ── */}
         <header className="px-6 pt-10 pb-12 max-w-4xl mx-auto">
           <p className="text-green-600 font-semibold text-sm uppercase tracking-widest mb-4">
-            Scheduling Software · Updated April 2026
+            Scheduling Software • Updated April 2026
           </p>
           <h1 className="text-4xl sm:text-5xl font-extrabold text-stone-900 leading-tight mb-6">
             Dog Grooming Scheduling Software<br className="hidden sm:block" /> — Book Appointments in 2 Taps
           </h1>
           <p className="text-xl text-stone-600 leading-relaxed max-w-3xl">
-            Stop double bookings, eliminate no-shows, and let clients book themselves 24/7. 
-            GroomGrid is the scheduling software built for dog groomers — mobile-first, 
-            AI-powered, and ridiculously easy to use.
+            Stop double bookings, no-shows, and phone-tag forever. GroomGrid's scheduling software
+            auto-sends reminders, blocks conflicts before they happen, and lets clients book 24/7—
+            while you focus on grooming.
           </p>
           <div className="mt-8 flex flex-col sm:flex-row gap-4">
             <Link
               href="/signup?coupon=BETA50"
               className="px-7 py-3.5 rounded-xl bg-green-500 text-white font-bold text-lg hover:bg-green-600 transition-colors shadow-sm text-center"
+              data-cta="hero-primary"
             >
               Start Free 14-Day Trial →
             </Link>
             <Link
               href="/plans"
               className="px-7 py-3.5 rounded-xl border border-stone-300 text-stone-700 font-semibold text-lg hover:border-stone-400 transition-colors text-center"
+              data-cta="hero-secondary"
             >
               See Pricing
             </Link>
           </div>
           <p className="text-stone-400 text-sm mt-3">
-            No credit card required · Solo tier from $29/mo · Use code BETA50 for 50% off
+            No credit card required • Solo tier from $29/mo • Use code <strong className="text-green-600">BETA50</strong> for 50% off
           </p>
         </header>
 
-        {/* ── Pain Points + Solutions ── */}
+        {/* ── Pain Points ── */}
         <section className="px-6 py-14 bg-stone-50">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl font-bold text-stone-800 mb-3">
-              The Scheduling Chaos — and How Software Fixes It
+              6 Scheduling Headaches GroomGrid Solves
             </h2>
             <p className="text-stone-600 leading-relaxed mb-8">
-              Every groomer knows the pain of manual scheduling. Here is how GroomGrid 
-              replaces chaos with calm:
+              Every groomer knows the pain of schedule chaos. Here is how the right software eliminates each one:
             </p>
             <div className="grid grid-cols-1 gap-6">
               {painPoints.map((item) => (
@@ -327,21 +464,17 @@ export default function DogGroomingSchedulingSoftwarePage() {
           </div>
         </section>
 
-        {/* ── Feature Breakdown ── */}
+        {/* ── Features ── */}
         <section className="px-6 py-16 max-w-4xl mx-auto">
           <h2 className="text-3xl font-bold text-stone-800 mb-4">
-            Scheduling Features That Actually Save Time
+            Scheduling Features That Save Hours Every Week
           </h2>
           <p className="text-stone-600 leading-relaxed mb-10">
-            Every feature is designed around how groomers actually work — 
-            not how software engineers think you should work.
+            Built by groomers, for groomers. Every feature is designed around how you actually work.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             {features.map((feature) => (
-              <div
-                key={feature.title}
-                className="p-5 border border-stone-200 rounded-xl bg-white hover:border-green-300 hover:shadow-sm transition-all"
-              >
+              <div key={feature.title} className="p-5 border border-stone-200 rounded-xl bg-white hover:border-green-300 hover:shadow-sm transition-all">
                 <div className="flex items-start justify-between mb-2 gap-2">
                   <h3 className="font-bold text-stone-800 text-sm">{feature.title}</h3>
                   <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-semibold whitespace-nowrap flex-shrink-0">
@@ -354,109 +487,115 @@ export default function DogGroomingSchedulingSoftwarePage() {
           </div>
         </section>
 
-        {/* ── Feature Comparison Table ── */}
-        <section className="px-6 py-14 bg-green-50">
-          <div className="max-w-5xl mx-auto">
-            <h2 className="text-3xl font-bold text-stone-800 mb-4">
-              GroomGrid vs MoeGo vs DaySmart: Scheduling Features
-            </h2>
-            <p className="text-stone-600 leading-relaxed mb-8">
-              How the top grooming software platforms compare on scheduling capabilities:
-            </p>
-            <div className="overflow-x-auto rounded-xl border border-stone-200">
-              <table className="w-full text-sm">
-                <thead className="bg-stone-100 text-stone-700">
-                  <tr>
-                    <th className="text-left px-5 py-4 font-semibold">Feature</th>
-                    <th className="text-center px-5 py-4 font-semibold text-green-600">GroomGrid</th>
-                    <th className="text-center px-5 py-4 font-semibold text-stone-500">MoeGo</th>
-                    <th className="text-center px-5 py-4 font-semibold text-stone-500">DaySmart</th>
-                    <th className="text-center px-5 py-4 font-semibold text-stone-500">Pawfinity</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {comparisonRows.map((row, i) => (
-                    <tr key={row.feature} className={i % 2 === 0 ? 'bg-white' : 'bg-stone-50'}>
-                      <td className="px-5 py-3 text-stone-700 font-medium">{row.feature}</td>
-                      <td className="px-5 py-3 text-center text-green-600 font-semibold">{row.groomgrid}</td>
-                      <td className="px-5 py-3 text-center text-stone-500">{row.moego}</td>
-                      <td className="px-5 py-3 text-center text-stone-500">{row.daysmart}</td>
-                      <td className="px-5 py-3 text-center text-stone-500">{row.pawfinity}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <p className="text-stone-500 text-xs mt-3">
-              Based on published feature pages and pricing as of April 2026. Features subject to change.
-            </p>
-          </div>
-        </section>
-
-        {/* ── Mobile-First Focus ── */}
-        <section className="px-6 py-16 max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold text-stone-800 mb-4">
-            Built for Groomers Who Book Between Dogs
-          </h2>
-          <p className="text-stone-600 leading-relaxed mb-8">
-            Most scheduling software is designed for receptionists sitting at desks. 
-            GroomGrid is designed for groomers standing in vans, holding phones with one hand:
-          </p>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            {[
-              {
-                icon: '📱',
-                title: 'Large tap targets',
-                detail: 'Buttons sized for thumbs, not mouse cursors. No accidental taps, no frustration.',
-              },
-              {
-                icon: '⚡',
-                title: 'One-handed booking',
-                detail: 'Book an appointment in 10 seconds with one hand while holding a leash with the other.',
-              },
-              {
-                icon: '🌐',
-                title: 'Works offline',
-                detail: 'Check your schedule even without cellular service. Updates sync when you are back online.',
-              },
-            ].map((item) => (
-              <div key={item.title} className="bg-white border border-stone-200 rounded-xl p-6 text-center">
-                <div className="text-3xl mb-3">{item.icon}</div>
-                <p className="font-bold text-stone-800 mb-2">{item.title}</p>
-                <p className="text-stone-500 text-sm leading-relaxed">{item.detail}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* ── ROI Section ── */}
+        {/* ── Scheduling Deep Dive ── */}
         <section className="px-6 py-14 bg-green-50">
           <div className="max-w-4xl mx-auto">
+            <h2 className="text-3xl font-bold text-stone-800 mb-3">
+              Scheduling That Actually Works for Groomers
+            </h2>
+            <p className="text-stone-600 leading-relaxed mb-10">
+              Four powerful features that transform how you manage your calendar:
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              {schedulingDeepDive.map((item) => (
+                <div key={item.title} className="p-6 border border-green-200 rounded-xl bg-white hover:border-green-400 hover:shadow-sm transition-all">
+                  <div className="text-3xl mb-3">{item.icon}</div>
+                  <h3 className="font-bold text-stone-800 mb-2">{item.title}</h3>
+                  <p className="text-stone-600 text-sm leading-relaxed">{item.description}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── Comparison Table ── */}
+        <section className="px-6 py-16 max-w-5xl mx-auto">
+          <h2 className="text-3xl font-bold text-stone-800 mb-4">
+            GroomGrid vs The Competition
+          </h2>
+          <p className="text-stone-600 leading-relaxed mb-8">
+            See how GroomGrid compares on the scheduling features that matter most to groomers:
+          </p>
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="border-b-2 border-stone-200">
+                  <th className="text-left py-3 px-4 font-semibold text-stone-700">Feature</th>
+                  <th className="text-center py-3 px-4 font-bold text-green-700 bg-green-50 rounded-t-lg">GroomGrid</th>
+                  <th className="text-center py-3 px-4 font-semibold text-stone-600">MoeGo</th>
+                  <th className="text-center py-3 px-4 font-semibold text-stone-600">DaySmart</th>
+                  <th className="text-center py-3 px-4 font-semibold text-stone-600">Pawfinity</th>
+                </tr>
+              </thead>
+              <tbody>
+                {comparisonData.map((row, index) => (
+                  <tr key={row.feature} className={index % 2 === 0 ? 'bg-stone-50' : 'bg-white'}>
+                    <td className="py-3 px-4 text-sm text-stone-700 font-medium">{row.feature}</td>
+                    <td className="py-3 px-4 text-center bg-green-50">
+                      {typeof row.groomgrid === 'boolean' ? (
+                        row.groomgrid ? (
+                          <span className="text-green-600 font-bold">✓</span>
+                        ) : (
+                          <span className="text-stone-400">—</span>
+                        )
+                      ) : (
+                        <span className="text-green-700 font-semibold text-sm">{row.groomgrid}</span>
+                      )}
+                    </td>
+                    <td className="py-3 px-4 text-center">
+                      {typeof row.moego === 'boolean' ? (
+                        row.moego ? (
+                          <span className="text-green-600">✓</span>
+                        ) : (
+                          <span className="text-stone-400">—</span>
+                        )
+                      ) : (
+                        <span className="text-stone-600 text-sm">{row.moego}</span>
+                      )}
+                    </td>
+                    <td className="py-3 px-4 text-center">
+                      {typeof row.daysmart === 'boolean' ? (
+                        row.daysmart ? (
+                          <span className="text-green-600">✓</span>
+                        ) : (
+                          <span className="text-stone-400">—</span>
+                        )
+                      ) : (
+                        <span className="text-stone-600 text-sm">{row.daysmart}</span>
+                      )}
+                    </td>
+                    <td className="py-3 px-4 text-center">
+                      {typeof row.pawfinity === 'boolean' ? (
+                        row.pawfinity ? (
+                          <span className="text-green-600">✓</span>
+                        ) : (
+                          <span className="text-stone-400">—</span>
+                        )
+                      ) : (
+                        <span className="text-stone-600 text-sm">{row.pawfinity}</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="text-stone-500 text-sm mt-4 text-center">
+            GroomGrid delivers the same core scheduling power at a lower price—with mobile-first design competitors can't match.
+          </p>
+        </section>
+
+        {/* ── ROI Stats ── */}
+        <section className="px-6 py-14 bg-stone-50">
+          <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl font-bold text-stone-800 mb-6">
-              The Real ROI of Grooming Scheduling Software
+              The ROI of Better Scheduling
             </h2>
             <p className="text-stone-600 leading-relaxed mb-8">
-              At $29/month, GroomGrid pays for itself the first time it prevents a no-show. 
-              Here is the math for a typical groomer:
+              At $29/month, GroomGrid pays for itself quickly. Here is the math:
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
-              {[
-                {
-                  number: '2–3',
-                  unit: 'no-shows prevented per month',
-                  detail: 'Average grooming revenue: $65–$90/dog. That is $130–$270 recovered monthly from reminder automation alone.',
-                },
-                {
-                  number: '5+',
-                  unit: 'hours saved per week',
-                  detail: 'No more back-and-forth scheduling texts, manual calendar management, or chasing confirmations.',
-                },
-                {
-                  number: '$240',
-                  unit: 'saved vs. MoeGo annually',
-                  detail: "GroomGrid Solo at $29/mo vs. MoeGo's $49+/mo starting price. Same scheduling features, lower price.",
-                },
-              ].map((stat) => (
+              {roiStats.map((stat) => (
                 <div key={stat.unit} className="bg-white border border-stone-200 rounded-xl p-6 text-center">
                   <p className="text-4xl font-extrabold text-green-600 mb-1">{stat.number}</p>
                   <p className="text-stone-700 font-semibold text-sm mb-2">{stat.unit}</p>
@@ -464,62 +603,51 @@ export default function DogGroomingSchedulingSoftwarePage() {
                 </div>
               ))}
             </div>
-            <div className="bg-white border border-green-300 rounded-xl p-6">
-              <p className="text-stone-700 text-sm leading-relaxed">
-                <strong className="text-green-600">Conservative estimate:</strong> A groomer
-                preventing 2 no-shows per month at $75 average = <strong>$150 recovered</strong>.
-                GroomGrid costs $29/month. Net gain: <strong>$121/month, $1,452/year</strong> — and
-                that is just from reminder automation. The time savings and reduced stress are bonus.
-              </p>
-            </div>
+          </div>
+        </section>
+
+        {/* ── Getting Started ── */}
+        <section className="px-6 py-14 max-w-4xl mx-auto">
+          <h2 className="text-3xl font-bold text-stone-800 mb-6">
+            Get Started in 5 Steps
+          </h2>
+          <p className="text-stone-600 leading-relaxed mb-6">
+            No onboarding calls, no IT setup. Most groomers are scheduling appointments within 30 minutes:
+          </p>
+          <div className="space-y-4">
+            {gettingStartedSteps.map((item) => (
+              <div key={item.step} className="flex gap-4 p-5 border border-stone-200 rounded-xl bg-white">
+                <div className="w-8 h-8 rounded-full bg-green-500 text-white font-bold text-sm flex items-center justify-center flex-shrink-0 mt-0.5">
+                  {item.step}
+                </div>
+                <div>
+                  <p className="font-bold text-stone-800 mb-1">{item.title}</p>
+                  <p className="text-stone-600 text-sm leading-relaxed">{item.body}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </section>
 
         {/* ── FAQ ── */}
-        <section className="px-6 py-16 bg-stone-50">
+        <section className="px-6 py-16 bg-green-50">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl font-bold text-stone-800 mb-8">
               Frequently Asked Questions
             </h2>
             <div className="space-y-6">
-              {faqSchema.mainEntity.map((item: { name: string; acceptedAnswer: { text: string } }) => (
-                <div key={item.name} className="border border-stone-200 rounded-xl p-6 bg-white">
-                  <h3 className="font-bold text-stone-800 mb-3">{item.name}</h3>
-                  <p className="text-stone-600 leading-relaxed text-sm">
-                    {item.acceptedAnswer.text}
-                  </p>
+              {faqItems.map((item) => (
+                <div key={item.question} className="border border-stone-200 rounded-xl p-6 bg-white">
+                  <h3 className="font-bold text-stone-800 mb-3">{item.question}</h3>
+                  <p className="text-stone-600 leading-relaxed text-sm">{item.answer}</p>
                 </div>
               ))}
             </div>
           </div>
         </section>
 
-        {/* ── Final CTA ── */}
-        <section className="px-6 py-16 max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-bold text-stone-800 mb-4">
-            Stop Juggling Calendars. Start Grooming Dogs.
-          </h2>
-          <p className="text-stone-600 mb-8 max-w-2xl mx-auto">
-            Join hundreds of groomers who have replaced scheduling stress with software that just works. 
-            14-day free trial, no credit card required.
-          </p>
-          <Link
-            href="/signup?coupon=BETA50"
-            className="inline-block px-10 py-4 rounded-xl bg-green-500 text-white font-bold text-lg hover:bg-green-600 transition-colors shadow-lg"
-          >
-            Start Free Trial — $29/mo after
-          </Link>
-          <p className="text-stone-400 text-sm mt-4">
-            Use code <strong className="text-green-600">BETA50</strong> for 50% off your first month
-          </p>
-        </section>
-
         {/* ── Related Links ── */}
-        <PageRelatedLinks 
-          slug="dog-grooming-scheduling-software" 
-          variant="landing" 
-          heading="Scheduling software that works as hard as you do" 
-        />
+        <PageRelatedLinks slug="dog-grooming-scheduling-software" variant="landing" heading="Scheduling software that works as hard as you do" />
 
         {/* ── Footer ── */}
         <SiteFooter slug="dog-grooming-scheduling-software" />
