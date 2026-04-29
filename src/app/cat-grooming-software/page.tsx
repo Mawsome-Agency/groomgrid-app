@@ -6,14 +6,14 @@ import PageRelatedLinks from '@/components/marketing/PageRelatedLinks';
 import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
-  title: 'Cat Grooming Software Built for Feline Specialists | GroomGrid',
+  title: 'Cat Grooming Software — Scheduling & Reminders',
   description:
     'Temperament tracking, sedation notes, custom appointment slots, and client education tools — built for cat grooming specialists. Not another dog-first app. Start your free trial.',
   alternates: {
     canonical: 'https://getgroomgrid.com/cat-grooming-software',
   },
   openGraph: {
-    title: 'Cat Grooming Software Built for Feline Specialists',
+    title: 'Cat Grooming Software — Scheduling & Reminders',
     description:
       'Temperament tracking, sedation notes, custom appointment slots, and client education tools — built for cat grooming specialists. Not another dog-first app.',
     url: 'https://getgroomgrid.com/cat-grooming-software',

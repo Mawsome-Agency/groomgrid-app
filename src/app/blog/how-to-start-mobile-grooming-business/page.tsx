@@ -81,7 +81,8 @@ export default function HowToStartMobileGroomingBusinessPage() {
           <p className="text-xl text-stone-600 leading-relaxed max-w-3xl">
             Mobile grooming is one of the most accessible ways to own a grooming business — lower
             overhead than a salon, flexible hours, and clients who pay a premium for convenience.
-            Here&apos;s everything you need to launch correctly from day one.
+            Here&apos;s everything you need to launch correctly from day one — from <Link href="/blog/mobile-dog-grooming-business-plan/" className="text-green-700 font-semibold hover:underline">your business plan</Link> to
+            finding your first clients.
           </p>
         </header>
 
@@ -146,7 +147,7 @@ export default function HowToStartMobileGroomingBusinessPage() {
             <p className="text-stone-600 leading-relaxed mb-4">
               Your van is your biggest investment and your daily workspace. It needs to be reliable,
               purpose-built for grooming (or properly converted), and big enough to work comfortably
-              with large breeds.
+              with large breeds. For a full breakdown of van conversion options, see our <Link href="/blog/how-to-build-mobile-grooming-trailer/" className="text-green-700 font-semibold hover:underline">mobile grooming trailer and van guide</Link>.
             </p>
             <p className="text-stone-600 leading-relaxed mb-4">
               Essential equipment checklist:
@@ -257,7 +258,7 @@ export default function HowToStartMobileGroomingBusinessPage() {
           <p className="text-stone-600 leading-relaxed mb-4">
             The admin side of mobile grooming — scheduling, reminders, payments, client notes — can
             eat hours every week if you&apos;re doing it manually. Set up systems before you get
-            busy, not after.
+            busy, not after. For more day-to-day operational tips, check out our <Link href="/blog/mobile-dog-grooming-business-tips/" className="text-green-700 font-semibold hover:underline">mobile grooming business tips</Link>.
           </p>
           <p className="text-stone-600 leading-relaxed mb-4">
             At minimum, you need:
@@ -279,6 +280,37 @@ export default function HowToStartMobileGroomingBusinessPage() {
             The more of this you automate early, the more time you spend grooming (and earning)
             instead of doing admin.
           </p>
+        </section>
+
+        {/* ── Related Content ── */}
+        <section className="px-6 py-14 max-w-4xl mx-auto">
+          <h2 className="text-2xl font-bold text-stone-800 mb-8">More Grooming Business Resources</h2>
+          <div className="grid sm:grid-cols-3 gap-5">
+            <Link
+              href="/blog/mobile-dog-grooming-business-plan/"
+              className="p-5 rounded-xl border border-stone-200 hover:border-green-300 hover:shadow-sm transition-all block"
+            >
+              <p className="text-2xl mb-2">📋</p>
+              <p className="font-semibold text-stone-800 text-sm mb-1">Mobile Dog Grooming Business Plan</p>
+              <p className="text-stone-500 text-xs">Complete template with costs, pricing, and revenue targets</p>
+            </Link>
+            <Link
+              href="/blog/mobile-dog-grooming-business-tips/"
+              className="p-5 rounded-xl border border-stone-200 hover:border-green-300 hover:shadow-sm transition-all block"
+            >
+              <p className="text-2xl mb-2">💡</p>
+              <p className="font-semibold text-stone-800 text-sm mb-1">Mobile Dog Grooming Business Tips</p>
+              <p className="text-stone-500 text-xs">Day-to-day tips from successful mobile groomers</p>
+            </Link>
+            <Link
+              href="/blog/how-to-build-mobile-grooming-trailer/"
+              className="p-5 rounded-xl border border-stone-200 hover:border-green-300 hover:shadow-sm transition-all block"
+            >
+              <p className="text-2xl mb-2">🚐</p>
+              <p className="font-semibold text-stone-800 text-sm mb-1">How to Build a Mobile Grooming Trailer</p>
+              <p className="text-stone-500 text-xs">Van and trailer conversion options, costs, and layouts</p>
+            </Link>
+          </div>
         </section>
 
         {/* ── Related Links ── */}

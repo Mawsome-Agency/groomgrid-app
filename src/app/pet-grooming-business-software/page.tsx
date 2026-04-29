@@ -6,14 +6,14 @@ import PageRelatedLinks from '@/components/marketing/PageRelatedLinks';
 import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
-  title: 'Pet Grooming Business Software: Scheduling, Payments & Client Management | GroomGrid',
+  title: 'Pet Grooming Business Software — Manage Your Salon',
   description:
     'All-in-one pet grooming business software with AI scheduling, automated reminders, payment processing, client and pet profiles, and business analytics. Built for solo groomers and salons. Start your free trial.',
   alternates: {
     canonical: 'https://getgroomgrid.com/pet-grooming-business-software',
   },
   openGraph: {
-    title: 'Pet Grooming Business Software: Scheduling, Payments & Client Management',
+    title: 'Pet Grooming Business Software — Manage Your Salon',
     description:
       'Run your entire grooming business from one app — AI scheduling, no-show prevention, payments, pet profiles, and analytics. Built for groomers, not desk jockeys.',
     url: 'https://getgroomgrid.com/pet-grooming-business-software',

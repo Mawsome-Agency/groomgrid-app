@@ -99,7 +99,7 @@ export default function ReduceNoShowsDogGroomingPage() {
             <p className="text-stone-600 leading-relaxed mb-4">
               Most groomers treat no-shows as an unavoidable cost of doing business. They&apos;re
               not. The groomers with the lowest no-show rates aren&apos;t lucky — they have systems
-              that make it easy for clients to remember, confirm, and show up.
+              that make it easy for clients to remember, confirm, and show up. Building the right <Link href="/blog/dog-grooming-business-management/" className="text-green-700 font-semibold hover:underline">business management systems</Link> is the foundation.
             </p>
             <p className="text-stone-600 leading-relaxed">
               The good news: you don&apos;t need to be pushy or awkward. A well-timed automated
@@ -115,7 +115,7 @@ export default function ReduceNoShowsDogGroomingPage() {
           </h2>
           <p className="text-stone-600 leading-relaxed mb-4">
             One reminder isn&apos;t enough. Life is noisy, and clients genuinely forget. The most
-            effective grooming reminder cadence uses three touchpoints:
+            effective <Link href="/blog/dog-grooming-appointment-app/" className="text-green-700 font-semibold hover:underline">grooming appointment app</Link> uses a three-touch reminder cadence:
           </p>
           <ul className="space-y-4 mb-6">
             {[
@@ -178,7 +178,7 @@ export default function ReduceNoShowsDogGroomingPage() {
             </ul>
             <p className="text-stone-600 leading-relaxed mb-4">
               When you collect deposits online at booking, you eliminate the awkward conversation
-              entirely. The system handles it, and clients who aren&apos;t serious self-select out.
+              entirely. The system handles it, and clients who aren&apos;t serious self-select out. A <Link href="/blog/dog-grooming-client-intake-form/" className="text-green-700 font-semibold hover:underline">proper client intake form</Link> collected at booking time ensures you have all the information — and deposit — before the appointment.
             </p>
             <p className="text-stone-600 leading-relaxed">
               What about existing clients who&apos;ve never paid a deposit? Introduce it as a policy
@@ -257,6 +257,37 @@ export default function ReduceNoShowsDogGroomingPage() {
               </li>
             ))}
           </ol>
+        </section>
+
+        {/* ── Related Content ── */}
+        <section className="px-6 py-14 max-w-4xl mx-auto">
+          <h2 className="text-2xl font-bold text-stone-800 mb-8">More Grooming Business Resources</h2>
+          <div className="grid sm:grid-cols-3 gap-5">
+            <Link
+              href="/blog/dog-grooming-business-management/"
+              className="p-5 rounded-xl border border-stone-200 hover:border-green-300 hover:shadow-sm transition-all block"
+            >
+              <p className="text-2xl mb-2">📊</p>
+              <p className="font-semibold text-stone-800 text-sm mb-1">Dog Grooming Business Management</p>
+              <p className="text-stone-500 text-xs">Scheduling, client retention, and payments</p>
+            </Link>
+            <Link
+              href="/blog/dog-grooming-appointment-app/"
+              className="p-5 rounded-xl border border-stone-200 hover:border-green-300 hover:shadow-sm transition-all block"
+            >
+              <p className="text-2xl mb-2">📅</p>
+              <p className="font-semibold text-stone-800 text-sm mb-1">Dog Grooming Appointment App</p>
+              <p className="text-stone-500 text-xs">Booking, reminders, and calendar management</p>
+            </Link>
+            <Link
+              href="/blog/dog-grooming-client-intake-form/"
+              className="p-5 rounded-xl border border-stone-200 hover:border-green-300 hover:shadow-sm transition-all block"
+            >
+              <p className="text-2xl mb-2">📝</p>
+              <p className="font-semibold text-stone-800 text-sm mb-1">Dog Grooming Client Intake Form</p>
+              <p className="text-stone-500 text-xs">Collect health, behavior, and consent info upfront</p>
+            </Link>
+          </div>
         </section>
 
         {/* ── Related Links ── */}

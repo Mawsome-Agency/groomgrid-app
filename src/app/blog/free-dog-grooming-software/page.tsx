@@ -173,7 +173,7 @@ export default function FreeDogGroomingSoftwarePage() {
             <p className="text-stone-600 leading-relaxed mb-6">
               No true all-in-one free grooming platform exists in 2026. What&apos;s actually available
               falls into two categories: general scheduling tools with severe limits, and DIY stacks
-              stitched together from consumer apps. Here&apos;s an honest look at each.
+              stitched together from consumer apps. Here&apos;s an honest look at each — and for a broader comparison, see our <Link href="/blog/dog-grooming-software/" className="text-green-700 font-semibold hover:underline">complete dog grooming software guide</Link>.
             </p>
             <div className="space-y-4">
               {[
@@ -263,6 +263,9 @@ export default function FreeDogGroomingSoftwarePage() {
         <section className="px-6 py-14 bg-stone-50">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl font-bold text-stone-800 mb-6">Free vs. Paid: Full Comparison</h2>
+            <p className="text-stone-600 leading-relaxed mb-6">
+              Wondering how GroomGrid stacks up against the biggest name in grooming software? See our <Link href="/blog/groomgrid-vs-moego/" className="text-green-700 font-semibold hover:underline">GroomGrid vs. MoeGo comparison</Link> for a detailed feature-by-feature breakdown.
+            </p>
             <div className="overflow-x-auto rounded-xl border border-stone-200">
               <table className="w-full text-sm">
                 <thead className="bg-stone-100">
@@ -297,7 +300,7 @@ export default function FreeDogGroomingSoftwarePage() {
           <h2 className="text-3xl font-bold text-stone-800 mb-6">What to Look for in Affordable Grooming Software</h2>
           <p className="text-stone-600 leading-relaxed mb-6">
             Once you&apos;re booking 4+ dogs/day, here are the features that separate useful software
-            from expensive clutter:
+            from expensive clutter. For a detailed comparison of all the top platforms, see our <Link href="/blog/best-pet-grooming-software/" className="text-green-700 font-semibold hover:underline">best pet grooming software</Link> roundup:
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {[
@@ -336,6 +339,37 @@ export default function FreeDogGroomingSoftwarePage() {
                 </div>
               ))}
             </div>
+          </div>
+        </section>
+
+        {/* ── Related Content ── */}
+        <section className="px-6 py-14 max-w-4xl mx-auto">
+          <h2 className="text-2xl font-bold text-stone-800 mb-8">More Grooming Business Resources</h2>
+          <div className="grid sm:grid-cols-3 gap-5">
+            <Link
+              href="/blog/dog-grooming-software/"
+              className="p-5 rounded-xl border border-stone-200 hover:border-green-300 hover:shadow-sm transition-all block"
+            >
+              <p className="text-2xl mb-2">💻</p>
+              <p className="font-semibold text-stone-800 text-sm mb-1">Dog Grooming Software</p>
+              <p className="text-stone-500 text-xs">The complete 2026 buyer&apos;s guide for groomers</p>
+            </Link>
+            <Link
+              href="/blog/best-pet-grooming-software/"
+              className="p-5 rounded-xl border border-stone-200 hover:border-green-300 hover:shadow-sm transition-all block"
+            >
+              <p className="text-2xl mb-2">🏆</p>
+              <p className="font-semibold text-stone-800 text-sm mb-1">Best Pet Grooming Software</p>
+              <p className="text-stone-500 text-xs">Top-rated platforms compared by features and price</p>
+            </Link>
+            <Link
+              href="/blog/groomgrid-vs-moego/"
+              className="p-5 rounded-xl border border-stone-200 hover:border-green-300 hover:shadow-sm transition-all block"
+            >
+              <p className="text-2xl mb-2">⚖️</p>
+              <p className="font-semibold text-stone-800 text-sm mb-1">GroomGrid vs. MoeGo</p>
+              <p className="text-stone-500 text-xs">Feature-by-feature comparison with the market leader</p>
+            </Link>
           </div>
         </section>
 
