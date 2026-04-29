@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Script from 'next/script';
-import RelatedLinks from '@/components/marketing/RelatedLinks';
+import PageBreadcrumbs from '@/components/marketing/PageBreadcrumbs';
+import PageRelatedLinks from '@/components/marketing/PageRelatedLinks';
 import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
@@ -18,31 +19,6 @@ export const metadata: Metadata = {
     url: 'https://getgroomgrid.com/blog/dog-grooming-contract-template',
     type: 'article',
   },
-};
-
-const breadcrumbSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'BreadcrumbList',
-  itemListElement: [
-    {
-      '@type': 'ListItem',
-      position: 1,
-      name: 'Home',
-      item: 'https://getgroomgrid.com',
-    },
-    {
-      '@type': 'ListItem',
-      position: 2,
-      name: 'Blog',
-      item: 'https://getgroomgrid.com/blog',
-    },
-    {
-      '@type': 'ListItem',
-      position: 3,
-      name: 'Dog Grooming Contract Template',
-      item: 'https://getgroomgrid.com/blog/dog-grooming-contract-template',
-    },
-  ],
 };
 
 const articleSchema = {
@@ -120,13 +96,7 @@ const contractSections = [
 
 export default function DogGroomingContractTemplatePage() {
   return (
-    <>
-      <Script
-        id="breadcrumb-schema"
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
-      />
-      <Script
+    <>      <Script
         id="article-schema"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
@@ -148,25 +118,7 @@ export default function DogGroomingContractTemplatePage() {
 
         {/* ── Breadcrumb ── */}
         <div className="px-6 py-3 max-w-5xl mx-auto">
-          <nav aria-label="Breadcrumb" className="text-sm text-stone-500">
-            <ol className="flex items-center gap-2">
-              <li>
-                <Link href="/" className="hover:text-green-600 transition-colors">
-                  Home
-                </Link>
-              </li>
-              <li aria-hidden="true">/</li>
-              <li>
-                <Link href="/grooming-business-operations/" className="hover:text-green-600 transition-colors">
-                  Operations
-                </Link>
-              </li>
-              <li aria-hidden="true">/</li>
-              <li className="text-stone-700 font-medium" aria-current="page">
-                Contract Template
-              </li>
-            </ol>
-          </nav>
+          <PageBreadcrumbs slug="blog/dog-grooming-contract-template" />
         </div>
 
         {/* ── Hero ── */}
@@ -394,17 +346,10 @@ export default function DogGroomingContractTemplatePage() {
         </section>
 
         {/* ── Related Links ── */}
-        <RelatedLinks
-          heading="Ready to streamline your grooming business?"
-          links={[
-          { href: '/signup', category: 'Business Management', title: 'Dog Grooming Business Management: The Complete Guide' },
-          { href: '/blog/is-dog-grooming-a-profitable-business', category: 'Business', title: 'Is Dog Grooming a Profitable Business? Real Numbers, Real Talk' }
-          ]}
-          columns={3}
-        />
+        <PageRelatedLinks slug="blog/dog-grooming-contract-template" variant="blog" heading="Ready to streamline your grooming business?" />
 
         {/* ── Footer ── */}
-        <SiteFooter />
+        <SiteFooter slug="blog/dog-grooming-contract-template" />
       </div>
     </>
   );

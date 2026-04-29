@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Script from 'next/script';
-import RelatedLinks from '@/components/marketing/RelatedLinks';
+import PageBreadcrumbs from '@/components/marketing/PageBreadcrumbs';
+import PageRelatedLinks from '@/components/marketing/PageRelatedLinks';
 import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
@@ -17,21 +18,6 @@ export const metadata: Metadata = {
     url: 'https://getgroomgrid.com/blog/how-to-build-mobile-grooming-trailer',
     type: 'article',
   },
-};
-
-const breadcrumbSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'BreadcrumbList',
-  itemListElement: [
-    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://getgroomgrid.com' },
-    { '@type': 'ListItem', position: 2, name: 'Blog', item: 'https://getgroomgrid.com/blog' },
-    {
-      '@type': 'ListItem',
-      position: 3,
-      name: 'How to Build a Mobile Grooming Trailer',
-      item: 'https://getgroomgrid.com/blog/how-to-build-mobile-grooming-trailer',
-    },
-  ],
 };
 
 const articleSchema = {
@@ -119,13 +105,7 @@ const budgets = [
 
 export default function HowToBuildMobileGroomingTrailerPage() {
   return (
-    <>
-      <Script
-        id="breadcrumb-schema"
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
-      />
-      <Script
+    <>      <Script
         id="article-schema"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
@@ -147,15 +127,7 @@ export default function HowToBuildMobileGroomingTrailerPage() {
 
         {/* Breadcrumb */}
         <div className="px-6 py-3 max-w-5xl mx-auto">
-          <nav aria-label="Breadcrumb" className="text-sm text-stone-500">
-            <ol className="flex items-center gap-2">
-              <li><Link href="/" className="hover:text-green-600 transition-colors">Home</Link></li>
-              <li aria-hidden="true">/</li>
-              <li><Link href="/blog/" className="hover:text-green-600 transition-colors">Blog</Link></li>
-              <li aria-hidden="true">/</li>
-              <li className="text-stone-700 font-medium" aria-current="page">How to Build a Mobile Grooming Trailer</li>
-            </ol>
-          </nav>
+          <PageBreadcrumbs slug="blog/how-to-build-mobile-grooming-trailer" />
         </div>
 
         {/* Hero */}
@@ -415,18 +387,10 @@ export default function HowToBuildMobileGroomingTrailerPage() {
         </section>
 
         {/* ── Related Links ── */}
-        <RelatedLinks
-          heading="Ready to hit the road?"
-          links={[
-          { href: '/signup?coupon=BETA50', category: 'Mobile', title: 'Mobile Dog Grooming Business Tips' },
-          { href: '/blog/mobile-dog-grooming-business-plan', category: 'Planning', title: 'Mobile Dog Grooming Business Plan: Free Template' },
-          { href: '/blog/how-to-open-a-pet-grooming-business', category: 'Business', title: 'How to Open a Pet Grooming Business: Complete Guide' }
-          ]}
-          columns={3}
-        />
+        <PageRelatedLinks slug="blog/how-to-build-mobile-grooming-trailer" variant="blog" heading="Ready to hit the road?" />
 
         {/* Footer */}
-        <SiteFooter />
+        <SiteFooter slug="blog/how-to-build-mobile-grooming-trailer" />
       </div>
     </>
   );

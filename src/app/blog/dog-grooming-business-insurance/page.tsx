@@ -1,6 +1,9 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Script from 'next/script';
+import PageBreadcrumbs from '@/components/marketing/PageBreadcrumbs';
+import PageRelatedLinks from '@/components/marketing/PageRelatedLinks';
+import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
   title: 'Dog Grooming Business Insurance: What You Need & What It Costs (2026) | GroomGrid',
@@ -16,16 +19,6 @@ export const metadata: Metadata = {
     url: 'https://getgroomgrid.com/blog/dog-grooming-business-insurance',
     type: 'article',
   },
-};
-
-const breadcrumbSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'BreadcrumbList',
-  itemListElement: [
-    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://getgroomgrid.com' },
-    { '@type': 'ListItem', position: 2, name: 'Blog', item: 'https://getgroomgrid.com/blog' },
-    { '@type': 'ListItem', position: 3, name: 'Dog Grooming Business Insurance', item: 'https://getgroomgrid.com/blog/dog-grooming-business-insurance' },
-  ],
 };
 
 const articleSchema = {
@@ -137,9 +130,7 @@ const insuranceTypes = [
 
 export default function DogGroomingBusinessInsurance() {
   return (
-    <>
-      <Script id="breadcrumb-schema" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
-      <Script id="article-schema" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
+    <>      <Script id="article-schema" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
       <Script id="faq-schema" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
 
       <div className="min-h-screen bg-stone-50">
@@ -319,18 +310,7 @@ export default function DogGroomingBusinessInsurance() {
           </section>
         </main>
 
-        <footer className="px-6 py-8 max-w-5xl mx-auto border-t border-stone-100">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-stone-400">
-            <Link href="/" className="font-bold text-green-600">GroomGrid 🐾</Link>
-            <div className="flex gap-6">
-              <Link href="/grooming-business-operations/" className="hover:text-stone-600 transition-colors">Operations Hub</Link>
-              <Link href="/mobile-grooming-business/" className="hover:text-stone-600 transition-colors">Mobile Grooming</Link>
-              <Link href="/plans" className="hover:text-stone-600 transition-colors">Pricing</Link>
-              <Link href="/signup" className="hover:text-stone-600 transition-colors">Sign Up</Link>
-            </div>
-            <p>© {new Date().getFullYear()} GroomGrid. All rights reserved.</p>
-          </div>
-        </footer>
+        <SiteFooter slug="blog/dog-grooming-business-insurance" />
       </div>
     </>
   );

@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Script from 'next/script';
-import RelatedLinks from '@/components/marketing/RelatedLinks';
+import PageBreadcrumbs from '@/components/marketing/PageBreadcrumbs';
+import PageRelatedLinks from '@/components/marketing/PageRelatedLinks';
 import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
@@ -18,21 +19,6 @@ export const metadata: Metadata = {
     url: 'https://getgroomgrid.com/blog/dog-grooming-tools-equipment-list',
     type: 'article',
   },
-};
-
-const breadcrumbSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'BreadcrumbList',
-  itemListElement: [
-    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://getgroomgrid.com' },
-    { '@type': 'ListItem', position: 2, name: 'Blog', item: 'https://getgroomgrid.com/blog' },
-    {
-      '@type': 'ListItem',
-      position: 3,
-      name: 'Dog Grooming Tools & Equipment List',
-      item: 'https://getgroomgrid.com/blog/dog-grooming-tools-equipment-list',
-    },
-  ],
 };
 
 const articleSchema = {
@@ -103,13 +89,7 @@ const faqSchema = {
 
 export default function DogGroomingToolsEquipmentListPage() {
   return (
-    <>
-      <Script
-        id="breadcrumb-schema"
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
-      />
-      <Script
+    <>      <Script
         id="article-schema"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
@@ -136,15 +116,7 @@ export default function DogGroomingToolsEquipmentListPage() {
 
         {/* ── Breadcrumb ── */}
         <div className="px-6 py-3 max-w-5xl mx-auto">
-          <nav aria-label="Breadcrumb" className="text-sm text-stone-500">
-            <ol className="flex items-center gap-2">
-              <li><Link href="/" className="hover:text-green-600 transition-colors">Home</Link></li>
-              <li aria-hidden="true">/</li>
-              <li><Link href="/blog" className="hover:text-green-600 transition-colors">Blog</Link></li>
-              <li aria-hidden="true">/</li>
-              <li className="text-stone-700 font-medium" aria-current="page">Tools & Equipment List</li>
-            </ol>
-          </nav>
+          <PageBreadcrumbs slug="blog/dog-grooming-tools-equipment-list" />
         </div>
 
         {/* ── Hero ── */}
@@ -336,17 +308,10 @@ export default function DogGroomingToolsEquipmentListPage() {
         </section>
 
         {/* ── Related Links ── */}
-        <RelatedLinks
-          heading="Got your equipment? Now get your schedule sorted."
-          links={[
-          { href: '/signup?coupon=BETA50', category: 'Startup Costs', title: 'How Much Does It Cost to Start a Dog Grooming Business?' },
-          { href: '/blog/is-dog-grooming-a-profitable-business', category: 'Business', title: 'Is Dog Grooming a Profitable Business? Real Numbers, Real Talk' }
-          ]}
-          columns={3}
-        />
+        <PageRelatedLinks slug="blog/dog-grooming-tools-equipment-list" variant="blog" heading="Got your equipment? Now get your schedule sorted." />
 
         {/* ── Footer ── */}
-        <SiteFooter links={[{ href: '/grooming-business-operations/', label: 'Operations Hub' }, { href: '/mobile-grooming-business/', label: 'Mobile Grooming' }, { href: '/plans', label: 'Pricing' }, { href: '/signup?coupon=BETA50', label: 'Sign Up' }]} />
+        <SiteFooter slug="blog/dog-grooming-tools-equipment-list" />
       </div>
     </>
   );

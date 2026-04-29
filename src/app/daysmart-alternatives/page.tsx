@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Script from 'next/script';
-import RelatedLinks from '@/components/marketing/RelatedLinks';
+import PageBreadcrumbs from '@/components/marketing/PageBreadcrumbs';
+import PageRelatedLinks from '@/components/marketing/PageRelatedLinks';
 import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
@@ -18,20 +19,6 @@ export const metadata: Metadata = {
     url: 'https://getgroomgrid.com/daysmart-alternatives',
     type: 'article',
   },
-};
-
-const breadcrumbSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'BreadcrumbList',
-  itemListElement: [
-    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://getgroomgrid.com' },
-    {
-      '@type': 'ListItem',
-      position: 2,
-      name: 'DaySmart Alternatives',
-      item: 'https://getgroomgrid.com/daysmart-alternatives',
-    },
-  ],
 };
 
 const articleSchema = {
@@ -117,13 +104,7 @@ const comparisonRows = [
 
 export default function DaySmartAlternativesPage() {
   return (
-    <>
-      <Script
-        id="breadcrumb-schema"
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
-      />
-      <Script
+    <>      <Script
         id="article-schema"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
@@ -150,17 +131,7 @@ export default function DaySmartAlternativesPage() {
 
         {/* ── Breadcrumb ── */}
         <div className="px-6 py-3 max-w-5xl mx-auto">
-          <nav aria-label="Breadcrumb" className="text-sm text-stone-500">
-            <ol className="flex items-center gap-2">
-              <li>
-                <Link href="/" className="hover:text-green-600 transition-colors">Home</Link>
-              </li>
-              <li aria-hidden="true">/</li>
-              <li className="text-stone-700 font-medium" aria-current="page">
-                DaySmart Alternatives
-              </li>
-            </ol>
-          </nav>
+          <PageBreadcrumbs slug="daysmart-alternatives" />
         </div>
 
         {/* ── Hero ── */}
@@ -328,18 +299,10 @@ export default function DaySmartAlternativesPage() {
         </section>
 
         {/* ── Related Links ── */}
-        <RelatedLinks
-          heading="The DaySmart alternative built for how groomers actually work"
-          links={[
-          { href: '/signup?coupon=BETA50', category: 'Comparison', title: 'GroomGrid vs MoeGo: Which Dog Grooming Software is Right for You?' },
-          { href: '/pawfinity-alternatives', category: 'Alternatives', title: 'Pawfinity Alternatives: Best Pet Grooming Software for 2026' },
-          { href: '/blog/dog-grooming-software', category: 'Software Guide', title: 'Dog Grooming Software: The 2026 Buyer\'s Guide' }
-          ]}
-          columns={3}
-        />
+        <PageRelatedLinks slug="daysmart-alternatives" variant="landing" heading="The DaySmart alternative built for how groomers actually work" />
 
         {/* ── Footer ── */}
-        <SiteFooter />
+        <SiteFooter slug="daysmart-alternatives" />
       </div>
     </>
   );

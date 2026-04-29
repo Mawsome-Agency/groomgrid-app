@@ -1,6 +1,9 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Script from 'next/script';
+import PageBreadcrumbs from '@/components/marketing/PageBreadcrumbs';
+import PageRelatedLinks from '@/components/marketing/PageRelatedLinks';
+import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
   title: 'Dog Grooming Waiver Template: Free Liability Waiver for Professional Groomers | GroomGrid',
@@ -16,31 +19,6 @@ export const metadata: Metadata = {
     url: 'https://getgroomgrid.com/blog/dog-grooming-waiver-template',
     type: 'article',
   },
-};
-
-const breadcrumbSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'BreadcrumbList',
-  itemListElement: [
-    {
-      '@type': 'ListItem',
-      position: 1,
-      name: 'Home',
-      item: 'https://getgroomgrid.com',
-    },
-    {
-      '@type': 'ListItem',
-      position: 2,
-      name: 'Blog',
-      item: 'https://getgroomgrid.com/blog',
-    },
-    {
-      '@type': 'ListItem',
-      position: 3,
-      name: 'Dog Grooming Waiver Template',
-      item: 'https://getgroomgrid.com/blog/dog-grooming-waiver-template',
-    },
-  ],
 };
 
 const articleSchema = {
@@ -161,13 +139,7 @@ const waiverSections = [
 
 export default function DogGroomingWaiverTemplatePage() {
   return (
-    <>
-      <Script
-        id="breadcrumb-schema"
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
-      />
-      <Script
+    <>      <Script
         id="article-schema"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
@@ -194,25 +166,7 @@ export default function DogGroomingWaiverTemplatePage() {
 
         {/* ── Breadcrumb ── */}
         <div className="px-6 py-3 max-w-5xl mx-auto">
-          <nav aria-label="Breadcrumb" className="text-sm text-stone-500">
-            <ol className="flex items-center gap-2">
-              <li>
-                <Link href="/" className="hover:text-green-600 transition-colors">
-                  Home
-                </Link>
-              </li>
-              <li aria-hidden="true">/</li>
-              <li>
-                <Link href="/blog/" className="hover:text-green-600 transition-colors">
-                  Blog
-                </Link>
-              </li>
-              <li aria-hidden="true">/</li>
-              <li className="text-stone-700 font-medium" aria-current="page">
-                Dog Grooming Waiver Template
-              </li>
-            </ol>
-          </nav>
+          <PageBreadcrumbs slug="blog/dog-grooming-waiver-template" />
         </div>
 
         {/* ── Hero ── */}
@@ -564,18 +518,7 @@ export default function DogGroomingWaiverTemplatePage() {
         </section>
 
         {/* ── Footer ── */}
-        <footer className="px-6 py-8 border-t border-stone-100 max-w-5xl mx-auto text-center text-stone-400 text-sm">
-          <p>
-            © 2026{' '}
-            <Link href="/" className="hover:text-green-600 transition-colors">
-              GroomGrid
-            </Link>{' '}
-            · AI-powered grooming business management ·{' '}
-            <Link href="/blog/" className="hover:text-green-600 transition-colors">
-              Blog
-            </Link>
-          </p>
-        </footer>
+          <SiteFooter slug="blog/dog-grooming-waiver-template" />
       </div>
     </>
   );

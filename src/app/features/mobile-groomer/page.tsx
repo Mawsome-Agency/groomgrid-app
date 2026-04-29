@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Script from 'next/script';
-import RelatedLinks from '@/components/marketing/RelatedLinks';
+import PageBreadcrumbs from '@/components/marketing/PageBreadcrumbs';
+import PageRelatedLinks from '@/components/marketing/PageRelatedLinks';
 import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
@@ -18,26 +19,6 @@ export const metadata: Metadata = {
     url: 'https://getgroomgrid.com/features/mobile-groomer',
     type: 'website',
   },
-};
-
-const breadcrumbSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'BreadcrumbList',
-  itemListElement: [
-    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://getgroomgrid.com' },
-    {
-      '@type': 'ListItem',
-      position: 2,
-      name: 'Features',
-      item: 'https://getgroomgrid.com/features',
-    },
-    {
-      '@type': 'ListItem',
-      position: 3,
-      name: 'Mobile Groomer',
-      item: 'https://getgroomgrid.com/features/mobile-groomer',
-    },
-  ],
 };
 
 const productSchema = {
@@ -154,13 +135,7 @@ const trustSignals = [
 
 export default function MobileGroomerFeaturePage() {
   return (
-    <>
-      <Script
-        id="breadcrumb-schema"
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
-      />
-      <Script
+    <>      <Script
         id="product-schema"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
@@ -187,25 +162,7 @@ export default function MobileGroomerFeaturePage() {
 
         {/* ── Breadcrumb ── */}
         <div className="px-6 py-3 max-w-5xl mx-auto">
-          <nav aria-label="Breadcrumb" className="text-sm text-stone-500">
-            <ol className="flex items-center gap-2">
-              <li>
-                <Link href="/" className="hover:text-green-600 transition-colors">
-                  Home
-                </Link>
-              </li>
-              <li aria-hidden="true">/</li>
-              <li>
-                <Link href="/mobile-grooming-software" className="hover:text-green-600 transition-colors">
-                  Features
-                </Link>
-              </li>
-              <li aria-hidden="true">/</li>
-              <li className="text-stone-700 font-medium" aria-current="page">
-                Mobile Groomer
-              </li>
-            </ol>
-          </nav>
+          <PageBreadcrumbs slug="features-mobile-groomer" />
         </div>
 
         {/* ── Hero Section ── */}
@@ -541,18 +498,10 @@ export default function MobileGroomerFeaturePage() {
         </section>
 
         {/* ── Related Links ── */}
-        <RelatedLinks
-          heading="Frequently Asked Questions"
-          links={[
-          { href: '/mobile-grooming-software', category: 'Overview', title: 'Mobile Grooming Software Built for the Van' },
-          { href: '/blog/how-to-start-a-mobile-dog-grooming-business', category: 'Business Guide', title: 'How to Start a Mobile Dog Grooming Business' },
-          { href: '/best-dog-grooming-software', category: 'Comparison', title: 'Best Dog Grooming Software for 2026' }
-          ]}
-          columns={3}
-        />
+        <PageRelatedLinks slug="features-mobile-groomer" variant="landing" heading="Frequently Asked Questions" />
 
         {/* ── Footer ── */}
-        <SiteFooter links={[{ href: '/mobile-grooming-software', label: 'Mobile Software' }, { href: '/plans', label: 'Pricing' }, { href: '/signup', label: 'Sign Up' }]} />
+        <SiteFooter slug="features-mobile-groomer" />
       </div>
     </>
   );

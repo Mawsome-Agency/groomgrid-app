@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { AlertCircle, RefreshCw, Mail, ArrowLeft } from 'lucide-react';
+import { AlertCircle, RefreshCw, Mail, ArrowLeft, CreditCard, Tag } from 'lucide-react';
+import { trackEvent } from '@/lib/ga4';
 
 type ErrorType = 'declined' | 'insufficient' | 'expired' | 'generic' | 'maxRetries';
 
@@ -115,12 +116,38 @@ export function CheckoutErrorContent() {
 
   const config = ERROR_CONFIG[errorType];
 
+  // Track page view on mount
+  useEffect(() => {
+    if (mounted) {
+      trackEvent('checkout_error_viewed', {
+        error_type: errorType,
+        timestamp: new Date().toISOString(),
+      });
+    }
+  }, [mounted, errorType]);
+
+  const handleContactSupport = () => {
+    trackEvent('checkout_error_support_clicked', {
+      error_type: errorType,
+      timestamp: new Date().toISOString(),
+    });
+    window.location.href = 'mailto:hello@getgroomgrid.com?subject=Payment%20Error&body=' + encodeURIComponent(`Error Type: ${errorType}\n\nPlease describe what happened:\n\n`);
+  };
+
   const handleRetry = () => {
+    trackEvent('checkout_error_retry_clicked', {
+      error_type: errorType,
+      timestamp: new Date().toISOString(),
+    });
     router.push('/plans');
   };
 
-  const handleContactSupport = () => {
-    window.location.href = 'mailto:help@getgroomgrid.com?subject=Payment%20Error&body=' + encodeURIComponent(`Error Type: ${errorType}\n\nPlease describe what happened:\n\n`);
+  const handleTryDifferentCard = () => {
+    trackEvent('checkout_error_different_card_clicked', {
+      error_type: errorType,
+      timestamp: new Date().toISOString(),
+    });
+    router.push('/plans');
   };
 
   if (!mounted) {
@@ -199,14 +226,37 @@ export function CheckoutErrorContent() {
           ) : (
             config.secondaryAction && (
               <button
-                onClick={() => router.push('/plans')}
-                className="flex-1 bg-white text-stone-700 font-semibold py-3 px-6 rounded-xl hover:bg-stone-50 border-2 border-stone-300 transition-colors"
+                onClick={handleTryDifferentCard}
+                className="flex-1 bg-white text-stone-700 font-semibold py-3 px-6 rounded-xl hover:bg-stone-50 border-2 border-stone-300 transition-colors flex items-center justify-center gap-2"
                 aria-label={config.secondaryAction}
               >
+                <CreditCard className="w-5 h-5" aria-hidden="true" />
                 {config.secondaryAction}
               </button>
             )
           )}
+        </div>
+
+        {/* BETA50 Founding Pricing Reminder */}
+        <div className="bg-green-50 border-2 border-green-200 rounded-xl p-6 mb-8">
+          <div className="flex items-start gap-4">
+            <div className="flex-shrink-0 w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+              <Tag className="w-5 h-5 text-green-600" aria-hidden="true" />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-bold text-green-900 mb-1">Don't Miss Your Founding Pricing</h3>
+              <p className="text-green-800 text-sm mb-3">
+                Use code <span className="font-bold bg-green-200 px-2 py-0.5 rounded">BETA50</span> for 50% off —
+                lock in $14.50/mo forever. Less than half a grooming session.
+              </p>
+              <button
+                onClick={handleRetry}
+                className="text-green-700 font-semibold text-sm hover:text-green-900 underline"
+              >
+                Try checkout again with BETA50 →
+              </button>
+            </div>
+          </div>
         </div>
 
         <div className="bg-stone-50 rounded-xl p-6 text-center">
@@ -214,11 +264,11 @@ export function CheckoutErrorContent() {
             Still having trouble? We're here to help.
           </p>
           <a
-            href="mailto:help@getgroomgrid.com"
+            href="mailto:hello@getgroomgrid.com"
             className="inline-flex items-center gap-2 text-green-600 hover:text-green-700 font-medium"
           >
             <Mail className="w-4 h-4" aria-hidden="true" />
-            help@getgroomgrid.com
+            hello@getgroomgrid.com
           </a>
         </div>
       </main>

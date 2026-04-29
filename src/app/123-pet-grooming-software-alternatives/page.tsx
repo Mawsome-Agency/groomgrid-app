@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Script from 'next/script';
-import RelatedLinks from '@/components/marketing/RelatedLinks';
+import PageBreadcrumbs from '@/components/marketing/PageBreadcrumbs';
+import PageRelatedLinks from '@/components/marketing/PageRelatedLinks';
 import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
@@ -18,20 +19,6 @@ export const metadata: Metadata = {
     url: 'https://getgroomgrid.com/123-pet-grooming-software-alternatives',
     type: 'article',
   },
-};
-
-const breadcrumbSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'BreadcrumbList',
-  itemListElement: [
-    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://getgroomgrid.com' },
-    {
-      '@type': 'ListItem',
-      position: 2,
-      name: '123Pet Grooming Software Alternatives',
-      item: 'https://getgroomgrid.com/123-pet-grooming-software-alternatives',
-    },
-  ],
 };
 
 const articleSchema = {
@@ -117,13 +104,7 @@ const comparisonRows = [
 
 export default function Pet123GroomingSoftwareAlternativesPage() {
   return (
-    <>
-      <Script
-        id="breadcrumb-schema"
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
-      />
-      <Script
+    <>      <Script
         id="article-schema"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
@@ -151,17 +132,7 @@ export default function Pet123GroomingSoftwareAlternativesPage() {
 
         {/* ── Breadcrumb ── */}
         <div className="px-6 py-3 max-w-5xl mx-auto">
-          <nav aria-label="Breadcrumb" className="text-sm text-stone-500">
-            <ol className="flex items-center gap-2">
-              <li>
-                <Link href="/" className="hover:text-green-600 transition-colors">Home</Link>
-              </li>
-              <li aria-hidden="true">/</li>
-              <li className="text-stone-700 font-medium" aria-current="page">
-                123Pet Alternatives
-              </li>
-            </ol>
-          </nav>
+          <PageBreadcrumbs slug="123-pet-grooming-software-alternatives" />
         </div>
 
         {/* ── Hero ── */}
@@ -399,18 +370,10 @@ export default function Pet123GroomingSoftwareAlternativesPage() {
         </section>
 
         {/* ── Related Links ── */}
-        <RelatedLinks
-          heading="The 123Pet alternative built for how groomers actually work"
-          links={[
-            { href: '/blog/pet-grooming-software', category: 'Software Guide', title: 'Pet Grooming Software: The 2026 Buyer\'s Guide' },
-            { href: '/plans', category: 'Pricing', title: 'GroomGrid Plans — Starting at $29/month' },
-            { href: '/blog/free-dog-grooming-software', category: 'Free Options', title: 'Free Dog Grooming Software: What Actually Works in 2026' },
-          ]}
-          columns={3}
-        />
+        <PageRelatedLinks slug="123-pet-grooming-software-alternatives" variant="landing" heading="The 123Pet alternative built for how groomers actually work" />
 
         {/* ── Footer ── */}
-        <SiteFooter />
+        <SiteFooter slug="123-pet-grooming-software-alternatives" />
       </div>
     </>
   );

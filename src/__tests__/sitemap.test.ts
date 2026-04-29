@@ -158,8 +158,12 @@ describe('Sitemap Generation', () => {
   it('should have total entries matching all pages', () => {
     const result = sitemap();
 
-    // 4 static pages + 8 landing pages + 1 feature page + 20 blog posts = 33 total
+    // 4 static pages (/, /signup, /plans, /blog)
+    // + 10 landing pages
+    // + 1 feature page
+    // + 31 blog posts
+    // = 46 total
     // (update this count when pages are added/removed)
-    expect(result.length).toBeGreaterThanOrEqual(30);
+    expect(result.length).toBeGreaterThanOrEqual(46);
   });
 });

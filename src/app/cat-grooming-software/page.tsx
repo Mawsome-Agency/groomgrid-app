@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Script from 'next/script';
-import RelatedLinks from '@/components/marketing/RelatedLinks';
+import PageBreadcrumbs from '@/components/marketing/PageBreadcrumbs';
+import PageRelatedLinks from '@/components/marketing/PageRelatedLinks';
 import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
@@ -18,20 +19,6 @@ export const metadata: Metadata = {
     url: 'https://getgroomgrid.com/cat-grooming-software',
     type: 'article',
   },
-};
-
-const breadcrumbSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'BreadcrumbList',
-  itemListElement: [
-    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://getgroomgrid.com' },
-    {
-      '@type': 'ListItem',
-      position: 2,
-      name: 'Cat Grooming Software',
-      item: 'https://getgroomgrid.com/cat-grooming-software',
-    },
-  ],
 };
 
 const serviceSchema = {
@@ -250,13 +237,7 @@ export default function CatGroomingSoftwarePage() {
   ];
 
   return (
-    <>
-      <Script
-        id="breadcrumb-schema"
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
-      />
-      <Script
+    <>      <Script
         id="service-schema"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }}
@@ -283,17 +264,7 @@ export default function CatGroomingSoftwarePage() {
 
         {/* Breadcrumb */}
         <div className="px-6 py-3 max-w-5xl mx-auto">
-          <nav aria-label="Breadcrumb" className="text-sm text-stone-500">
-            <ol className="flex items-center gap-2">
-              <li>
-                <Link href="/" className="hover:text-green-600 transition-colors">Home</Link>
-              </li>
-              <li aria-hidden="true">/</li>
-              <li className="text-stone-700 font-medium" aria-current="page">
-                Cat Grooming Software
-              </li>
-            </ol>
-          </nav>
+          <PageBreadcrumbs slug="cat-grooming-software" />
         </div>
 
         {/* Hero */}
@@ -539,15 +510,7 @@ export default function CatGroomingSoftwarePage() {
         </section>
 
         {/* ── Related Links ── */}
-        <RelatedLinks
-          heading="Ready to Stop Fighting Dog-First Software?"
-          links={[
-          { href: '/signup?coupon=BETA50', category: 'Mobile Groomers', title: 'Mobile Grooming Software for Van Groomers' },
-          { href: '/blog/cat-grooming-business-guide', category: 'Business Guide', title: 'How to Start a Cat Grooming Business' },
-          { href: '/best-dog-grooming-software', category: 'Buyer\'s Guide', title: 'Best Dog Grooming Software for 2026' }
-          ]}
-          columns={3}
-        />
+        <PageRelatedLinks slug="cat-grooming-software" variant="landing" heading="Ready to Stop Fighting Dog-First Software?" />
 
         {/* Footer Features Bar */}
         <section className="px-6 py-8 bg-stone-50 border-t border-stone-100">
@@ -564,7 +527,7 @@ export default function CatGroomingSoftwarePage() {
         </section>
 
         {/* Footer */}
-        <SiteFooter links={[{ href: '/mobile-grooming-software', label: 'Mobile Grooming' }, { href: '/plans', label: 'Pricing' }, { href: '/signup', label: 'Sign Up' }]} />
+        <SiteFooter slug="cat-grooming-software" />
       </div>
     </>
   );

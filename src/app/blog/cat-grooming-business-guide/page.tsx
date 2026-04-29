@@ -1,6 +1,9 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Script from 'next/script';
+import PageBreadcrumbs from '@/components/marketing/PageBreadcrumbs';
+import PageRelatedLinks from '@/components/marketing/PageRelatedLinks';
+import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
   title: 'How to Start a Cat Grooming Business: The Complete Guide | GroomGrid',
@@ -16,21 +19,6 @@ export const metadata: Metadata = {
     url: 'https://getgroomgrid.com/blog/cat-grooming-business-guide',
     type: 'article',
   },
-};
-
-const breadcrumbSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'BreadcrumbList',
-  itemListElement: [
-    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://getgroomgrid.com' },
-    { '@type': 'ListItem', position: 2, name: 'Blog', item: 'https://getgroomgrid.com/blog' },
-    {
-      '@type': 'ListItem',
-      position: 3,
-      name: 'How to Start a Cat Grooming Business',
-      item: 'https://getgroomgrid.com/blog/cat-grooming-business-guide',
-    },
-  ],
 };
 
 const articleSchema = {
@@ -54,13 +42,7 @@ const articleSchema = {
 
 export default function CatGroomingBusinessGuidePage() {
   return (
-    <>
-      <Script
-        id="breadcrumb-schema"
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
-      />
-      <Script
+    <>      <Script
         id="article-schema"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
@@ -82,15 +64,7 @@ export default function CatGroomingBusinessGuidePage() {
 
         {/* ── Breadcrumb ── */}
         <div className="px-6 py-3 max-w-5xl mx-auto">
-          <nav aria-label="Breadcrumb" className="text-sm text-stone-500">
-            <ol className="flex items-center gap-2">
-              <li><Link href="/" className="hover:text-green-600 transition-colors">Home</Link></li>
-              <li aria-hidden="true">/</li>
-              <li><Link href="/blog" className="hover:text-green-600 transition-colors">Blog</Link></li>
-              <li aria-hidden="true">/</li>
-              <li className="text-stone-700 font-medium" aria-current="page">Cat Grooming Business Guide</li>
-            </ol>
-          </nav>
+          <PageBreadcrumbs slug="blog/cat-grooming-business-guide" />
         </div>
 
         {/* ── Hero ── */}
@@ -483,14 +457,7 @@ export default function CatGroomingBusinessGuidePage() {
         </section>
 
         {/* ── Footer ── */}
-        <footer className="px-6 py-8 border-t border-stone-100 max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-stone-400">
-          <p>© {new Date().getFullYear()} GroomGrid. Built for groomers who love their craft.</p>
-          <div className="flex gap-6">
-            <Link href="/blog" className="hover:text-green-600 transition-colors">Blog</Link>
-            <Link href="/plans" className="hover:text-green-600 transition-colors">Pricing</Link>
-            <Link href="/signup" className="hover:text-green-600 transition-colors">Get Started</Link>
-          </div>
-        </footer>
+          <SiteFooter slug="blog/cat-grooming-business-guide" />
       </div>
     </>
   );

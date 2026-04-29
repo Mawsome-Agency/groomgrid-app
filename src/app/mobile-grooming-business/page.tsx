@@ -2,6 +2,9 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import Script from 'next/script';
 import { BOFUAnalyticsWrapper } from '@/components/analytics/BOFUAnalyticsWrapper';
+import PageBreadcrumbs from '@/components/marketing/PageBreadcrumbs';
+import PageRelatedLinks from '@/components/marketing/PageRelatedLinks';
+import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
   title: 'Mobile Grooming Business: Complete Guide to Starting & Growing | GroomGrid',
@@ -17,25 +20,6 @@ export const metadata: Metadata = {
     url: 'https://getgroomgrid.com/mobile-grooming-business',
     type: 'article',
   },
-};
-
-const breadcrumbSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'BreadcrumbList',
-  itemListElement: [
-    {
-      '@type': 'ListItem',
-      position: 1,
-      name: 'Home',
-      item: 'https://getgroomgrid.com',
-    },
-    {
-      '@type': 'ListItem',
-      position: 2,
-      name: 'Mobile Grooming Business',
-      item: 'https://getgroomgrid.com/mobile-grooming-business',
-    },
-  ],
 };
 
 const articleSchema = {
@@ -102,13 +86,7 @@ const startupCosts = [
 
 export default function MobileGroomingBusinessPage() {
   return (
-    <>
-      <Script
-        id="breadcrumb-schema"
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
-      />
-      <Script
+    <>      <Script
         id="article-schema"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
@@ -158,21 +136,9 @@ export default function MobileGroomingBusinessPage() {
           </nav>
 
           {/* ── Breadcrumb ── */}
-          <div className="px-6 py-3 max-w-5xl mx-auto">
-            <nav aria-label="Breadcrumb" className="text-sm text-stone-500">
-              <ol className="flex items-center gap-2">
-                <li>
-                  <Link href="/" className="hover:text-green-600 transition-colors">
-                    Home
-                  </Link>
-                </li>
-                <li aria-hidden="true">/</li>
-                <li className="text-stone-700 font-medium" aria-current="page">
-                  Mobile Grooming Business
-                </li>
-              </ol>
-            </nav>
-          </div>
+        <div className="px-6 py-3 max-w-5xl mx-auto">
+          <PageBreadcrumbs slug="mobile-grooming-business" />
+        </div>
 
           {/* ── Hero ── */}
           <header
@@ -572,25 +538,7 @@ export default function MobileGroomingBusinessPage() {
           </section>
 
           {/* ── Footer ── */}
-          <footer className="px-6 py-8 max-w-5xl mx-auto border-t border-stone-100">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-stone-400">
-              <Link href="/" className="font-bold text-green-600">
-                GroomGrid 🐾
-              </Link>
-              <div className="flex gap-6">
-                <Link href="/blog/how-to-start-mobile-grooming-business" className="hover:text-stone-600 transition-colors">
-                  Start Mobile Grooming
-                </Link>
-                <Link href="/grooming-business-operations/" className="hover:text-stone-600 transition-colors">
-                  Operations Hub
-                </Link>
-                <Link href="/plans" className="hover:text-stone-600 transition-colors">
-                  Pricing
-                </Link>
-              </div>
-              <p>© {new Date().getFullYear()} GroomGrid. All rights reserved.</p>
-            </div>
-          </footer>
+          <SiteFooter slug="mobile-grooming-business" />
         </div>
       </BOFUAnalyticsWrapper>
     </>

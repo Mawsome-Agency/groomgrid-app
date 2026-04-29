@@ -1,6 +1,9 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Script from 'next/script';
+import PageBreadcrumbs from '@/components/marketing/PageBreadcrumbs';
+import PageRelatedLinks from '@/components/marketing/PageRelatedLinks';
+import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
   title: 'Dog Grooming Pricing Guide: How Much to Charge in 2026 | GroomGrid',
@@ -16,16 +19,6 @@ export const metadata: Metadata = {
     url: 'https://getgroomgrid.com/blog/dog-grooming-pricing-guide',
     type: 'article',
   },
-};
-
-const breadcrumbSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'BreadcrumbList',
-  itemListElement: [
-    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://getgroomgrid.com' },
-    { '@type': 'ListItem', position: 2, name: 'Blog', item: 'https://getgroomgrid.com/blog' },
-    { '@type': 'ListItem', position: 3, name: 'Dog Grooming Pricing Guide', item: 'https://getgroomgrid.com/blog/dog-grooming-pricing-guide' },
-  ],
 };
 
 const articleSchema = {
@@ -125,13 +118,7 @@ const regionalData = [
 
 export default function DogGroomingPricingGuide() {
   return (
-    <div className="min-h-screen bg-white text-stone-900">
-      <Script
-        id="breadcrumb-schema"
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
-      />
-      <Script
+    <div className="min-h-screen bg-white text-stone-900">      <Script
         id="article-schema"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}

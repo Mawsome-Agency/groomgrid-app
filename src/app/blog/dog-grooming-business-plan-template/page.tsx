@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Script from 'next/script';
-import RelatedLinks from '@/components/marketing/RelatedLinks';
+import PageBreadcrumbs from '@/components/marketing/PageBreadcrumbs';
+import PageRelatedLinks from '@/components/marketing/PageRelatedLinks';
 import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
@@ -18,31 +19,6 @@ export const metadata: Metadata = {
     url: 'https://getgroomgrid.com/blog/dog-grooming-business-plan-template',
     type: 'article',
   },
-};
-
-const breadcrumbSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'BreadcrumbList',
-  itemListElement: [
-    {
-      '@type': 'ListItem',
-      position: 1,
-      name: 'Home',
-      item: 'https://getgroomgrid.com',
-    },
-    {
-      '@type': 'ListItem',
-      position: 2,
-      name: 'Blog',
-      item: 'https://getgroomgrid.com/blog',
-    },
-    {
-      '@type': 'ListItem',
-      position: 3,
-      name: 'Dog Grooming Business Plan Template',
-      item: 'https://getgroomgrid.com/blog/dog-grooming-business-plan-template',
-    },
-  ],
 };
 
 const articleSchema = {
@@ -126,13 +102,7 @@ const faqSchema = {
 
 export default function DogGroomingBusinessPlanTemplatePage() {
   return (
-    <>
-      <Script
-        id="breadcrumb-schema"
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
-      />
-      <Script
+    <>      <Script
         id="article-schema"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
@@ -159,25 +129,7 @@ export default function DogGroomingBusinessPlanTemplatePage() {
 
         {/* ── Breadcrumb ── */}
         <div className="px-6 py-3 max-w-5xl mx-auto">
-          <nav aria-label="Breadcrumb" className="text-sm text-stone-500">
-            <ol className="flex items-center gap-2">
-              <li>
-                <Link href="/" className="hover:text-green-600 transition-colors">
-                  Home
-                </Link>
-              </li>
-              <li aria-hidden="true">/</li>
-              <li>
-                <Link href="/blog" className="hover:text-green-600 transition-colors">
-                  Blog
-                </Link>
-              </li>
-              <li aria-hidden="true">/</li>
-              <li className="text-stone-700 font-medium" aria-current="page">
-                Business Plan Template
-              </li>
-            </ol>
-          </nav>
+          <PageBreadcrumbs slug="blog/dog-grooming-business-plan-template" />
         </div>
 
         {/* ── Hero ── */}
@@ -759,16 +711,7 @@ export default function DogGroomingBusinessPlanTemplatePage() {
         </section>
 
         {/* ── Related Links ── */}
-        <RelatedLinks
-          heading="More Grooming Business Resources"
-          links={[
-            { href: '/blog/dog-grooming-business-management', category: 'Management', title: 'Dog Grooming Business Management: The Complete Guide' },
-            { href: '/blog/how-to-start-dog-grooming-business-at-home', category: 'Getting Started', title: 'How to Start a Dog Grooming Business at Home' },
-            { href: '/blog/mobile-dog-grooming-business-plan', category: 'Mobile', title: 'Mobile Dog Grooming Business Plan: The Complete Template' },
-            { href: '/grooming-business-operations', category: 'Operations', title: 'Grooming Business Operations Hub' },
-          ]}
-          columns={4}
-        />
+        <PageRelatedLinks slug="blog/dog-grooming-business-plan-template" variant="blog" heading="More Grooming Business Resources" />
 
         {/* ── Bottom CTA ── */}
         <section className="px-6 py-16 bg-green-600 text-white">
@@ -792,7 +735,7 @@ export default function DogGroomingBusinessPlanTemplatePage() {
         </section>
 
         {/* ── Footer ── */}
-        <SiteFooter />
+        <SiteFooter slug="blog/dog-grooming-business-plan-template" />
       </div>
     </>
   );

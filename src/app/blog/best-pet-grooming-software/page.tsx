@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Script from 'next/script';
-import RelatedLinks from '@/components/marketing/RelatedLinks';
+import PageBreadcrumbs from '@/components/marketing/PageBreadcrumbs';
+import PageRelatedLinks from '@/components/marketing/PageRelatedLinks';
 import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
@@ -18,21 +19,6 @@ export const metadata: Metadata = {
     url: 'https://getgroomgrid.com/blog/best-pet-grooming-software',
     type: 'article',
   },
-};
-
-const breadcrumbSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'BreadcrumbList',
-  itemListElement: [
-    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://getgroomgrid.com' },
-    { '@type': 'ListItem', position: 2, name: 'Blog', item: 'https://getgroomgrid.com/blog' },
-    {
-      '@type': 'ListItem',
-      position: 3,
-      name: 'Best Pet Grooming Software',
-      item: 'https://getgroomgrid.com/blog/best-pet-grooming-software',
-    },
-  ],
 };
 
 const articleSchema = {
@@ -56,13 +42,7 @@ const articleSchema = {
 
 export default function BestPetGroomingSoftwarePage() {
   return (
-    <>
-      <Script
-        id="breadcrumb-schema"
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
-      />
-      <Script
+    <>      <Script
         id="article-schema"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
@@ -84,15 +64,7 @@ export default function BestPetGroomingSoftwarePage() {
 
         {/* ── Breadcrumb ── */}
         <div className="px-6 py-3 max-w-5xl mx-auto">
-          <nav aria-label="Breadcrumb" className="text-sm text-stone-500">
-            <ol className="flex items-center gap-2">
-              <li><Link href="/" className="hover:text-green-600 transition-colors">Home</Link></li>
-              <li aria-hidden="true">/</li>
-              <li><Link href="/blog" className="hover:text-green-600 transition-colors">Blog</Link></li>
-              <li aria-hidden="true">/</li>
-              <li className="text-stone-700 font-medium" aria-current="page">Best Pet Grooming Software</li>
-            </ol>
-          </nav>
+          <PageBreadcrumbs slug="blog/best-pet-grooming-software" />
         </div>
 
         {/* ── Hero ── */}
@@ -282,17 +254,10 @@ export default function BestPetGroomingSoftwarePage() {
         </section>
 
         {/* ── Related Links ── */}
-        <RelatedLinks
-          heading="Start with the best-rated option for independent groomers"
-          links={[
-          { href: '/signup?coupon=BETA50', category: 'Comparison', title: 'GroomGrid vs MoeGo: An Honest Comparison' },
-          { href: '/blog/pet-grooming-software', category: 'Software Guide', title: 'Pet Grooming Software: The Complete Beginner\'s Guide' }
-          ]}
-          columns={3}
-        />
+        <PageRelatedLinks slug="blog/best-pet-grooming-software" variant="blog" heading="Start with the best-rated option for independent groomers" />
 
         {/* ── Footer ── */}
-        <SiteFooter links={[{ href: '/grooming-business-operations/', label: 'Operations Hub' }, { href: '/mobile-grooming-business/', label: 'Mobile Grooming' }, { href: '/plans', label: 'Pricing' }, { href: '/signup?coupon=BETA50', label: 'Sign Up' }]} />
+        <SiteFooter slug="blog/best-pet-grooming-software" />
       </div>
     </>
   );
