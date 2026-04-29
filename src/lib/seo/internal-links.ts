@@ -61,6 +61,12 @@ const landingPages: ContentPage[] = [
     path: '/cat-grooming-software',
   },
   {
+    slug: 'dog-grooming-scheduling-software',
+    title: 'Dog Grooming Scheduling Software',
+    type: 'landing',
+    path: '/dog-grooming-scheduling-software',
+  },
+  {
     slug: 'mobile-grooming-software',
     title: 'Mobile Grooming Software for Van Groomers',
     type: 'landing',
