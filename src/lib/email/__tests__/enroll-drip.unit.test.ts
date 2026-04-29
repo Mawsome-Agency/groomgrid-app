@@ -19,11 +19,18 @@
 
 const mockCreateMany = jest.fn()
 
+const mockUnsubscribeTokenFindFirst = jest.fn().mockResolvedValue(null)
+const mockUnsubscribeTokenCreate = jest.fn().mockResolvedValue({ token: 'test-token-123' })
+
 jest.mock('@/lib/prisma', () => ({
   __esModule: true,
   default: {
     dripEmailQueue: {
       createMany: mockCreateMany,
+    },
+    unsubscribeToken: {
+      findFirst: mockUnsubscribeTokenFindFirst,
+      create: mockUnsubscribeTokenCreate,
     },
   },
 }))
