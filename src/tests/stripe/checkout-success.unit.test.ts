@@ -56,7 +56,7 @@ const TRIAL_SESSION = {
     userId: 'user-abc',
     planType: 'solo',
     businessName: 'Test Grooming',
-    planName: 'Solo',
+    planName: 'Solo Groomer',
     planPrice: '2900',
     isTrial: 'true',
     clientId: '',
@@ -241,7 +241,7 @@ describe('GET /api/checkout/success', () => {
     const body = await res.json();
 
     expect(body.metadata.businessName).toBe('Test Grooming');
-    expect(body.metadata.planName).toBe('Solo');
+    expect(body.metadata.planName).toBe('Solo Groomer');
     expect(body.metadata.isTrial).toBe('true');
   });
 
