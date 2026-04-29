@@ -50,13 +50,13 @@ export interface BreadcrumbItem {
 const landingPages: ContentPage[] = [
   {
     slug: 'best-dog-grooming-software',
-    title: 'Best Dog Grooming Software for 2026',
+    title: 'Best Dog Grooming Software (2026) — GroomGrid vs MoeGo vs DaySmart',
     type: 'landing',
     path: '/best-dog-grooming-software',
   },
   {
     slug: 'cat-grooming-software',
-    title: 'Cat Grooming Software for Feline Specialists',
+    title: 'Cat Grooming Software — Scheduling, Profiles & Reminders | GroomGrid',
     type: 'landing',
     path: '/cat-grooming-software',
   },
@@ -68,7 +68,7 @@ const landingPages: ContentPage[] = [
   },
   {
     slug: 'mobile-grooming-software',
-    title: 'Mobile Grooming Software for Van Groomers',
+    title: 'Mobile Grooming Software — Built for Van Groomers | GroomGrid',
     type: 'landing',
     path: '/mobile-grooming-software',
   },
@@ -86,7 +86,7 @@ const landingPages: ContentPage[] = [
   },
   {
     slug: 'moego-alternatives',
-    title: 'MoeGo Alternatives: Why Groomers Are Switching',
+    title: 'MoeGo Alternatives: Better Grooming Software for Less | GroomGrid',
     type: 'landing',
     path: '/moego-alternatives',
   },
@@ -110,7 +110,7 @@ const landingPages: ContentPage[] = [
   },
   {
     slug: 'pet-grooming-business-software',
-    title: 'Pet Grooming Business Software',
+    title: 'Pet Grooming Business Software — Manage Your Salon | GroomGrid',
     type: 'landing',
     path: '/pet-grooming-business-software',
   },
@@ -153,8 +153,8 @@ export const topicClusters: TopicCluster[] = [
     slug: 'software-comparison',
     pages: [
       { slug: 'dog-grooming-software', title: "Dog Grooming Software: The 2026 Buyer's Guide", type: 'blog', path: '/blog/dog-grooming-software' },
-      { slug: 'best-dog-grooming-software', title: 'Best Dog Grooming Software for 2026', type: 'landing', path: '/best-dog-grooming-software' },
-      { slug: 'moego-alternatives', title: 'MoeGo Alternatives', type: 'landing', path: '/moego-alternatives' },
+      { slug: 'best-dog-grooming-software', title: 'Best Dog Grooming Software (2026) — GroomGrid vs MoeGo vs DaySmart', type: 'landing', path: '/best-dog-grooming-software' },
+      { slug: 'moego-alternatives', title: 'MoeGo Alternatives: Better Grooming Software for Less | GroomGrid', type: 'landing', path: '/moego-alternatives' },
       { slug: 'daysmart-alternatives', title: 'DaySmart Alternatives', type: 'landing', path: '/daysmart-alternatives' },
       { slug: 'groomgrid-vs-moego', title: 'GroomGrid vs MoeGo', type: 'blog', path: '/blog/groomgrid-vs-moego' },
       { slug: 'groomgrid-vs-daysmart', title: 'GroomGrid vs DaySmart Pet', type: 'blog', path: '/blog/groomgrid-vs-daysmart' },
@@ -165,7 +165,7 @@ export const topicClusters: TopicCluster[] = [
       { slug: 'best-pet-grooming-software', title: 'Best Pet Grooming Software in 2026', type: 'blog', path: '/blog/best-pet-grooming-software' },
       { slug: 'dog-grooming-appointment-app', title: 'Best Dog Grooming Appointment App', type: 'blog', path: '/blog/dog-grooming-appointment-app' },
       { slug: '123-pet-grooming-software-alternatives', title: '123 Pet Grooming Software Alternatives', type: 'landing', path: '/123-pet-grooming-software-alternatives' },
-      { slug: 'pet-grooming-business-software', title: 'Pet Grooming Business Software', type: 'landing', path: '/pet-grooming-business-software' },
+      { slug: 'pet-grooming-business-software', title: 'Pet Grooming Business Software — Manage Your Salon | GroomGrid', type: 'landing', path: '/pet-grooming-business-software' },
       { slug: 'dog-grooming-scheduling-software', title: 'Dog Grooming Scheduling Software', type: 'landing', path: '/dog-grooming-scheduling-software' },
     ],
   },
@@ -196,7 +196,7 @@ export const topicClusters: TopicCluster[] = [
       { slug: 'mobile-dog-grooming-business-tips', title: 'Mobile Dog Grooming Business Tips', type: 'blog', path: '/blog/mobile-dog-grooming-business-tips' },
       { slug: 'how-to-build-mobile-grooming-trailer', title: 'How to Build a Mobile Grooming Trailer', type: 'blog', path: '/blog/how-to-build-mobile-grooming-trailer' },
       { slug: 'mobile-grooming-business', title: 'Mobile Grooming Business Guide', type: 'landing', path: '/mobile-grooming-business' },
-      { slug: 'mobile-grooming-software', title: 'Mobile Grooming Software for Van Groomers', type: 'landing', path: '/mobile-grooming-software' },
+      { slug: 'mobile-grooming-software', title: 'Mobile Grooming Software — Built for Van Groomers | GroomGrid', type: 'landing', path: '/mobile-grooming-software' },
       { slug: 'features-mobile-groomer', title: 'Mobile Groomer Feature Spotlight', type: 'landing', path: '/features/mobile-groomer' },
     ],
   },
@@ -244,7 +244,7 @@ export const topicClusters: TopicCluster[] = [
     slug: 'cat-grooming',
     pages: [
       { slug: 'cat-grooming-business-guide', title: 'How to Start a Cat Grooming Business', type: 'blog', path: '/blog/cat-grooming-business-guide' },
-      { slug: 'cat-grooming-software', title: 'Cat Grooming Software for Feline Specialists', type: 'landing', path: '/cat-grooming-software' },
+      { slug: 'cat-grooming-software', title: 'Cat Grooming Software — Scheduling, Profiles & Reminders | GroomGrid', type: 'landing', path: '/cat-grooming-software' },
     ],
   },
   {

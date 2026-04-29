@@ -6,14 +6,14 @@ import PageRelatedLinks from '@/components/marketing/PageRelatedLinks';
 import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
-  title: 'MoeGo Alternatives: Best Pet Grooming Software for 2026 | GroomGrid',
+  title: 'MoeGo Alternatives: Better Grooming Software for Less | GroomGrid',
   description:
     'Looking for MoeGo alternatives? Compare GroomGrid, DaySmart, and Pawfinity on pricing, features, AI tools, and mobile access — and see why groomers are making the switch.',
   alternates: {
     canonical: 'https://getgroomgrid.com/moego-alternatives',
   },
   openGraph: {
-    title: 'MoeGo Alternatives: Best Pet Grooming Software for 2026',
+    title: 'MoeGo Alternatives: Better Grooming Software for Less | GroomGrid',
     description:
       'Looking for MoeGo alternatives? Compare GroomGrid, DaySmart, and Pawfinity on pricing, features, and mobile access.',
     url: 'https://getgroomgrid.com/moego-alternatives',
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
 const articleSchema = {
   '@context': 'https://schema.org',
   '@type': 'Article',
-  headline: 'MoeGo Alternatives: Best Pet Grooming Software for 2026',
+  headline: 'MoeGo Alternatives: Better Grooming Software for Less | GroomGrid',
   description:
     'Looking for MoeGo alternatives? Compare GroomGrid, DaySmart, and Pawfinity on pricing, features, AI tools, and mobile access.',
   url: 'https://getgroomgrid.com/moego-alternatives',
