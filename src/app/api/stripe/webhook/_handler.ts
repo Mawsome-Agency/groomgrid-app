@@ -129,6 +129,17 @@ export const handleStripeEvent = async (event: Stripe.Event) => {
           trialStarted
         ).catch((err) => console.error('[Webhook] checkout_completed tracking failed:', err));
 
+        // Cancel remaining drip emails for converted users (steps > 0 only;
+        // step 0 welcome is already sent and fine to have delivered)
+        await prisma.dripEmailQueue.updateMany({
+          where: {
+            userId,
+            status: 'pending',
+            sequenceStep: { gt: 0 },
+          },
+          data: { status: 'cancelled' },
+        }).catch((err) => console.error('[Webhook] drip cancellation failed:', err));
+
         // Write idempotency marker AFTER completion handler succeeds.
         // Placing this last closes the race window: if triggerPaymentCompletionHandler
         // throws, Stripe retries will find no CHECKOUT_SESSION_COMPLETED record and
@@ -155,6 +166,16 @@ export const handleStripeEvent = async (event: Stripe.Event) => {
           subscription.status,
           price
         ).catch((err) => console.error('[Webhook] subscription_started tracking failed:', err));
+
+        // Cancel remaining drip emails for converted users
+        await prisma.dripEmailQueue.updateMany({
+          where: {
+            userId,
+            status: 'pending',
+            sequenceStep: { gt: 0 },
+          },
+          data: { status: 'cancelled' },
+        }).catch((err) => console.error('[Webhook] drip cancellation failed:', err));
       }
       // Record event processing
       await recordEventProcessed(event.id, event.type, subscription.id);
