@@ -81,7 +81,7 @@ export default function MobileDogGroomingBusinessPlanPage() {
           <p className="text-xl text-stone-600 leading-relaxed max-w-3xl">
             Starting a mobile grooming business without a plan is how groomers end up overworked,
             underpaid, and driving to clients who live an hour apart. This guide walks through every
-            section of a real mobile grooming business plan — from startup costs to revenue targets.
+            section of a real mobile grooming business plan — from startup costs to revenue targets. If you&apos;re still deciding whether mobile grooming is right for you, start with our <Link href="/blog/how-to-start-mobile-grooming-business/" className="text-green-700 font-semibold hover:underline">how to start a mobile grooming business</Link> guide.
           </p>
         </header>
 
@@ -184,7 +184,7 @@ export default function MobileDogGroomingBusinessPlanPage() {
             selling convenience, and clients who value that will pay for it.
           </p>
           <p className="text-stone-600 leading-relaxed mb-4">
-            Build your pricing from your cost structure:
+            Build your pricing from your cost structure. For a deep dive into breed-by-breed pricing, see our <Link href="/blog/dog-grooming-pricing-guide/" className="text-green-700 font-semibold hover:underline">dog grooming pricing guide</Link>:
           </p>
           <ul className="space-y-3 mb-6">
             {[
@@ -252,8 +252,39 @@ export default function MobileDogGroomingBusinessPlanPage() {
           </ul>
           <p className="text-stone-600 leading-relaxed">
             Once you have 20–30 regular clients, most of your growth comes from referrals. Focus
-            on those first clients — their word-of-mouth is your marketing budget.
+            on those first clients — their word-of-mouth is your marketing budget. For more day-to-day strategies from working mobile groomers, see our <Link href="/blog/mobile-dog-grooming-business-tips/" className="text-green-700 font-semibold hover:underline">mobile grooming business tips</Link>.
           </p>
+        </section>
+
+        {/* ── Related Content ── */}
+        <section className="px-6 py-14 max-w-4xl mx-auto">
+          <h2 className="text-2xl font-bold text-stone-800 mb-8">More Grooming Business Resources</h2>
+          <div className="grid sm:grid-cols-3 gap-5">
+            <Link
+              href="/blog/how-to-start-mobile-grooming-business/"
+              className="p-5 rounded-xl border border-stone-200 hover:border-green-300 hover:shadow-sm transition-all block"
+            >
+              <p className="text-2xl mb-2">🚀</p>
+              <p className="font-semibold text-stone-800 text-sm mb-1">How to Start a Mobile Grooming Business</p>
+              <p className="text-stone-500 text-xs">Step-by-step guide to launching your mobile grooming biz</p>
+            </Link>
+            <Link
+              href="/blog/dog-grooming-pricing-guide/"
+              className="p-5 rounded-xl border border-stone-200 hover:border-green-300 hover:shadow-sm transition-all block"
+            >
+              <p className="text-2xl mb-2">💲</p>
+              <p className="font-semibold text-stone-800 text-sm mb-1">Dog Grooming Pricing Guide</p>
+              <p className="text-stone-500 text-xs">Breed-by-breed pricing, add-ons, and profit margins</p>
+            </Link>
+            <Link
+              href="/blog/mobile-dog-grooming-business-tips/"
+              className="p-5 rounded-xl border border-stone-200 hover:border-green-300 hover:shadow-sm transition-all block"
+            >
+              <p className="text-2xl mb-2">💡</p>
+              <p className="font-semibold text-stone-800 text-sm mb-1">Mobile Grooming Business Tips</p>
+              <p className="text-stone-500 text-xs">Day-to-day tips from successful mobile groomers</p>
+            </Link>
+          </div>
         </section>
 
         {/* ── Related Links ── */}

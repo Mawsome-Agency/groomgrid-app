@@ -172,7 +172,7 @@ export default function HowToOpenAPetGroomingBusinessPage() {
             </h2>
             <p className="text-stone-600 leading-relaxed mb-8">
               Every decision that follows — location, equipment, staffing, pricing — depends on
-              your business model. There are three main paths:
+              your business model. There are three main paths. <Link href="/blog/how-much-to-start-dog-grooming-business/" className="text-green-700 font-semibold hover:underline">Compare the full startup costs</Link> for each model before you commit:
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {businessModels.map((model) => (
@@ -198,7 +198,7 @@ export default function HowToOpenAPetGroomingBusinessPage() {
             Writing Your Pet Grooming Business Plan
           </h2>
           <p className="text-stone-600 leading-relaxed mb-4">
-            You do not need a 40-page document. You need clarity on seven things:
+            You do not need a 40-page document. You need clarity on seven things. <Link href="/blog/dog-grooming-business-plan-template/" className="text-green-700 font-semibold hover:underline">Use our dog grooming business plan template</Link> to get started:
           </p>
           <div className="space-y-4 mb-6">
             {[
@@ -251,7 +251,7 @@ export default function HowToOpenAPetGroomingBusinessPage() {
             </ul>
             <p className="text-stone-600 leading-relaxed">
               Budget $400–$800/year for all licensing and insurance combined. It is not optional — a
-              single incident without insurance can wipe out a year of income.
+              single incident without insurance can wipe out a year of income. For a deeper look at coverage options, see our <Link href="/blog/dog-grooming-business-insurance/" className="text-green-700 font-semibold hover:underline">dog grooming business insurance guide</Link>.
             </p>
           </div>
         </section>
@@ -366,6 +366,37 @@ export default function HowToOpenAPetGroomingBusinessPage() {
                 </div>
               ))}
             </div>
+          </div>
+        </section>
+
+        {/* ── Related Content ── */}
+        <section className="px-6 py-14 max-w-4xl mx-auto">
+          <h2 className="text-2xl font-bold text-stone-800 mb-8">More Grooming Business Resources</h2>
+          <div className="grid sm:grid-cols-3 gap-5">
+            <Link
+              href="/blog/dog-grooming-business-plan-template/"
+              className="p-5 rounded-xl border border-stone-200 hover:border-green-300 hover:shadow-sm transition-all block"
+            >
+              <p className="text-2xl mb-2">📋</p>
+              <p className="font-semibold text-stone-800 text-sm mb-1">Dog Grooming Business Plan Template</p>
+              <p className="text-stone-500 text-xs">Fill-in-the-blank template with financial projections</p>
+            </Link>
+            <Link
+              href="/blog/dog-grooming-business-insurance/"
+              className="p-5 rounded-xl border border-stone-200 hover:border-green-300 hover:shadow-sm transition-all block"
+            >
+              <p className="text-2xl mb-2">🛡️</p>
+              <p className="font-semibold text-stone-800 text-sm mb-1">Dog Grooming Business Insurance</p>
+              <p className="text-stone-500 text-xs">Coverage types, costs, and what you actually need</p>
+            </Link>
+            <Link
+              href="/blog/how-much-to-start-dog-grooming-business/"
+              className="p-5 rounded-xl border border-stone-200 hover:border-green-300 hover:shadow-sm transition-all block"
+            >
+              <p className="text-2xl mb-2">💰</p>
+              <p className="font-semibold text-stone-800 text-sm mb-1">How Much to Start a Dog Grooming Business</p>
+              <p className="text-stone-500 text-xs">Full cost breakdown for home, mobile, and retail</p>
+            </Link>
           </div>
         </section>
 

@@ -6,14 +6,14 @@ import PageRelatedLinks from '@/components/marketing/PageRelatedLinks';
 import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
-  title: 'Best Dog Grooming Software for 2026: Full Comparison | GroomGrid',
+  title: 'Best Dog Grooming Software (2026) — GroomGrid vs MoeGo',
   description:
     'Comparing the best dog grooming software of 2026? We review GroomGrid, MoeGo, DaySmart, and Pawfinity on pricing, AI features, scheduling, and ease of use for solo and salon groomers.',
   alternates: {
     canonical: 'https://getgroomgrid.com/best-dog-grooming-software',
   },
   openGraph: {
-    title: 'Best Dog Grooming Software for 2026: Full Comparison',
+    title: 'Best Dog Grooming Software (2026) — GroomGrid vs MoeGo',
     description:
       'Full comparison of the best dog grooming software — GroomGrid, MoeGo, DaySmart, Pawfinity. Find the right fit for solo groomers, mobile operators, and salons.',
     url: 'https://getgroomgrid.com/best-dog-grooming-software',
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
 const articleSchema = {
   '@context': 'https://schema.org',
   '@type': 'Article',
-  headline: 'Best Dog Grooming Software for 2026: Full Comparison',
+  headline: 'Best Dog Grooming Software (2026) — GroomGrid vs MoeGo',
   description:
     'We compare the top dog grooming software platforms — GroomGrid, MoeGo, DaySmart, and Pawfinity — on pricing, features, AI tools, and use case fit.',
   url: 'https://getgroomgrid.com/best-dog-grooming-software',
