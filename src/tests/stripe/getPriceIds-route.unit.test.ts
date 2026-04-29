@@ -20,9 +20,9 @@
  * acts as a regression guard for that alignment.
  *
  * Coverage targets:
- *  - solo plan → planType:'solo', planData:{name:'Solo', price:2900}
- *  - salon plan → planType:'salon', planData:{name:'Salon', price:7900}
- *  - enterprise plan → planType:'enterprise', planData:{name:'Enterprise', price:14900}
+ *  - solo plan → planType:'solo', planData:{name:'Solo Groomer', price:2900}
+ *  - salon plan → planType:'salon', planData:{name:'Salon Team', price:7900}
+ *  - enterprise plan → planType:'enterprise', planData:{name:'Multi-Location', price:14900}
  *  - planType is forwarded as-is (no transformation)
  *  - createCheckoutSession is called exactly once per request
  */
@@ -124,9 +124,9 @@ describe('getPriceIds() route integration — planType routes to correct STRIPE_
 
   // Regression: planData prices must align with pricing-data.ts PLANS array
   it.each([
-    ['solo',       { name: 'Solo',       price: 2900  }],
-    ['salon',      { name: 'Salon',      price: 7900  }],
-    ['enterprise', { name: 'Enterprise', price: 14900 }],
+    ['solo',       { name: 'Solo Groomer',   price: 2900  }],
+    ['salon',      { name: 'Salon Team',     price: 7900  }],
+    ['enterprise', { name: 'Multi-Location', price: 14900 }],
   ] as const)('%s plan forwards correct planData to createCheckoutSession', async (planType, expectedPlanData) => {
     await POST(makeReq({ userId: 'user-123', planType }));
     const [args] = mockCreate.mock.calls[0];
@@ -151,22 +151,22 @@ describe('getPriceIds() route integration — planType routes to correct STRIPE_
     expect(args.planData?.price).toBe(14900);
   });
 
-  it('solo planData name is "Solo"', async () => {
+  it('solo planData name is "Solo Groomer"', async () => {
     await POST(makeReq({ userId: 'user-123', planType: 'solo' }));
     const [args] = mockCreate.mock.calls[0];
-    expect(args.planData?.name).toBe('Solo');
+    expect(args.planData?.name).toBe('Solo Groomer');
   });
 
-  it('salon planData name is "Salon"', async () => {
+  it('salon planData name is "Salon Team"', async () => {
     await POST(makeReq({ userId: 'user-123', planType: 'salon' }));
     const [args] = mockCreate.mock.calls[0];
-    expect(args.planData?.name).toBe('Salon');
+    expect(args.planData?.name).toBe('Salon Team');
   });
 
-  it('enterprise planData name is "Enterprise"', async () => {
+  it('enterprise planData name is "Multi-Location"', async () => {
     await POST(makeReq({ userId: 'user-123', planType: 'enterprise' }));
     const [args] = mockCreate.mock.calls[0];
-    expect(args.planData?.name).toBe('Enterprise');
+    expect(args.planData?.name).toBe('Multi-Location');
   });
 
   it('createCheckoutSession is called exactly once per request', async () => {
