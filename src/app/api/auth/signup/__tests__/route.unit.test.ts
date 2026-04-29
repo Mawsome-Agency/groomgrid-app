@@ -201,7 +201,7 @@ describe('POST /api/auth/signup', () => {
       expect(mockSendVerificationEmail).toHaveBeenCalledTimes(1)
     })
 
-    it('calls sendWelcomeEmail', async () => {
+    it('does NOT call sendWelcomeEmail (welcome is handled by drip step0)', async () => {
       const req = makeRequest({
         email: 'groomer@example.com',
         password: 'SecurePass1!',
@@ -209,7 +209,8 @@ describe('POST /api/auth/signup', () => {
       })
       await POST(req)
 
-      expect(mockSendWelcomeEmail).toHaveBeenCalledTimes(1)
+      // sendWelcomeEmail was removed — drip step0 handles the welcome email
+      expect(mockSendWelcomeEmail).not.toHaveBeenCalled()
     })
   })
 
@@ -318,41 +319,20 @@ describe('POST /api/auth/signup', () => {
     })
   })
 
-  // ── (5) sendWelcomeEmail failure is fire-and-forget ──────────────────────────
+  // ── (5) sendWelcomeEmail is no longer called ──────────────────────────
 
-  describe('sendWelcomeEmail failure — fire-and-forget', () => {
-    it('returns 200 even when sendWelcomeEmail rejects', async () => {
-      mockSendWelcomeEmail.mockRejectedValue(new Error('Mailgun 502'))
-
+  describe('sendWelcomeEmail — removed (drip step0 handles welcome)', () => {
+    it('sendWelcomeEmail is never called on signup', async () => {
       const req = makeRequest({
         email: 'wel@example.com',
         password: 'pass1234',
         businessName: 'Welcome Test',
       })
-      const res = await POST(req)
-      await Promise.resolve()
-      await Promise.resolve()
-
-      const body = await res.json()
-
-      expect(res.status).toBe(201)
-      expect(body.success).toBe(true)
-    })
-
-    it('still creates user and token when sendWelcomeEmail rejects', async () => {
-      mockSendWelcomeEmail.mockRejectedValue(new Error('Mailgun down'))
-
-      const req = makeRequest({
-        email: 'wel2@example.com',
-        password: 'pass1234',
-        businessName: 'Welcome Test 2',
-      })
       await POST(req)
       await Promise.resolve()
       await Promise.resolve()
 
-      expect(mockUserCreate).toHaveBeenCalledTimes(1)
-      expect(mockEmailVerificationTokenCreate).toHaveBeenCalledTimes(1)
+      expect(mockSendWelcomeEmail).not.toHaveBeenCalled()
     })
   })
 
@@ -391,7 +371,6 @@ describe('POST /api/auth/signup', () => {
       // emailVerificationToken.create is awaited — its failure throws into the
       // outer catch block and aborts execution before any emails are sent.
       expect(mockSendVerificationEmail).not.toHaveBeenCalled()
-      expect(mockSendWelcomeEmail).not.toHaveBeenCalled()
     })
   })
 
