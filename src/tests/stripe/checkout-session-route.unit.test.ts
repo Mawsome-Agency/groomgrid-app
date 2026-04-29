@@ -323,7 +323,7 @@ describe('GET /api/checkout/session — PLAN_DATA_CENTS regression lock', () => 
     await GET(req);
 
     const [args] = mockCreateCheckoutSession.mock.calls[0];
-    expect(args.planData).toEqual({ name: 'Solo', price: 2900 });
+    expect(args.planData).toEqual({ name: 'Solo Groomer', price: 2900 });
   });
 
   it('passes correct planData for salon ($79 = 7900 cents)', async () => {
@@ -331,7 +331,7 @@ describe('GET /api/checkout/session — PLAN_DATA_CENTS regression lock', () => 
     await GET(req);
 
     const [args] = mockCreateCheckoutSession.mock.calls[0];
-    expect(args.planData).toEqual({ name: 'Salon', price: 7900 });
+    expect(args.planData).toEqual({ name: 'Salon Team', price: 7900 });
   });
 
   it('passes correct planData for enterprise ($149 = 14900 cents)', async () => {
@@ -339,7 +339,7 @@ describe('GET /api/checkout/session — PLAN_DATA_CENTS regression lock', () => 
     await GET(req);
 
     const [args] = mockCreateCheckoutSession.mock.calls[0];
-    expect(args.planData).toEqual({ name: 'Enterprise', price: 14900 });
+    expect(args.planData).toEqual({ name: 'Multi-Location', price: 14900 });
   });
 
   it('planData is sourced from PLAN_DATA_CENTS — same shape as checkout POST route', async () => {
