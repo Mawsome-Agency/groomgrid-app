@@ -1,0 +1,163 @@
+{
+  "timestamp": "2026-04-29T14:19:15Z",
+  "base_url": "https://getgroomgrid.com",
+  "runs_per_page": 3,
+  "results": [
+    {
+      "page": "/",
+      "url": "https://getgroomgrid.com/",
+      "runs": 3,
+      "ttfb": {
+        "min": 268.6,
+        "avg": 269.8,
+        "max": 270.7,
+        "unit": "ms"
+      },
+      "total": {
+        "min": 276.7,
+        "avg": 282.6,
+        "max": 287.1,
+        "unit": "ms"
+      },
+      "size": {
+        "min": 29493,
+        "avg": 29493,
+        "max": 29493,
+        "unit": "bytes"
+      },
+      "status": 200,
+      "cache_control": "s-maxage=31536000",
+      "content_type": "text/html; charset=utf-8"
+    },
+    {
+      "page": "/signup",
+      "url": "https://getgroomgrid.com/signup",
+      "runs": 3,
+      "ttfb": {
+        "min": 259.1,
+        "avg": 265.9,
+        "max": 273.4,
+        "unit": "ms"
+      },
+      "total": {
+        "min": 273.7,
+        "avg": 283.2,
+        "max": 298.1,
+        "unit": "ms"
+      },
+      "size": {
+        "min": 17227,
+        "avg": 17227,
+        "max": 17227,
+        "unit": "bytes"
+      },
+      "status": 200,
+      "cache_control": "no-store, must-revalidate",
+      "content_type": "text/html; charset=utf-8"
+    },
+    {
+      "page": "/plans",
+      "url": "https://getgroomgrid.com/plans",
+      "runs": 3,
+      "ttfb": {
+        "min": 265.8,
+        "avg": 266.5,
+        "max": 267.4,
+        "unit": "ms"
+      },
+      "total": {
+        "min": 267.5,
+        "avg": 273.0,
+        "max": 276.6,
+        "unit": "ms"
+      },
+      "size": {
+        "min": 18328,
+        "avg": 18328,
+        "max": 18328,
+        "unit": "bytes"
+      },
+      "status": 200,
+      "cache_control": "no-store, must-revalidate",
+      "content_type": "text/html; charset=utf-8"
+    },
+    {
+      "page": "/login",
+      "url": "https://getgroomgrid.com/login",
+      "runs": 3,
+      "ttfb": {
+        "min": 256.1,
+        "avg": 261.4,
+        "max": 269.5,
+        "unit": "ms"
+      },
+      "total": {
+        "min": 256.4,
+        "avg": 261.7,
+        "max": 269.9,
+        "unit": "ms"
+      },
+      "size": {
+        "min": 16560,
+        "avg": 16560,
+        "max": 16560,
+        "unit": "bytes"
+      },
+      "status": 200,
+      "cache_control": "no-store, must-revalidate",
+      "content_type": "text/html; charset=utf-8"
+    },
+    {
+      "page": "/cat-grooming-software",
+      "url": "https://getgroomgrid.com/cat-grooming-software",
+      "runs": 3,
+      "ttfb": {
+        "min": 244.7,
+        "avg": 260.4,
+        "max": 268.8,
+        "unit": "ms"
+      },
+      "total": {
+        "min": 317.6,
+        "avg": 340.5,
+        "max": 360.0,
+        "unit": "ms"
+      },
+      "size": {
+        "min": 75269,
+        "avg": 75269,
+        "max": 75269,
+        "unit": "bytes"
+      },
+      "status": 200,
+      "cache_control": "s-maxage=31536000",
+      "content_type": "text/html; charset=utf-8"
+    },
+    {
+      "page": "/mobile-groomer",
+      "url": "https://getgroomgrid.com/mobile-groomer",
+      "runs": 3,
+      "ttfb": {
+        "min": 258.0,
+        "avg": 262.0,
+        "max": 269.5,
+        "unit": "ms"
+      },
+      "total": {
+        "min": 266.5,
+        "avg": 276.8,
+        "max": 285.0,
+        "unit": "ms"
+      },
+      "size": {
+        "min": 17648,
+        "avg": 17648,
+        "max": 17648,
+        "unit": "bytes"
+      },
+      "status": 404,
+      "cache_control": "private, no-cache, no-store, max-age=0, must-revalidate",
+      "content_type": "text/html; charset=utf-8"
+    }
+  ]
+}
