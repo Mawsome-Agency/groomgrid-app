@@ -18,7 +18,7 @@
  *  - stripe_price_id falls back to '' when env var is absent
  *  - stripe_price_id uses env var value when set
  *  - Feature list counts and required feature strings
- *  - popular flag: only Salon is popular
+ *  - popular flag: Solo is the popular plan
  *  - TESTIMONIALS and FAQ_ITEMS exports are present and non-empty
  */
 
@@ -117,26 +117,26 @@ describe('PLANS[0] — Solo plan static fields', () => {
   });
 
   it('has id "solo"', () => expect(solo.id).toBe('solo'));
-  it('has name "Solo"', () => expect(solo.name).toBe('Solo'));
+  it('has name "Solo Groomer"', () => expect(solo.name).toBe('Solo Groomer'));
   it('has type "solo"', () => expect(solo.type).toBe('solo'));
   it('has price 29', () => expect(solo.price).toBe(29));
   it('has interval "monthly"', () => expect(solo.interval).toBe('monthly'));
-  it('is not the popular plan', () => expect(solo.popular).toBe(false));
+  it('is the popular plan', () => expect(solo.popular).toBe(true));
 
   it('has at least 4 features', () => {
     expect(solo.features.length).toBeGreaterThanOrEqual(4);
   });
 
-  it('features include "Unlimited appointments"', () => {
-    expect(solo.features).toContain('Unlimited appointments');
+  it('features include "Unlimited bookings — no per-dog fees"', () => {
+    expect(solo.features).toContain('Unlimited bookings — no per-dog fees');
   });
 
-  it('features include "Automated reminders"', () => {
-    expect(solo.features).toContain('Automated reminders');
+  it('features include "Auto SMS + email reminders — cut no-shows 40%"', () => {
+    expect(solo.features).toContain('Auto SMS + email reminders — cut no-shows 40%');
   });
 
-  it('features include "Online booking widget"', () => {
-    expect(solo.features).toContain('Online booking widget');
+  it('features include "Online booking widget — clients book themselves"', () => {
+    expect(solo.features).toContain('Online booking widget — clients book themselves');
   });
 });
 
@@ -156,22 +156,22 @@ describe('PLANS[1] — Salon plan static fields', () => {
   });
 
   it('has id "salon"', () => expect(salon.id).toBe('salon'));
-  it('has name "Salon"', () => expect(salon.name).toBe('Salon'));
+  it('has name "Salon Team"', () => expect(salon.name).toBe('Salon Team'));
   it('has type "salon"', () => expect(salon.type).toBe('salon'));
   it('has price 79', () => expect(salon.price).toBe(79));
   it('has interval "monthly"', () => expect(salon.interval).toBe('monthly'));
-  it('is the popular plan', () => expect(salon.popular).toBe(true));
+  it('is not the popular plan', () => expect(salon.popular).toBe(false));
 
   it('has at least 5 features', () => {
     expect(salon.features.length).toBeGreaterThanOrEqual(5);
   });
 
-  it('features include "Everything in Solo"', () => {
-    expect(salon.features).toContain('Everything in Solo');
+  it('features include "Everything in Solo Groomer"', () => {
+    expect(salon.features).toContain('Everything in Solo Groomer');
   });
 
-  it('features include "Team scheduling"', () => {
-    expect(salon.features).toContain('Team scheduling');
+  it('features include "Team scheduling — auto-balance workload"', () => {
+    expect(salon.features).toContain('Team scheduling — auto-balance workload');
   });
 
   it('features include "Priority support"', () => {
@@ -195,7 +195,7 @@ describe('PLANS[2] — Enterprise plan static fields', () => {
   });
 
   it('has id "enterprise"', () => expect(enterprise.id).toBe('enterprise'));
-  it('has name "Enterprise"', () => expect(enterprise.name).toBe('Enterprise'));
+  it('has name "Multi-Location"', () => expect(enterprise.name).toBe('Multi-Location'));
   it('has type "enterprise"', () => expect(enterprise.type).toBe('enterprise'));
   it('has price 149', () => expect(enterprise.price).toBe(149));
   it('has interval "monthly"', () => expect(enterprise.interval).toBe('monthly'));
@@ -205,8 +205,8 @@ describe('PLANS[2] — Enterprise plan static fields', () => {
     expect(enterprise.features.length).toBeGreaterThanOrEqual(4);
   });
 
-  it('features include "Everything in Salon"', () => {
-    expect(enterprise.features).toContain('Everything in Salon');
+  it('features include "Everything in Salon Team"', () => {
+    expect(enterprise.features).toContain('Everything in Salon Team');
   });
 
   it('features include "API access"', () => {
@@ -427,12 +427,12 @@ describe('popular flag', () => {
     expect(popularPlans).toHaveLength(1);
   });
 
-  it('the Salon plan (index 1) is the popular plan', () => {
-    expect(PLANS[1].popular).toBe(true);
+  it('the Solo plan (index 0) is the popular plan', () => {
+    expect(PLANS[0].popular).toBe(true);
   });
 
-  it('the Solo plan is not popular', () => {
-    expect(PLANS[0].popular).toBeFalsy();
+  it('the Salon plan is not popular', () => {
+    expect(PLANS[1].popular).toBe(false);
   });
 
   it('the Enterprise plan is not popular', () => {
@@ -455,8 +455,8 @@ describe('TESTIMONIALS export', () => {
     expect(Array.isArray(TESTIMONIALS)).toBe(true);
   });
 
-  it('TESTIMONIALS has at least one entry', () => {
-    expect(TESTIMONIALS.length).toBeGreaterThanOrEqual(1);
+  it('TESTIMONIALS is defined (empty until real customers provide them)', () => {
+    expect(TESTIMONIALS).toBeDefined();
   });
 
   it('each testimonial has name, business, and quote fields', () => {

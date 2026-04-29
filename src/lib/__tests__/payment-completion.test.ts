@@ -407,7 +407,7 @@ describe('triggerPaymentCompletionHandler — purchase_completed event', () => {
       'ga4-client-id',
       'user-abc',
       'cs_test_abc',
-      'Solo',
+      'Solo Groomer',
       29
     );
   });
@@ -422,7 +422,7 @@ describe('triggerPaymentCompletionHandler — purchase_completed event', () => {
       'ga4-client-id',
       'user-abc',
       'cs_test_abc',
-      'Salon',
+      'Salon Team',
       79
     );
   });

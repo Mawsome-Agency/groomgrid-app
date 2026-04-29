@@ -73,7 +73,9 @@ function createMailgunClient(): MailgunClient {
             method: 'POST',
             headers: { Authorization: `Basic ${credentials}` },
             body: formData,
-            signal: AbortSignal.timeout(10_000), // abort after 10s — protects awaited callers
+            signal: typeof AbortSignal.timeout === 'function'
+              ? AbortSignal.timeout(10_000) // abort after 10s — protects awaited callers
+              : undefined, // fallback for test environments without timeout support
           })
 
           if (!response.ok) {
