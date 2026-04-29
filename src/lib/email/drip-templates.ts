@@ -13,7 +13,7 @@ const BRAND = {
   white: '#ffffff',
 }
 
-function emailWrapper(body: string): string {
+function emailWrapper(body: string, unsubscribeUrl: string): string {
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -43,7 +43,7 @@ function emailWrapper(body: string): string {
             <td style="padding:24px 32px;border-top:1px solid ${BRAND.border};background-color:${BRAND.bg};">
               <p style="margin:0;font-size:13px;color:${BRAND.textMuted};text-align:center;">
                 GroomGrid — Built for groomers, by groomers.<br />
-                <a href="{{unsubscribe_url}}" style="color:${BRAND.textMuted};">Unsubscribe</a>
+                <a href="${unsubscribeUrl}" style="color:${BRAND.textMuted};">Unsubscribe</a>
               </p>
             </td>
           </tr>
@@ -69,7 +69,7 @@ function p(text: string, muted = false): string {
 
 // ─── STEP 0: Welcome + Getting Started (Day 0) ──────────────────────────────────
 
-function step0(userName: string, appUrl: string): EmailContent {
+function step0(userName: string, appUrl: string, unsubscribeUrl: string): EmailContent {
   const firstName = userName.split(' ')[0]
 
   const html = emailWrapper(`
@@ -104,7 +104,7 @@ function step0(userName: string, appUrl: string): EmailContent {
     ${ctaButton('Set Up My Account', appUrl)}
     <br /><br />
     ${p(`Questions? Just reply to this email — we're real people and we read everything.`, true)}
-  `)
+  `, unsubscribeUrl)
 
   const text = `Welcome to GroomGrid, ${firstName}!
 
@@ -126,7 +126,7 @@ Questions? Reply to this email.`
 
 // ─── STEP 1: How GroomGrid Solves No-Shows (Day 1) ────────────────────────────
 
-function step1(userName: string, appUrl: string): EmailContent {
+function step1(userName: string, appUrl: string, unsubscribeUrl: string): EmailContent {
   const firstName = userName.split(' ')[0]
   const remindersUrl = `${appUrl}/settings/reminders`
 
@@ -156,7 +156,7 @@ function step1(userName: string, appUrl: string): EmailContent {
     ${ctaButton('Enable Reminders Now', remindersUrl)}
     <br /><br />
     ${p(`Already enabled? You're ahead of most groomers. Tomorrow we'll share how one groomer grew her business with GroomGrid.`, true)}
-  `)
+  `, unsubscribeUrl)
 
   const text = `Hey ${firstName},
 
@@ -180,7 +180,7 @@ Enable reminders now: ${remindersUrl}`
 
 // ─── STEP 3: Case Study — Sarah Mitchell (Day 3) ──────────────────────────────
 
-function step3(userName: string, appUrl: string): EmailContent {
+function step3(userName: string, appUrl: string, unsubscribeUrl: string): EmailContent {
   const firstName = userName.split(' ')[0]
   const plansUrl = `${appUrl}/plans`
 
@@ -206,7 +206,7 @@ function step3(userName: string, appUrl: string): EmailContent {
     ${ctaButton('See What GroomGrid Can Do for You', plansUrl)}
     <br /><br />
     ${p(`Your results will vary, but the pattern is clear: less admin = more grooming = more revenue.`, true)}
-  `)
+  `, unsubscribeUrl)
 
   const text = `Hey ${firstName},
 
@@ -234,7 +234,7 @@ See what GroomGrid can do for you: ${plansUrl}`
 
 // ─── STEP 5: Feature Spotlight — Automated Reminders (Day 5) ──────────────────
 
-function step5(userName: string, appUrl: string): EmailContent {
+function step5(userName: string, appUrl: string, unsubscribeUrl: string): EmailContent {
   const firstName = userName.split(' ')[0]
   const settingsUrl = `${appUrl}/settings/reminders`
 
@@ -269,7 +269,7 @@ function step5(userName: string, appUrl: string): EmailContent {
     ${ctaButton('Set Up Reminders in 2 Minutes', settingsUrl)}
     <br /><br />
     ${p(`P.S. Two more days until something special lands in your inbox. Keep an eye out. 👀`, true)}
-  `)
+  `, unsubscribeUrl)
 
   const text = `Hey ${firstName},
 
@@ -296,7 +296,7 @@ P.S. Two more days until something special. Keep an eye out.`
 
 // ─── STEP 7: Early Adopter Offer + Upgrade CTA (Day 7) ────────────────────────
 
-function step7(userName: string, appUrl: string): EmailContent {
+function step7(userName: string, appUrl: string, unsubscribeUrl: string): EmailContent {
   const firstName = userName.split(' ')[0]
   const plansUrl = `${appUrl}/plans`
 
@@ -338,7 +338,7 @@ function step7(userName: string, appUrl: string): EmailContent {
     ${ctaButton('Lock In My Rate', plansUrl)}
     <br /><br />
     ${p(`Not sure which plan fits? Reply to this email — we'll help you pick.`, true)}
-  `)
+  `, unsubscribeUrl)
 
   const text = `Hey ${firstName},
 
@@ -365,21 +365,22 @@ Choose your plan: ${plansUrl}`
 export function getDripEmailContent(
   step: number,
   userName: string,
-  appUrl: string
+  appUrl: string,
+  unsubscribeUrl: string
 ): EmailContent {
   switch (step) {
     case 0:
-      return step0(userName, appUrl)
+      return step0(userName, appUrl, unsubscribeUrl)
     case 1:
-      return step1(userName, appUrl)
+      return step1(userName, appUrl, unsubscribeUrl)
     case 3:
-      return step3(userName, appUrl)
+      return step3(userName, appUrl, unsubscribeUrl)
     case 5:
-      return step5(userName, appUrl)
+      return step5(userName, appUrl, unsubscribeUrl)
     case 7:
-      return step7(userName, appUrl)
+      return step7(userName, appUrl, unsubscribeUrl)
     case 14:
-      return step14(userName, appUrl)
+      return step14(userName, appUrl, unsubscribeUrl)
     default:
       throw new Error(`No drip template for step ${step}`)
   }
@@ -387,7 +388,7 @@ export function getDripEmailContent(
 
 // ─── STEP 14: Trial Ending — Upgrade CTA (Day 14) ─────────────────────────────
 
-function step14(userName: string, appUrl: string): EmailContent {
+function step14(userName: string, appUrl: string, unsubscribeUrl: string): EmailContent {
   const firstName = userName.split(' ')[0]
   const plansUrl = `${appUrl}/plans`
 
@@ -427,7 +428,7 @@ function step14(userName: string, appUrl: string): EmailContent {
     ${ctaButton('Upgrade Now', plansUrl)}
     <br /><br />
     ${p(`Questions about which plan is right for you? Just reply — we're happy to help.`, true)}
-  `)
+  `, unsubscribeUrl)
 
   const text = `Hey ${firstName},
 

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { getResend, FROM_EMAIL } from '@/lib/email/resend'
 import { getDripEmailContent } from '@/lib/email/drip-templates'
+import { getUnsubscribeToken } from '@/lib/email/enroll-drip'
 
 export async function POST(req: NextRequest) {
   const cronSecret = req.headers.get('CRON_SECRET')
@@ -15,6 +16,11 @@ export async function POST(req: NextRequest) {
     where: {
       status: 'pending',
       scheduledAt: { lte: new Date() },
+      user: {
+        profile: {
+          emailUnsubscribed: false,
+        },
+      },
     },
     select: {
       id: true,
@@ -26,19 +32,28 @@ export async function POST(req: NextRequest) {
   })
 
   if (pendingEmails.length === 0) {
-    return NextResponse.json({ processed: 0, failed: 0 })
+    return NextResponse.json({ processed: 0, failed: 0, skipped: 0 })
   }
 
   let processed = 0
   let failed = 0
+  let skipped = 0
 
   for (const row of pendingEmails) {
     try {
       const userName = row.user?.businessName ?? row.email.split('@')[0]
+
+      // Get or create unsubscribe token for the real unsubscribe URL
+      const token = await getUnsubscribeToken(row.userId)
+      const unsubscribeUrl = token
+        ? `${appUrl}/api/email/unsubscribe?token=${token}`
+        : `${appUrl}/api/email/unsubscribe`
+
       const { subject, html, text } = getDripEmailContent(
         row.sequenceStep,
         userName,
-        appUrl
+        appUrl,
+        unsubscribeUrl
       )
 
       const { error: sendError } = await getResend().emails.send({
@@ -72,5 +87,5 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  return NextResponse.json({ processed, failed })
+  return NextResponse.json({ processed, failed, skipped })
 }

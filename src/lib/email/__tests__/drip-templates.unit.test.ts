@@ -21,6 +21,7 @@ import { getDripEmailContent } from '../drip-templates'
 // ─── Fixtures ────────────────────────────────────────────────────────────────
 
 const APP_URL = 'https://app.getgroomgrid.com'
+const UNSUBSCRIBE_URL = 'https://app.getgroomgrid.com/api/email/unsubscribe?token=abc123'
 const FULL_NAME = 'Sarah Mitchell'
 const SINGLE_NAME = 'GroomerPro'
 const EMPTY_NAME = ''
@@ -31,47 +32,53 @@ describe('getDripEmailContent — valid steps return EmailContent', () => {
   const validSteps = [0, 1, 3, 5, 7, 14]
 
   it.each(validSteps)('step %d returns an object with subject, html, text', (step) => {
-    const result = getDripEmailContent(step, FULL_NAME, APP_URL)
+    const result = getDripEmailContent(step, FULL_NAME, APP_URL, UNSUBSCRIBE_URL)
     expect(result).toHaveProperty('subject')
     expect(result).toHaveProperty('html')
     expect(result).toHaveProperty('text')
   })
 
   it.each(validSteps)('step %d has non-empty subject', (step) => {
-    const result = getDripEmailContent(step, FULL_NAME, APP_URL)
+    const result = getDripEmailContent(step, FULL_NAME, APP_URL, UNSUBSCRIBE_URL)
     expect(result.subject.length).toBeGreaterThan(0)
   })
 
   it.each(validSteps)('step %d has non-empty html', (step) => {
-    const result = getDripEmailContent(step, FULL_NAME, APP_URL)
+    const result = getDripEmailContent(step, FULL_NAME, APP_URL, UNSUBSCRIBE_URL)
     expect(result.html.length).toBeGreaterThan(0)
   })
 
   it.each(validSteps)('step %d has non-empty text', (step) => {
-    const result = getDripEmailContent(step, FULL_NAME, APP_URL)
+    const result = getDripEmailContent(step, FULL_NAME, APP_URL, UNSUBSCRIBE_URL)
     expect(result.text.length).toBeGreaterThan(0)
   })
 
   it.each(validSteps)('step %d html contains DOCTYPE (complete document)', (step) => {
-    const result = getDripEmailContent(step, FULL_NAME, APP_URL)
+    const result = getDripEmailContent(step, FULL_NAME, APP_URL, UNSUBSCRIBE_URL)
     expect(result.html).toContain('<!DOCTYPE html>')
   })
 
   it.each(validSteps)('step %d html contains brand wrapper', (step) => {
-    const result = getDripEmailContent(step, FULL_NAME, APP_URL)
+    const result = getDripEmailContent(step, FULL_NAME, APP_URL, UNSUBSCRIBE_URL)
     expect(result.html).toContain('GroomGrid')
     expect(result.html).toContain('background-color')
   })
 
   it.each(validSteps)('step %d text does not contain HTML tags', (step) => {
-    const result = getDripEmailContent(step, FULL_NAME, APP_URL)
+    const result = getDripEmailContent(step, FULL_NAME, APP_URL, UNSUBSCRIBE_URL)
     // Plain text should not contain common HTML tags
     expect(result.text).not.toMatch(/<table|<tr|<td|<div|<span|<style/)
   })
 
-  it.each(validSteps)('step %d html contains unsubscribe link', (step) => {
-    const result = getDripEmailContent(step, FULL_NAME, APP_URL)
-    expect(result.html).toContain('{{unsubscribe_url}}')
+  it.each(validSteps)('step %d html contains real unsubscribe URL', (step) => {
+    const result = getDripEmailContent(step, FULL_NAME, APP_URL, UNSUBSCRIBE_URL)
+    expect(result.html).toContain(UNSUBSCRIBE_URL)
+    expect(result.html).toContain('Unsubscribe')
+  })
+
+  it.each(validSteps)('step %d html does NOT contain literal {{unsubscribe_url}} placeholder', (step) => {
+    const result = getDripEmailContent(step, FULL_NAME, APP_URL, UNSUBSCRIBE_URL)
+    expect(result.html).not.toContain('{{unsubscribe_url}}')
   })
 })
 
@@ -79,31 +86,31 @@ describe('getDripEmailContent — valid steps return EmailContent', () => {
 
 describe('getDripEmailContent — invalid step numbers throw', () => {
   it('throws for step 2 (not in the sequence)', () => {
-    expect(() => getDripEmailContent(2, FULL_NAME, APP_URL)).toThrow(
+    expect(() => getDripEmailContent(2, FULL_NAME, APP_URL, UNSUBSCRIBE_URL)).toThrow(
       'No drip template for step 2'
     )
   })
 
   it('throws for step 4 (not in the sequence)', () => {
-    expect(() => getDripEmailContent(4, FULL_NAME, APP_URL)).toThrow(
+    expect(() => getDripEmailContent(4, FULL_NAME, APP_URL, UNSUBSCRIBE_URL)).toThrow(
       'No drip template for step 4'
     )
   })
 
   it('throws for step 6 (not in the sequence)', () => {
-    expect(() => getDripEmailContent(6, FULL_NAME, APP_URL)).toThrow(
+    expect(() => getDripEmailContent(6, FULL_NAME, APP_URL, UNSUBSCRIBE_URL)).toThrow(
       'No drip template for step 6'
     )
   })
 
   it('throws for step -1 (negative)', () => {
-    expect(() => getDripEmailContent(-1, FULL_NAME, APP_URL)).toThrow(
+    expect(() => getDripEmailContent(-1, FULL_NAME, APP_URL, UNSUBSCRIBE_URL)).toThrow(
       'No drip template for step -1'
     )
   })
 
   it('throws for step 100 (way out of range)', () => {
-    expect(() => getDripEmailContent(100, FULL_NAME, APP_URL)).toThrow(
+    expect(() => getDripEmailContent(100, FULL_NAME, APP_URL, UNSUBSCRIBE_URL)).toThrow(
       'No drip template for step 100'
     )
   })
@@ -113,51 +120,51 @@ describe('getDripEmailContent — invalid step numbers throw', () => {
 
 describe('Step 0 — Welcome email', () => {
   it('subject contains "Welcome"', () => {
-    const result = getDripEmailContent(0, FULL_NAME, APP_URL)
+    const result = getDripEmailContent(0, FULL_NAME, APP_URL, UNSUBSCRIBE_URL)
     expect(result.subject).toContain('Welcome')
   })
 
   it('html contains first name (Sarah)', () => {
-    const result = getDripEmailContent(0, FULL_NAME, APP_URL)
+    const result = getDripEmailContent(0, FULL_NAME, APP_URL, UNSUBSCRIBE_URL)
     expect(result.html).toContain('Sarah')
   })
 
   it('text contains first name (Sarah)', () => {
-    const result = getDripEmailContent(0, FULL_NAME, APP_URL)
+    const result = getDripEmailContent(0, FULL_NAME, APP_URL, UNSUBSCRIBE_URL)
     expect(result.text).toContain('Sarah')
   })
 
   it('html contains app URL', () => {
-    const result = getDripEmailContent(0, FULL_NAME, APP_URL)
+    const result = getDripEmailContent(0, FULL_NAME, APP_URL, UNSUBSCRIBE_URL)
     expect(result.html).toContain(APP_URL)
   })
 
   it('text contains app URL', () => {
-    const result = getDripEmailContent(0, FULL_NAME, APP_URL)
+    const result = getDripEmailContent(0, FULL_NAME, APP_URL, UNSUBSCRIBE_URL)
     expect(result.text).toContain(APP_URL)
   })
 
   it('html contains getting started steps', () => {
-    const result = getDripEmailContent(0, FULL_NAME, APP_URL)
+    const result = getDripEmailContent(0, FULL_NAME, APP_URL, UNSUBSCRIBE_URL)
     expect(result.html).toContain('Add your services')
     expect(result.html).toContain('Add your first client')
     expect(result.html).toContain('Book your first appointment')
   })
 
   it('text contains getting started steps', () => {
-    const result = getDripEmailContent(0, FULL_NAME, APP_URL)
+    const result = getDripEmailContent(0, FULL_NAME, APP_URL, UNSUBSCRIBE_URL)
     expect(result.text).toContain('Add your services')
     expect(result.text).toContain('Add your first client')
     expect(result.text).toContain('Book your first appointment')
   })
 
   it('html contains CTA button', () => {
-    const result = getDripEmailContent(0, FULL_NAME, APP_URL)
+    const result = getDripEmailContent(0, FULL_NAME, APP_URL, UNSUBSCRIBE_URL)
     expect(result.html).toContain('Set Up My Account')
   })
 
   it('uses first name only (not full name)', () => {
-    const result = getDripEmailContent(0, 'John Smith Jr.', APP_URL)
+    const result = getDripEmailContent(0, 'John Smith Jr.', APP_URL, UNSUBSCRIBE_URL)
     expect(result.html).toContain('John')
     expect(result.html).not.toContain('Smith Jr.')
   })
@@ -167,32 +174,32 @@ describe('Step 0 — Welcome email', () => {
 
 describe('Step 1 — No-shows cost money email', () => {
   it('subject mentions money or groomers', () => {
-    const result = getDripEmailContent(1, FULL_NAME, APP_URL)
+    const result = getDripEmailContent(1, FULL_NAME, APP_URL, UNSUBSCRIBE_URL)
     expect(result.subject).toMatch(/money|groomer/i)
   })
 
   it('html contains first name', () => {
-    const result = getDripEmailContent(1, FULL_NAME, APP_URL)
+    const result = getDripEmailContent(1, FULL_NAME, APP_URL, UNSUBSCRIBE_URL)
     expect(result.html).toContain('Sarah')
   })
 
   it('html contains reminders settings URL', () => {
-    const result = getDripEmailContent(1, FULL_NAME, APP_URL)
+    const result = getDripEmailContent(1, FULL_NAME, APP_URL, UNSUBSCRIBE_URL)
     expect(result.html).toContain(`${APP_URL}/settings/reminders`)
   })
 
   it('text contains reminders settings URL', () => {
-    const result = getDripEmailContent(1, FULL_NAME, APP_URL)
+    const result = getDripEmailContent(1, FULL_NAME, APP_URL, UNSUBSCRIBE_URL)
     expect(result.text).toContain(`${APP_URL}/settings/reminders`)
   })
 
   it('html contains CTA button to enable reminders', () => {
-    const result = getDripEmailContent(1, FULL_NAME, APP_URL)
+    const result = getDripEmailContent(1, FULL_NAME, APP_URL, UNSUBSCRIBE_URL)
     expect(result.html).toContain('Enable Reminders Now')
   })
 
   it('uses first name only (not full name)', () => {
-    const result = getDripEmailContent(1, 'Maria Garcia-Lopez', APP_URL)
+    const result = getDripEmailContent(1, 'Maria Garcia-Lopez', APP_URL, UNSUBSCRIBE_URL)
     expect(result.html).toContain('Maria')
     expect(result.html).not.toContain('Garcia-Lopez')
   })
@@ -202,32 +209,32 @@ describe('Step 1 — No-shows cost money email', () => {
 
 describe('Step 3 — Social proof email', () => {
   it('subject mentions growth or business', () => {
-    const result = getDripEmailContent(3, FULL_NAME, APP_URL)
+    const result = getDripEmailContent(3, FULL_NAME, APP_URL, UNSUBSCRIBE_URL)
     expect(result.subject).toMatch(/grew|business|growth/i)
   })
 
   it('html contains first name', () => {
-    const result = getDripEmailContent(3, FULL_NAME, APP_URL)
+    const result = getDripEmailContent(3, FULL_NAME, APP_URL, UNSUBSCRIBE_URL)
     expect(result.html).toContain('Sarah')
   })
 
   it('html contains plans URL', () => {
-    const result = getDripEmailContent(3, FULL_NAME, APP_URL)
+    const result = getDripEmailContent(3, FULL_NAME, APP_URL, UNSUBSCRIBE_URL)
     expect(result.html).toContain(`${APP_URL}/plans`)
   })
 
   it('text contains plans URL', () => {
-    const result = getDripEmailContent(3, FULL_NAME, APP_URL)
+    const result = getDripEmailContent(3, FULL_NAME, APP_URL, UNSUBSCRIBE_URL)
     expect(result.text).toContain(`${APP_URL}/plans`)
   })
 
   it('html contains CTA button', () => {
-    const result = getDripEmailContent(3, FULL_NAME, APP_URL)
+    const result = getDripEmailContent(3, FULL_NAME, APP_URL, UNSUBSCRIBE_URL)
     expect(result.html).toContain('See What GroomGrid Can Do for You')
   })
 
   it('uses first name only', () => {
-    const result = getDripEmailContent(3, 'Tom Two-Names', APP_URL)
+    const result = getDripEmailContent(3, 'Tom Two-Names', APP_URL, UNSUBSCRIBE_URL)
     expect(result.html).toContain('Tom')
     expect(result.html).not.toContain('Two-Names')
   })
@@ -237,45 +244,45 @@ describe('Step 3 — Social proof email', () => {
 
 describe('Step 5 — Feature Spotlight email', () => {
   it('subject mentions no-shows or reminders', () => {
-    const result = getDripEmailContent(5, FULL_NAME, APP_URL)
+    const result = getDripEmailContent(5, FULL_NAME, APP_URL, UNSUBSCRIBE_URL)
     expect(result.subject).toMatch(/reminder|no-show/i)
   })
 
   it('html contains first name', () => {
-    const result = getDripEmailContent(5, FULL_NAME, APP_URL)
+    const result = getDripEmailContent(5, FULL_NAME, APP_URL, UNSUBSCRIBE_URL)
     expect(result.html).toContain('Sarah')
   })
 
   it('html contains reminders settings URL', () => {
-    const result = getDripEmailContent(5, FULL_NAME, APP_URL)
+    const result = getDripEmailContent(5, FULL_NAME, APP_URL, UNSUBSCRIBE_URL)
     expect(result.html).toContain(`${APP_URL}/settings/reminders`)
   })
 
   it('text contains reminders settings URL', () => {
-    const result = getDripEmailContent(5, FULL_NAME, APP_URL)
+    const result = getDripEmailContent(5, FULL_NAME, APP_URL, UNSUBSCRIBE_URL)
     expect(result.text).toContain(`${APP_URL}/settings/reminders`)
   })
 
   it('html mentions 3-layer reminder system', () => {
-    const result = getDripEmailContent(5, FULL_NAME, APP_URL)
+    const result = getDripEmailContent(5, FULL_NAME, APP_URL, UNSUBSCRIBE_URL)
     expect(result.html).toContain('48')
     expect(result.html).toContain('24')
     expect(result.html).toContain('2')
   })
 
   it('text mentions reminder timeline', () => {
-    const result = getDripEmailContent(5, FULL_NAME, APP_URL)
+    const result = getDripEmailContent(5, FULL_NAME, APP_URL, UNSUBSCRIBE_URL)
     expect(result.text).toContain('48')
     expect(result.text).toContain('24')
   })
 
   it('html contains CTA button to set up reminders', () => {
-    const result = getDripEmailContent(5, FULL_NAME, APP_URL)
+    const result = getDripEmailContent(5, FULL_NAME, APP_URL, UNSUBSCRIBE_URL)
     expect(result.html).toContain('Set Up Reminders')
   })
 
   it('uses first name only', () => {
-    const result = getDripEmailContent(5, 'Alex Three Names Here', APP_URL)
+    const result = getDripEmailContent(5, 'Alex Three Names Here', APP_URL, UNSUBSCRIBE_URL)
     expect(result.html).toContain('Alex')
     expect(result.html).not.toContain('Three Names Here')
   })
@@ -285,42 +292,42 @@ describe('Step 5 — Feature Spotlight email', () => {
 
 describe('Step 7 — Early adopter pricing email', () => {
   it('subject mentions early adopter or pricing', () => {
-    const result = getDripEmailContent(7, FULL_NAME, APP_URL)
+    const result = getDripEmailContent(7, FULL_NAME, APP_URL, UNSUBSCRIBE_URL)
     expect(result.subject).toMatch(/early adopter|pricing/i)
   })
 
   it('html contains first name', () => {
-    const result = getDripEmailContent(7, FULL_NAME, APP_URL)
+    const result = getDripEmailContent(7, FULL_NAME, APP_URL, UNSUBSCRIBE_URL)
     expect(result.html).toContain('Sarah')
   })
 
   it('html contains plans URL', () => {
-    const result = getDripEmailContent(7, FULL_NAME, APP_URL)
+    const result = getDripEmailContent(7, FULL_NAME, APP_URL, UNSUBSCRIBE_URL)
     expect(result.html).toContain(`${APP_URL}/plans`)
   })
 
   it('text contains plans URL', () => {
-    const result = getDripEmailContent(7, FULL_NAME, APP_URL)
+    const result = getDripEmailContent(7, FULL_NAME, APP_URL, UNSUBSCRIBE_URL)
     expect(result.text).toContain(`${APP_URL}/plans`)
   })
 
   it('html mentions Solo plan price ($29)', () => {
-    const result = getDripEmailContent(7, FULL_NAME, APP_URL)
+    const result = getDripEmailContent(7, FULL_NAME, APP_URL, UNSUBSCRIBE_URL)
     expect(result.html).toContain('$29')
   })
 
   it('html mentions Salon plan price ($79)', () => {
-    const result = getDripEmailContent(7, FULL_NAME, APP_URL)
+    const result = getDripEmailContent(7, FULL_NAME, APP_URL, UNSUBSCRIBE_URL)
     expect(result.html).toContain('$79')
   })
 
   it('html contains CTA button', () => {
-    const result = getDripEmailContent(7, FULL_NAME, APP_URL)
+    const result = getDripEmailContent(7, FULL_NAME, APP_URL, UNSUBSCRIBE_URL)
     expect(result.html).toContain('Lock In My Rate')
   })
 
   it('uses first name only', () => {
-    const result = getDripEmailContent(7, 'Alex Three Names Here', APP_URL)
+    const result = getDripEmailContent(7, 'Alex Three Names Here', APP_URL, UNSUBSCRIBE_URL)
     expect(result.html).toContain('Alex')
     expect(result.html).not.toContain('Three Names Here')
   })
@@ -330,48 +337,48 @@ describe('Step 7 — Early adopter pricing email', () => {
 
 describe('Step 14 — Upgrade CTA email', () => {
   it('subject mentions trial ending', () => {
-    const result = getDripEmailContent(14, FULL_NAME, APP_URL)
+    const result = getDripEmailContent(14, FULL_NAME, APP_URL, UNSUBSCRIBE_URL)
     expect(result.subject).toContain('trial')
   })
 
   it('html contains first name', () => {
-    const result = getDripEmailContent(14, FULL_NAME, APP_URL)
+    const result = getDripEmailContent(14, FULL_NAME, APP_URL, UNSUBSCRIBE_URL)
     expect(result.html).toContain('Sarah')
   })
 
   it('html contains plans page URL', () => {
-    const result = getDripEmailContent(14, FULL_NAME, APP_URL)
+    const result = getDripEmailContent(14, FULL_NAME, APP_URL, UNSUBSCRIBE_URL)
     expect(result.html).toContain(`${APP_URL}/plans`)
   })
 
   it('text contains plans page URL', () => {
-    const result = getDripEmailContent(14, FULL_NAME, APP_URL)
+    const result = getDripEmailContent(14, FULL_NAME, APP_URL, UNSUBSCRIBE_URL)
     expect(result.text).toContain(`${APP_URL}/plans`)
   })
 
   it('html mentions Solo plan price ($29)', () => {
-    const result = getDripEmailContent(14, FULL_NAME, APP_URL)
+    const result = getDripEmailContent(14, FULL_NAME, APP_URL, UNSUBSCRIBE_URL)
     expect(result.html).toContain('$29')
   })
 
   it('html mentions Salon plan price ($79)', () => {
-    const result = getDripEmailContent(14, FULL_NAME, APP_URL)
+    const result = getDripEmailContent(14, FULL_NAME, APP_URL, UNSUBSCRIBE_URL)
     expect(result.html).toContain('$79')
   })
 
   it('text mentions Solo and Salon plans', () => {
-    const result = getDripEmailContent(14, FULL_NAME, APP_URL)
+    const result = getDripEmailContent(14, FULL_NAME, APP_URL, UNSUBSCRIBE_URL)
     expect(result.text).toContain('$29')
     expect(result.text).toContain('$79')
   })
 
   it('html contains Upgrade CTA button', () => {
-    const result = getDripEmailContent(14, FULL_NAME, APP_URL)
+    const result = getDripEmailContent(14, FULL_NAME, APP_URL, UNSUBSCRIBE_URL)
     expect(result.html).toContain('Upgrade Now')
   })
 
   it('uses first name only', () => {
-    const result = getDripEmailContent(14, 'Jennifer Long Name Example', APP_URL)
+    const result = getDripEmailContent(14, 'Jennifer Long Name Example', APP_URL, UNSUBSCRIBE_URL)
     expect(result.html).toContain('Jennifer')
     expect(result.html).not.toContain('Long Name Example')
   })
@@ -381,21 +388,21 @@ describe('Step 14 — Upgrade CTA email', () => {
 
 describe('getDripEmailContent — userName edge cases', () => {
   it('handles single-word name (no space to split)', () => {
-    const result = getDripEmailContent(0, SINGLE_NAME, APP_URL)
+    const result = getDripEmailContent(0, SINGLE_NAME, APP_URL, UNSUBSCRIBE_URL)
     expect(result.html).toContain('GroomerPro')
     expect(result.text).toContain('GroomerPro')
   })
 
   it('handles empty string name — does not crash, uses empty string', () => {
     // Empty name should not crash; the split(' ')[0] on '' yields ''
-    const result = getDripEmailContent(0, EMPTY_NAME, APP_URL)
+    const result = getDripEmailContent(0, EMPTY_NAME, APP_URL, UNSUBSCRIBE_URL)
     expect(result.subject).toBeTruthy()
     expect(result.html).toBeTruthy()
     expect(result.text).toBeTruthy()
   })
 
   it('handles name with multiple spaces — uses first word only', () => {
-    const result = getDripEmailContent(0, '  Dr  Jane   Smith  ', APP_URL)
+    const result = getDripEmailContent(0, '  Dr  Jane   Smith  ', APP_URL, UNSUBSCRIBE_URL)
     // split(' ')[0] on '  Dr  Jane   Smith  ' gives '' (empty before first space)
     // This tests actual behavior — leading spaces mean first split is empty string
     expect(result).toBeDefined()
@@ -404,7 +411,7 @@ describe('getDripEmailContent — userName edge cases', () => {
 
   it('handles very long name without crashing', () => {
     const longName = 'A'.repeat(500)
-    const result = getDripEmailContent(0, longName, APP_URL)
+    const result = getDripEmailContent(0, longName, APP_URL, UNSUBSCRIBE_URL)
     expect(result.html).toContain('A')
     expect(result).toBeDefined()
   })
@@ -414,18 +421,18 @@ describe('getDripEmailContent — userName edge cases', () => {
 
 describe('getDripEmailContent — appUrl variations', () => {
   it('works with trailing slash in appUrl', () => {
-    const result = getDripEmailContent(1, FULL_NAME, 'https://app.getgroomgrid.com/')
+    const result = getDripEmailContent(1, FULL_NAME, 'https://app.getgroomgrid.com/', UNSUBSCRIBE_URL)
     expect(result.html).toContain('https://app.getgroomgrid.com/')
   })
 
   it('works with localhost URL for development', () => {
-    const result = getDripEmailContent(0, FULL_NAME, 'http://localhost:3000')
+    const result = getDripEmailContent(0, FULL_NAME, 'http://localhost:3000', UNSUBSCRIBE_URL)
     expect(result.html).toContain('http://localhost:3000')
     expect(result.text).toContain('http://localhost:3000')
   })
 
   it('works with staging URL', () => {
-    const result = getDripEmailContent(14, FULL_NAME, 'https://staging.getgroomgrid.com')
+    const result = getDripEmailContent(14, FULL_NAME, 'https://staging.getgroomgrid.com', UNSUBSCRIBE_URL)
     expect(result.html).toContain('https://staging.getgroomgrid.com')
     expect(result.text).toContain('https://staging.getgroomgrid.com')
   })
@@ -436,7 +443,7 @@ describe('getDripEmailContent — appUrl variations', () => {
 describe('getDripEmailContent — subject lines are distinct per step', () => {
   it('all 6 valid steps have unique subject lines', () => {
     const subjects = [0, 1, 3, 5, 7, 14].map(
-      (step) => getDripEmailContent(step, FULL_NAME, APP_URL).subject
+      (step) => getDripEmailContent(step, FULL_NAME, APP_URL, UNSUBSCRIBE_URL).subject
     )
     const uniqueSubjects = new Set(subjects)
     expect(uniqueSubjects.size).toBe(6)
@@ -449,7 +456,7 @@ describe('getDripEmailContent — HTML structure consistency', () => {
   const validSteps = [0, 1, 3, 5, 7, 14]
 
   it.each(validSteps)('step %d html has proper html/head/body tags', (step) => {
-    const result = getDripEmailContent(step, FULL_NAME, APP_URL)
+    const result = getDripEmailContent(step, FULL_NAME, APP_URL, UNSUBSCRIBE_URL)
     expect(result.html).toContain('<html')
     expect(result.html).toContain('</html>')
     expect(result.html).toContain('<body')
@@ -457,22 +464,22 @@ describe('getDripEmailContent — HTML structure consistency', () => {
   })
 
   it.each(validSteps)('step %d html contains GroomGrid header', (step) => {
-    const result = getDripEmailContent(step, FULL_NAME, APP_URL)
+    const result = getDripEmailContent(step, FULL_NAME, APP_URL, UNSUBSCRIBE_URL)
     expect(result.html).toContain('🐾 GroomGrid')
   })
 
   it.each(validSteps)('step %d html contains footer', (step) => {
-    const result = getDripEmailContent(step, FULL_NAME, APP_URL)
+    const result = getDripEmailContent(step, FULL_NAME, APP_URL, UNSUBSCRIBE_URL)
     expect(result.html).toContain('Built for groomers')
   })
 
   it.each(validSteps)('step %d html contains brand primary color', (step) => {
-    const result = getDripEmailContent(step, FULL_NAME, APP_URL)
+    const result = getDripEmailContent(step, FULL_NAME, APP_URL, UNSUBSCRIBE_URL)
     expect(result.html).toContain('#22c55e')
   })
 
   it.each(validSteps)('step %d html has CTA button with brand color', (step) => {
-    const result = getDripEmailContent(step, FULL_NAME, APP_URL)
+    const result = getDripEmailContent(step, FULL_NAME, APP_URL, UNSUBSCRIBE_URL)
     // All steps have a CTA button with the primary brand color
     expect(result.html).toContain('background-color:#22c55e')
   })

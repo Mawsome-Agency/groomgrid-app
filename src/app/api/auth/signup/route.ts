@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
 import crypto from 'crypto'
 import prisma from '@/lib/prisma'
-import { sendWelcomeEmail } from '@/lib/email/welcome'
 import { sendVerificationEmail } from '@/lib/email/verify-email'
 import { enrollUserInDrip } from '@/lib/email/enroll-drip'
 
@@ -118,9 +117,7 @@ export async function POST(req: NextRequest) {
     sendVerificationEmail(user.email, verifyUrl).catch(err =>
       console.error('Verification email failed:', err)
     )
-    sendWelcomeEmail(user.email, businessName).catch(err =>
-      console.error('Welcome email failed:', err)
-    )
+    // Welcome email is handled by drip step0 — no separate sendWelcomeEmail call needed
     enrollUserInDrip(user.id, user.email).catch(err =>
       console.error('Drip enrollment failed:', err)
     )

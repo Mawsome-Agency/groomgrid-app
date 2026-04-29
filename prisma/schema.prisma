@@ -26,6 +26,7 @@ model User {
   paymentLockouts         PaymentLockout[]
   passwordResetTokens     PasswordResetToken[]
   emailVerificationTokens EmailVerificationToken[]
+  unsubscribeTokens       UnsubscribeToken[]
   @@map("users")
 }
 
@@ -43,6 +44,7 @@ model Profile {
   stripeCustomerId     String?   @map("stripe_customer_id")
   stripeSubscriptionId String?   @map("stripe_subscription_id")
   attributionData      Json?     @map("attribution_data")
+  emailUnsubscribed   Boolean   @default(false) @map("email_unsubscribed")
   createdAt            DateTime  @default(now()) @map("created_at")
   updatedAt            DateTime  @updatedAt @map("updated_at")
 
@@ -288,4 +290,16 @@ model ABTestConversion {
   assignment   ABTestAssignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
   @@index([testId, event])
   @@map("ab_test_conversions")
+}
+
+model UnsubscribeToken {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  token     String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("unsubscribe_tokens")
 }
