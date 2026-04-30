@@ -17,6 +17,7 @@
  */
 
 import {
+  getFooterColumns,
   topicClusters,
   allContentPages,
   getRelatedLinks,

@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { signIn } from 'next-auth/react';
 import { AlertCircle, ArrowRight, Lock, Mail } from 'lucide-react';
 import TrustSignals from '@/components/trust/TrustSignals';
+import SiteFooter from '@/components/marketing/SiteFooter';
 
 function LoginForm() {
   const router = useRouter();
@@ -63,7 +64,8 @@ function LoginForm() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-stone-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-stone-50 flex flex-col">
+      <div className="flex-1 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full">
         {/* Header */}
         <div className="text-center mb-8">
@@ -157,6 +159,8 @@ function LoginForm() {
           <TrustSignals location="login" compact={true} />
         </div>
       </div>
+      </div>
+      <SiteFooter />
     </div>
   );
 }

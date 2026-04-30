@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { useScrollReveal } from '@/hooks/use-scroll-reveal';
+import SiteFooter from '@/components/marketing/SiteFooter';
 
 const SIGNUP_URL = '/signup?coupon=BETA50';
 
@@ -362,21 +363,7 @@ export default function HomePage() {
       </section>
 
       {/* ── Footer ── */}
-      <footer className="px-6 py-8 text-center text-stone-400 text-sm border-t border-stone-100">
-        <p className="mb-2">
-          <Link href="/blog" className="hover:text-stone-600 transition-colors">
-            Blog
-          </Link>
-          {' · '}
-          <a
-            href="mailto:hello@getgroomgrid.com"
-            className="hover:text-stone-600 transition-colors"
-          >
-            hello@getgroomgrid.com
-          </a>
-        </p>
-        <p>© 2026 GroomGrid</p>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

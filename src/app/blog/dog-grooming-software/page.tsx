@@ -176,7 +176,7 @@ export default function DogGroomingSoftwarePage() {
             Dog Grooming Software:<br className="hidden sm:block" /> The 2026 Buyer&apos;s Guide
           </h1>
           <p className="text-xl text-stone-600 leading-relaxed max-w-3xl">
-            The right grooming software pays for itself in recovered no-shows alone. The wrong one
+            The right <Link href="/blog/best-pet-grooming-software/" className="text-green-700 font-semibold hover:underline">grooming software</Link> pays for itself in recovered no-shows alone. The wrong one
             adds friction to every appointment. This guide covers what dog grooming software actually
             does, the features that matter, and how to choose the right tool for your business —
             whether you&apos;re a solo mobile groomer or running a multi-groomer salon.
@@ -195,7 +195,7 @@ export default function DogGroomingSoftwarePage() {
               the handwritten client card, and the end-of-day cash count — all in one place.
             </p>
             <p className="text-stone-600 leading-relaxed mb-4">
-              At the core, grooming software handles four things: scheduling appointments, storing
+              At the core, <Link href="/blog/pet-grooming-software/" className="text-green-700 font-semibold hover:underline">pet grooming software</Link> handles four things: scheduling appointments, storing
               client and pet records, sending automated reminders, and processing payments. More
               advanced platforms add AI features like breed detection, rebooking suggestions, and
               revenue forecasting.
@@ -274,7 +274,7 @@ export default function DogGroomingSoftwarePage() {
             Free Dog Grooming Software: What You Actually Get
           </h2>
           <p className="text-stone-600 leading-relaxed mb-4">
-            Free dog grooming software exists, but it comes with real limitations. The most common:
+            <Link href="/blog/free-dog-grooming-software/" className="text-green-700 font-semibold hover:underline">Free dog grooming software</Link> exists, but it comes with real limitations. The most common:
           </p>
           <ul className="space-y-3 mb-6">
             {[
@@ -460,6 +460,37 @@ export default function DogGroomingSoftwarePage() {
                 </p>
               </div>
             ))}
+          </div>
+        </section>
+
+        {/* ── Related Content ── */}
+        <section className="px-6 py-14 max-w-4xl mx-auto">
+          <h2 className="text-2xl font-bold text-stone-800 mb-8">More Grooming Business Resources</h2>
+          <div className="grid sm:grid-cols-3 gap-5">
+            <Link
+              href="/blog/best-pet-grooming-software/"
+              className="p-5 rounded-xl border border-stone-200 hover:border-green-300 hover:shadow-sm transition-all block"
+            >
+              <p className="text-2xl mb-2">🏆</p>
+              <p className="font-semibold text-stone-800 text-sm mb-1">Best Pet Grooming Software</p>
+              <p className="text-stone-500 text-xs">Top-rated platforms compared by features and price</p>
+            </Link>
+            <Link
+              href="/blog/free-dog-grooming-software/"
+              className="p-5 rounded-xl border border-stone-200 hover:border-green-300 hover:shadow-sm transition-all block"
+            >
+              <p className="text-2xl mb-2">🆓</p>
+              <p className="font-semibold text-stone-800 text-sm mb-1">Free Dog Grooming Software</p>
+              <p className="text-stone-500 text-xs">What free tools actually do — and where they fall short</p>
+            </Link>
+            <Link
+              href="/blog/pet-grooming-software/"
+              className="p-5 rounded-xl border border-stone-200 hover:border-green-300 hover:shadow-sm transition-all block"
+            >
+              <p className="text-2xl mb-2">🐾</p>
+              <p className="font-semibold text-stone-800 text-sm mb-1">Pet Grooming Software</p>
+              <p className="text-stone-500 text-xs">The complete guide to choosing grooming software</p>
+            </Link>
           </div>
         </section>
 

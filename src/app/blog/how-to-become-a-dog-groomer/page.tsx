@@ -388,6 +388,7 @@ export default function HowToBecomeADogGroomer() {
           </div>
         </section>
       </main>
+      <SiteFooter slug="blog/how-to-become-a-dog-groomer" />
     </div>
   );
 }

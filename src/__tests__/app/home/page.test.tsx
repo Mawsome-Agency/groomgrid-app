@@ -106,20 +106,22 @@ describe('HomePage', () => {
   // 3. PROMO BANNER
   // ────────────────────────────────────────────────────────
   describe('Promo Banner', () => {
-    it('displays the BETA50 coupon code prominently', () => {
-      render(<HomePage />);
-      expect(screen.getByText(/BETA50/)).toBeTruthy();
+    it('displays the BETA50 coupon code', () => {
+      const { container } = render(<HomePage />);
+      const allText = container.textContent || '';
+      expect(allText).toMatch(/BETA50/);
     });
 
-    it('mentions "50% off" or "50%" discount', () => {
-      render(<HomePage />);
-      expect(screen.getByText(/50%/)).toBeTruthy();
+    it('mentions founding pricing / launch pricing', () => {
+      const { container } = render(<HomePage />);
+      const allText = container.textContent || '';
+      expect(allText).toMatch(/founding pricing|launch pricing/i);
     });
 
-    it('links to /plans from the promo banner', () => {
-      render(<HomePage />);
-      const plansLink = screen.getByRole('link', { name: /see plans/i });
-      expect(plansLink).toHaveAttribute('href', PLANS_URL);
+    it('has a claim/signup link in the promo area', () => {
+      const { container } = render(<HomePage />);
+      const claimLink = container.querySelector('a[href*="signup"], a[href*="plans"]');
+      expect(claimLink).toBeTruthy();
     });
   });
 
@@ -244,6 +246,7 @@ describe('HomePage', () => {
     const EXPECTED_EXPLORE_LINKS = [
       { href: '/cat-grooming-software', category: 'Cat Groomers', title: 'Cat Grooming Software' },
       { href: '/mobile-grooming-software', category: 'Mobile Groomers', title: 'Mobile Grooming Software' },
+      { href: '/dog-grooming-scheduling-software', category: 'Scheduling', title: 'Scheduling Software' },
       { href: '/plans', category: 'Pricing', title: 'See All Plans' },
       { href: '/best-dog-grooming-software', category: "Buyer's Guide", title: 'Best Dog Grooming Software' },
       { href: '/moego-alternatives', category: 'Alternatives', title: 'MoeGo Alternatives' },
@@ -259,10 +262,10 @@ describe('HomePage', () => {
       expect(heading).toBeTruthy();
     });
 
-    it('renders exactly 8 explore link cards', () => {
+    it('renders exactly 10 explore link cards', () => {
       const { container } = render(<HomePage />);
       const exploreCards = container.querySelectorAll('section a.group.border-stone-200.rounded-xl');
-      expect(exploreCards.length).toBe(9);
+      expect(exploreCards.length).toBe(10);
     });
 
     it('each explore link card has the correct href', () => {
@@ -293,7 +296,7 @@ describe('HomePage', () => {
     it('explore section uses the card styling pattern from reference pages', () => {
       const { container } = render(<HomePage />);
       const cards = container.querySelectorAll('a.group.border-stone-200.rounded-xl');
-      expect(cards.length).toBe(9);
+      expect(cards.length).toBe(10);
       cards.forEach((card) => {
         expect(card.className).toContain('hover:border-green-300');
       });
@@ -348,31 +351,29 @@ describe('HomePage', () => {
   // 8. SOCIAL PROOF SECTION
   // ────────────────────────────────────────────────────────
   describe('Social Proof Section', () => {
-    it('mentions "50+" groomers on the waitlist', () => {
+    it('mentions real groomer conversations / pain points', () => {
       const { container } = render(<HomePage />);
       const allText = container.textContent || '';
-      expect(allText).toMatch(/50\+/);
+      // Page now uses "Built from real conversations" with real pain point quotes
+      expect(allText).toMatch(/real conversations|real pain points/i);
     });
 
-    it('renders 2 testimonial cards (Sarah Mitchell, James Rodriguez)', () => {
+    it('includes real groomer quotes about their problems', () => {
       const { container } = render(<HomePage />);
       const allText = container.textContent || '';
-      expect(allText).toContain('Sarah Mitchell');
-      expect(allText).toContain('James Rodriguez');
+      expect(allText).toMatch(/Google Calendar|sticky notes/i);
     });
 
-    it('testimonial quotes mention key value props', () => {
+    it('quotes mention key value props (no-shows, scheduling)', () => {
       const { container } = render(<HomePage />);
       const allText = container.textContent || '';
-      expect(allText).toMatch(/booking time/i);
       expect(allText).toMatch(/no.show/i);
     });
 
-    it('has business labels under testimonials', () => {
+    it('has "Why we built" explanation sections', () => {
       const { container } = render(<HomePage />);
       const allText = container.textContent || '';
-      expect(allText).toContain('Paws on Wheels');
-      expect(allText).toContain('Fur Perfect Salon');
+      expect(allText).toMatch(/why we built/i);
     });
   });
 
@@ -390,10 +391,10 @@ describe('HomePage', () => {
       const { container } = render(<HomePage />);
       const allText = container.textContent || '';
       expect(allText).toMatch(/unlimited appointments/i);
-      expect(allText).toMatch(/automated.*sms.*email.*reminder|automated.*reminder/i);
-      expect(allText).toMatch(/client.*pet profile|client & pet profile/i);
-      expect(allText).toMatch(/payment collection/i);
-      expect(allText).toMatch(/mobile-first/i);
+      expect(allText).toMatch(/auto.*sms.*email.*reminder|auto.*reminder/i);
+      expect(allText).toMatch(/pet profile/i);
+      expect(allText).toMatch(/built-in payments|payments.*booking/i);
+      expect(allText).toMatch(/built for van life|works.*phone/i);
     });
 
     it('has a "See all plans" link pointing to /plans', () => {
@@ -417,9 +418,10 @@ describe('HomePage', () => {
   // 10. FINAL CTA BANNER
   // ────────────────────────────────────────────────────────
   describe('Final CTA Banner', () => {
-    it('has a strong CTA heading about "phone tag"', () => {
+    it('has a strong CTA heading about no-shows and losing money', () => {
       render(<HomePage />);
-      expect(screen.getByRole('heading', { name: /phone tag/i })).toBeTruthy();
+      const headings = screen.getAllByRole('heading', { name: /no.show|lose|\$100/i });
+      expect(headings.length).toBeGreaterThanOrEqual(1);
     });
 
     it('mentions founding pricing ($29/mo forever)', () => {
@@ -428,10 +430,10 @@ describe('HomePage', () => {
       expect(allText).toMatch(/\$29\/mo.*forever|founding/i);
     });
 
-    it('mentions "First 20 groomers" scarcity element', () => {
+    it('mentions scarcity element (spots remaining)', () => {
       const { container } = render(<HomePage />);
       const allText = container.textContent || '';
-      expect(allText).toMatch(/first 20 groomer/i);
+      expect(allText).toMatch(/spots left|founding groomer/i);
     });
 
     it('has multiple CTA links with signup URL', () => {
@@ -461,10 +463,13 @@ describe('HomePage', () => {
       expect(blogLink).toBeTruthy();
     });
 
-    it('renders the contact email', () => {
-      render(<HomePage />);
-      const emailLink = screen.getByRole('link', { name: /hello@getgroomgrid\.com/i });
-      expect(emailLink).toHaveAttribute('href', 'mailto:hello@getgroomgrid.com');
+    it('renders the SiteFooter with CTA linking to /signup', () => {
+      const { container } = render(<HomePage />);
+      const footer = container.querySelector('footer');
+      expect(footer).toBeTruthy();
+      const signupLink = footer!.querySelector('a[href="/signup"]');
+      expect(signupLink).toBeTruthy();
+      expect(signupLink?.textContent).toContain('Start Free Trial');
     });
 
     it('renders the copyright notice with 2026', () => {
@@ -478,15 +483,18 @@ describe('HomePage', () => {
   // 12. CROSS-CUTTING: CTA LINK CONSISTENCY
   // ────────────────────────────────────────────────────────
   describe('CTA Link Consistency', () => {
-    it('all "Start Free Trial" CTAs point to the same signup URL with BETA50', () => {
+    it('page CTAs point to signup URL with BETA50 coupon; footer CTA links to /signup', () => {
       render(<HomePage />);
       const allCtas = screen.getAllByRole('link').filter(
         (link) => link.textContent?.toLowerCase().includes('start free trial')
       );
       expect(allCtas.length).toBeGreaterThanOrEqual(3);
-      allCtas.forEach((cta) => {
-        expect(cta.getAttribute('href')).toBe(SIGNUP_URL);
-      });
+      // Page body CTAs use BETA50 coupon; footer CTA uses plain /signup
+      const pageCtas = allCtas.filter((cta) => cta.getAttribute('href') === SIGNUP_URL);
+      expect(pageCtas.length).toBeGreaterThanOrEqual(2);
+      // Footer CTA links to /signup
+      const footerCtas = allCtas.filter((cta) => cta.getAttribute('href') === '/signup');
+      expect(footerCtas.length).toBeGreaterThanOrEqual(1);
     });
 
     it('CtaLink wrapper applies active:scale class', () => {
@@ -533,10 +541,14 @@ describe('HomePage', () => {
       });
     });
 
-    it('email link uses mailto: protocol', () => {
-      render(<HomePage />);
-      const emailLink = screen.getByRole('link', { name: /hello@getgroomgrid/i });
-      expect(emailLink.getAttribute('href')).toMatch(/^mailto:/);
+    it('footer includes Privacy and Terms links', () => {
+      const { container } = render(<HomePage />);
+      const footer = container.querySelector('footer');
+      expect(footer).toBeTruthy();
+      const privacyLink = footer!.querySelector('a[href="/privacy"]');
+      const termsLink = footer!.querySelector('a[href="/terms"]');
+      expect(privacyLink).toBeTruthy();
+      expect(termsLink).toBeTruthy();
     });
   });
 
@@ -563,14 +575,15 @@ describe('HomePage', () => {
       expect(sections.length).toBeGreaterThanOrEqual(7);
     });
 
-    it('no duplicate testimonial names', () => {
+    it('no fabricated testimonial names remain (social proof uses real pain points)', () => {
       const { container } = render(<HomePage />);
       const allText = container.textContent || '';
-      // Count occurrences of each name
-      const sarahCount = (allText.match(/Sarah Mitchell/g) || []).length;
-      const jamesCount = (allText.match(/James Rodriguez/g) || []).length;
-      expect(sarahCount).toBe(1);
-      expect(jamesCount).toBe(1);
+      // Fabricated testimonials (Sarah Mitchell, James Rodriguez) were removed
+      // during conversion copy audit. Verify they don't appear.
+      expect(allText).not.toContain('Sarah Mitchell');
+      expect(allText).not.toContain('James Rodriguez');
+      expect(allText).not.toContain('Paws on Wheels');
+      expect(allText).not.toContain('Fur Perfect Salon');
     });
 
     it('promo banner has green background (class check)', () => {

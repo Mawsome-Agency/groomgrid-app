@@ -155,6 +155,9 @@ jest.mock('@/lib/prisma', () => ({
       findFirst: jest.fn().mockResolvedValue(null),
       update: jest.fn().mockResolvedValue({}),
     },
+    dripEmailQueue: {
+      updateMany: jest.fn().mockResolvedValue({ count: 0 }),
+    },
     $transaction: jest.fn(),
   },
 }));

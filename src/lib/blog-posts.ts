@@ -87,7 +87,7 @@ export const blogPosts: BlogPost[] = [
   {
     slug: 'mobile-dog-grooming-business-tips',
     title: 'Mobile Dog Grooming Business Tips: Run a Tighter, More Profitable Operation',
-    description: 'Practical mobile dog grooming business tips from experienced operators — route optimization, van organization, client communication, pricing, and the tools that keep mobile businesses running smoothly.',
+    description: 'Practical mobile dog grooming business tips — route optimization, van organization, client communication, pricing, and tools that keep mobile businesses running.',
     publishedAt: '2026-04-22',
   },
   {
@@ -189,7 +189,7 @@ export const blogPosts: BlogPost[] = [
   {
     slug: 'dog-grooming-business-plan-template',
     title: 'Dog Grooming Business Plan Template: Free Download for 2026',
-    description: 'Free dog grooming business plan template with executive summary, market analysis, financial projections, and operational plan. Downloadable structure for mobile, salon, and home-based grooming businesses.',
+    description: 'Free dog grooming business plan template with executive summary, market analysis, financial projections, and operational plan for mobile, salon, and home-based businesses.',
     publishedAt: '2026-04-28',
   },
 ].sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());

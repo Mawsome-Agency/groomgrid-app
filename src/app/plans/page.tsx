@@ -11,6 +11,7 @@ import PlanCard from '@/components/funnel/PlanCard';
 import TrustSignals from '@/components/trust/TrustSignals';
 import StickyPlanBar from '@/components/funnel/StickyPlanBar';
 import { BillingSummaryData } from '@/components/trust/BillingSummary';
+import SiteFooter from '@/components/marketing/SiteFooter';
 import { trackPageView, trackPlanViewed, trackPlanSelected, trackCheckoutStarted, trackBillingSummaryViewed } from '@/lib/ga4';
 
 /** Schema.org SoftwareApplication + OfferCatalog structured data */
@@ -409,6 +410,8 @@ function PlansPageInner() {
         onSelectPlan={handleSelectPlan}
         planGridRef={planGridRef}
       />
+
+      <SiteFooter />
     </div>
   );
 }

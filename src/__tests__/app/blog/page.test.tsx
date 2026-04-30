@@ -102,7 +102,8 @@ describe('Blog Index Page', () => {
       const blogPostLinks = Array.from(postLinks).filter(
         (link) => link.getAttribute('href') !== '/'
       );
-      expect(blogPostLinks.length).toBe(5);
+      // 5 blog post cards + footer internal links that also match /blog/*
+      expect(blogPostLinks.length).toBeGreaterThanOrEqual(5);
     });
 
     it('each blog post link has correct href pattern', () => {
@@ -195,10 +196,12 @@ describe('Blog Index Page', () => {
       expect(footer?.textContent).toMatch(/© 2026 GroomGrid/);
     });
 
-    it('renders contact email link', () => {
+    it('renders legal links (Privacy & Terms)', () => {
       render(<BlogIndexPage />);
-      const emailLink = screen.getByRole('link', { name: /hello@getgroomgrid\.com/i });
-      expect(emailLink).toHaveAttribute('href', 'mailto:hello@getgroomgrid.com');
+      const privacyLink = screen.getByRole('link', { name: /privacy/i });
+      expect(privacyLink).toHaveAttribute('href', '/privacy');
+      const termsLink = screen.getByRole('link', { name: /terms/i });
+      expect(termsLink).toHaveAttribute('href', '/terms');
     });
   });
 

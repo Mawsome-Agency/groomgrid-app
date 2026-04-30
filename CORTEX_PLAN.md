@@ -1,7 +1,7 @@
 # Implementation Plan
 
-## Feature: Build /dog-grooming-scheduling-software landing page
-Scope: FEATURE | Iterations: 14 | Branch: cortex/build-dog-grooming-scheduling-software-l
+## Feature: test
+Scope: FEATURE | Iterations: 14 | Branch: cortex/test
 
 ## Scoping Research
 ## Code Scope

@@ -172,7 +172,7 @@ export default function HowToStartDogGroomingBusinessAtHomePage() {
             Starting a dog grooming business at home is one of the lowest-cost ways to enter the
             pet care industry — but low cost does not mean no planning. This guide walks you through
             zoning, licensing, equipment, pricing, and the systems you need to go from &quot;I groom my
-            own dog&quot; to &quot;I run a real business.&quot;
+            own dog&quot; to &quot;I run a real business.&quot; If you&apos;re considering a retail location instead, see our guide on <Link href="/blog/how-to-open-a-pet-grooming-business/" className="text-green-700 font-semibold hover:underline">how to open a pet grooming business</Link>.
           </p>
         </header>
 
@@ -185,7 +185,7 @@ export default function HowToStartDogGroomingBusinessAtHomePage() {
             <p className="text-stone-600 leading-relaxed mb-4">
               The math is compelling. A retail salon location costs $1,500–$4,000/month in rent
               alone. A home-based setup has zero rent and a fraction of the overhead. That means
-              profit margins of 60–70% versus 30–40% at a traditional salon.
+              profit margins of 60–70% versus 30–40% at a traditional salon. <Link href="/blog/how-much-to-start-dog-grooming-business/" className="text-green-700 font-semibold hover:underline">See the full cost breakdown</Link> for every startup model — home, mobile, and retail.
             </p>
             <p className="text-stone-600 leading-relaxed mb-4">
               Home-based grooming also gives you flexibility. You set your own hours, control your
@@ -230,7 +230,7 @@ export default function HowToStartDogGroomingBusinessAtHomePage() {
               Home Grooming Equipment: What You Actually Need
             </h2>
             <p className="text-stone-600 leading-relaxed mb-6">
-              Do not overspend on day one. Here is the realistic starter kit with actual price ranges:
+              Do not overspend on day one. Here is the realistic starter kit with actual price ranges. For a more detailed breakdown, see our <Link href="/blog/dog-grooming-tools-equipment-list/" className="text-green-700 font-semibold hover:underline">complete dog grooming tools and equipment list</Link>:
             </p>
             <div className="overflow-x-auto rounded-xl border border-stone-200">
               <table className="w-full text-sm">
@@ -393,6 +393,37 @@ export default function HowToStartDogGroomingBusinessAtHomePage() {
                 </p>
               </div>
             ))}
+          </div>
+        </section>
+
+        {/* ── Related Content ── */}
+        <section className="px-6 py-14 max-w-4xl mx-auto">
+          <h2 className="text-2xl font-bold text-stone-800 mb-8">More Grooming Business Resources</h2>
+          <div className="grid sm:grid-cols-3 gap-5">
+            <Link
+              href="/blog/how-much-to-start-dog-grooming-business/"
+              className="p-5 rounded-xl border border-stone-200 hover:border-green-300 hover:shadow-sm transition-all block"
+            >
+              <p className="text-2xl mb-2">💰</p>
+              <p className="font-semibold text-stone-800 text-sm mb-1">How Much to Start a Dog Grooming Business</p>
+              <p className="text-stone-500 text-xs">Full cost breakdown for home, mobile, and retail setups</p>
+            </Link>
+            <Link
+              href="/blog/dog-grooming-tools-equipment-list/"
+              className="p-5 rounded-xl border border-stone-200 hover:border-green-300 hover:shadow-sm transition-all block"
+            >
+              <p className="text-2xl mb-2">✂️</p>
+              <p className="font-semibold text-stone-800 text-sm mb-1">Dog Grooming Tools & Equipment List</p>
+              <p className="text-stone-500 text-xs">Every tool you need with realistic price ranges</p>
+            </Link>
+            <Link
+              href="/blog/how-to-open-a-pet-grooming-business/"
+              className="p-5 rounded-xl border border-stone-200 hover:border-green-300 hover:shadow-sm transition-all block"
+            >
+              <p className="text-2xl mb-2">🏪</p>
+              <p className="font-semibold text-stone-800 text-sm mb-1">How to Open a Pet Grooming Business</p>
+              <p className="text-stone-500 text-xs">Complete guide for all three business models</p>
+            </Link>
           </div>
         </section>
 
