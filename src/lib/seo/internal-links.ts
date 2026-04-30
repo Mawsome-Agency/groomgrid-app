@@ -425,6 +425,10 @@ function deterministicSlice<T>(arr: T[], seed: string, count: number): T[] {
 // getFooterLinks — FOOTER LINK GENERATION
 // ────────────────────────────────────────────────────────
 
+/**
+ * @deprecated Use getFooterColumns() instead for the new 4-column SEO footer.
+ * This function is preserved for backward compatibility with the legacy SiteFooter links prop.
+ */
 export function getFooterLinks(slug?: string): { href: string; label: string }[] {
   const baseLinks: { href: string; label: string }[] = [
     { href: '/plans', label: 'Pricing' },
@@ -489,4 +493,148 @@ export function getBreadcrumbs(slug: string): BreadcrumbItem[] {
   });
 
   return crumbs;
+}
+
+// ────────────────────────────────────────────────────────
+// TYPES: Footer columns
+// ────────────────────────────────────────────────────────
+
+export interface FooterColumnLink {
+  href: string;
+  label: string;
+}
+
+export interface FooterColumn {
+  heading: string;
+  links: FooterColumnLink[];
+}
+
+// ────────────────────────────────────────────────────────
+// getFooterColumns — 4-COLUMN SEO FOOTER LINK GENERATION
+// ────────────────────────────────────────────────────────
+
+/**
+ * Column configuration for the SEO footer.
+ * Each column can pull links from:
+ *   - slugs: looked up in allContentPages by slug
+ *   - clusterIds: all landing pages from the named cluster
+ *   - specialLinks: static routes not in allContentPages
+ */
+const FOOTER_COLUMN_CONFIG: Array<{
+  heading: string;
+  slugs?: string[];
+  clusterIds?: string[];
+  specialLinks?: FooterColumnLink[];
+}> = [
+  {
+    heading: 'Product',
+    slugs: [
+      'features-mobile-groomer',
+      'cat-grooming-software',
+      'dog-grooming-scheduling-software',
+    ],
+    specialLinks: [
+      { href: '/plans', label: 'Pricing' },
+      { href: '/signup', label: 'Get Started Free' },
+    ],
+  },
+  {
+    heading: 'Compare',
+    clusterIds: ['software-comparison'],
+  },
+  {
+    heading: 'Resources',
+    slugs: [
+      'grooming-business-operations',
+      'mobile-grooming-business',
+      'mobile-grooming-software',
+    ],
+    specialLinks: [
+      { href: '/blog', label: 'Blog' },
+      { href: '/sitemap.xml', label: 'Sitemap' },
+    ],
+  },
+  {
+    heading: 'Business Guides',
+    slugs: [
+      'how-to-start-mobile-grooming-business',
+      'dog-grooming-pricing-guide',
+      'reduce-no-shows-dog-grooming',
+      'dog-grooming-business-insurance',
+      'how-to-become-a-dog-groomer',
+      'dog-grooming-business-plan-template',
+      'is-dog-grooming-a-profitable-business',
+    ],
+  },
+];
+
+/**
+ * Generate 4-column footer data for the SEO footer.
+ * Links are derived from allContentPages and topicClusters.
+ *
+ * @param excludeSlug - Optional slug of current page to exclude (no self-referential links)
+ * @returns Array of exactly 4 FooterColumn objects
+ */
+export function getFooterColumns(excludeSlug?: string): FooterColumn[] {
+  const normalizedExclude = excludeSlug ? normalizeSlug(excludeSlug) : '';
+
+  // Build lookup for landing pages by cluster
+  const clusterLandingPages = new Map<string, ContentPage[]>();
+  topicClusters.forEach((cluster) => {
+    const landings = cluster.pages.filter((p) => p.type === 'landing');
+    clusterLandingPages.set(cluster.id, landings);
+  });
+
+  // Track all hrefs added across columns to prevent cross-column duplicates
+  const seenHrefs = new Set<string>();
+
+  const columns: FooterColumn[] = FOOTER_COLUMN_CONFIG.map((config) => {
+    const links: FooterColumnLink[] = [];
+
+    // Resolve slugs to content pages
+    if (config.slugs) {
+      for (const slug of config.slugs) {
+        const page = pageBySlug.get(slug);
+        if (page) {
+          // Skip if this is the current page or already added to a previous column
+          if (normalizedExclude && page.slug === normalizedExclude) continue;
+          if (seenHrefs.has(page.path)) continue;
+          seenHrefs.add(page.path);
+          links.push({ href: page.path, label: page.title });
+        }
+      }
+    }
+
+    // Resolve cluster IDs to landing pages
+    if (config.clusterIds) {
+      for (const clusterId of config.clusterIds) {
+        const landings = clusterLandingPages.get(clusterId) || [];
+        for (const page of landings) {
+          // Skip if this is the current page or already added (in this or previous column)
+          if (normalizedExclude && page.slug === normalizedExclude) continue;
+          if (seenHrefs.has(page.path)) continue;
+          seenHrefs.add(page.path);
+          links.push({ href: page.path, label: page.title });
+        }
+      }
+    }
+
+    // Add special (static) links
+    if (config.specialLinks) {
+      for (const link of config.specialLinks) {
+        // Skip if this matches the excluded slug path
+        if (normalizedExclude) {
+          const linkSlug = link.href.replace(/^\/+/, '').replace(/\/+$/, '').replace(/^blog\//, '');
+          if (linkSlug === normalizedExclude) continue;
+        }
+        if (seenHrefs.has(link.href)) continue;
+        seenHrefs.add(link.href);
+        links.push(link);
+      }
+    }
+
+    return { heading: config.heading, links };
+  });
+
+  return columns;
 }

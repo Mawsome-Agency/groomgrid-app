@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { blogPosts } from '@/lib/blog-posts';
+import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
   title: 'Blog | GroomGrid - Pet Grooming Business Tips & Resources',
@@ -106,17 +107,7 @@ export default function BlogIndexPage() {
       </section>
 
       {/* Footer */}
-      <footer className="px-6 py-8 text-center text-stone-400 text-sm border-t border-stone-100">
-        <p>
-          © 2026 GroomGrid ·{' '}
-          <a
-            href="mailto:hello@getgroomgrid.com"
-            className="hover:text-stone-600 transition-colors"
-          >
-            hello@getgroomgrid.com
-          </a>
-        </p>
-      </footer>
+      <SiteFooter />
 
       {/* Schema.org structured data */}
       <script

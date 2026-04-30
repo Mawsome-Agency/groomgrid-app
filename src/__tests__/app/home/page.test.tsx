@@ -463,10 +463,13 @@ describe('HomePage', () => {
       expect(blogLink).toBeTruthy();
     });
 
-    it('renders the contact email', () => {
-      render(<HomePage />);
-      const emailLink = screen.getByRole('link', { name: /hello@getgroomgrid\.com/i });
-      expect(emailLink).toHaveAttribute('href', 'mailto:hello@getgroomgrid.com');
+    it('renders the SiteFooter with CTA linking to /signup', () => {
+      const { container } = render(<HomePage />);
+      const footer = container.querySelector('footer');
+      expect(footer).toBeTruthy();
+      const signupLink = footer!.querySelector('a[href="/signup"]');
+      expect(signupLink).toBeTruthy();
+      expect(signupLink?.textContent).toContain('Start Free Trial');
     });
 
     it('renders the copyright notice with 2026', () => {
@@ -480,15 +483,18 @@ describe('HomePage', () => {
   // 12. CROSS-CUTTING: CTA LINK CONSISTENCY
   // ────────────────────────────────────────────────────────
   describe('CTA Link Consistency', () => {
-    it('all "Start Free Trial" CTAs point to the same signup URL with BETA50', () => {
+    it('page CTAs point to signup URL with BETA50 coupon; footer CTA links to /signup', () => {
       render(<HomePage />);
       const allCtas = screen.getAllByRole('link').filter(
         (link) => link.textContent?.toLowerCase().includes('start free trial')
       );
       expect(allCtas.length).toBeGreaterThanOrEqual(3);
-      allCtas.forEach((cta) => {
-        expect(cta.getAttribute('href')).toBe(SIGNUP_URL);
-      });
+      // Page body CTAs use BETA50 coupon; footer CTA uses plain /signup
+      const pageCtas = allCtas.filter((cta) => cta.getAttribute('href') === SIGNUP_URL);
+      expect(pageCtas.length).toBeGreaterThanOrEqual(2);
+      // Footer CTA links to /signup
+      const footerCtas = allCtas.filter((cta) => cta.getAttribute('href') === '/signup');
+      expect(footerCtas.length).toBeGreaterThanOrEqual(1);
     });
 
     it('CtaLink wrapper applies active:scale class', () => {
@@ -535,10 +541,14 @@ describe('HomePage', () => {
       });
     });
 
-    it('email link uses mailto: protocol', () => {
-      render(<HomePage />);
-      const emailLink = screen.getByRole('link', { name: /hello@getgroomgrid/i });
-      expect(emailLink.getAttribute('href')).toMatch(/^mailto:/);
+    it('footer includes Privacy and Terms links', () => {
+      const { container } = render(<HomePage />);
+      const footer = container.querySelector('footer');
+      expect(footer).toBeTruthy();
+      const privacyLink = footer!.querySelector('a[href="/privacy"]');
+      const termsLink = footer!.querySelector('a[href="/terms"]');
+      expect(privacyLink).toBeTruthy();
+      expect(termsLink).toBeTruthy();
     });
   });
 
