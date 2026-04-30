@@ -6,14 +6,14 @@ import PageRelatedLinks from '@/components/marketing/PageRelatedLinks';
 import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
-  title: 'Mobile Grooming Software — Built for Van Groomers',
+  title: 'Mobile Grooming Software — Built for Van Groomers | GroomGrid',
   description:
     'The best mobile grooming software built for van and mobile groomers. Scheduling, SMS reminders, payments, and pet profiles — all optimized for working on the road.',
   alternates: {
     canonical: 'https://getgroomgrid.com/mobile-grooming-software',
   },
   openGraph: {
-    title: 'Mobile Grooming Software — Built for Van Groomers',
+    title: 'Mobile Grooming Software — Built for Van Groomers | GroomGrid',
     description:
       'Mobile grooming software built for van operators. Scheduling, no-show prevention, payments from the road, and pet profiles — all on your phone.',
     url: 'https://getgroomgrid.com/mobile-grooming-software',
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
 const articleSchema = {
   '@context': 'https://schema.org',
   '@type': 'Article',
-  headline: 'Mobile Grooming Software — Built for Van Groomers',
+  headline: 'Mobile Grooming Software — Built for Van Groomers | GroomGrid',
   description:
     'The complete guide to mobile grooming software — what to look for, how it helps van groomers prevent no-shows, collect payment, and manage clients on the road.',
   url: 'https://getgroomgrid.com/mobile-grooming-software',

@@ -50,13 +50,13 @@ export interface BreadcrumbItem {
 const landingPages: ContentPage[] = [
   {
     slug: 'best-dog-grooming-software',
-    title: 'Best Dog Grooming Software (2026)',
+    title: 'Best Dog Grooming Software (2026) — GroomGrid vs MoeGo vs DaySmart',
     type: 'landing',
     path: '/best-dog-grooming-software',
   },
   {
     slug: 'cat-grooming-software',
-    title: 'Cat Grooming Software',
+    title: 'Cat Grooming Software — Scheduling, Profiles & Reminders | GroomGrid',
     type: 'landing',
     path: '/cat-grooming-software',
   },
@@ -68,7 +68,7 @@ const landingPages: ContentPage[] = [
   },
   {
     slug: 'mobile-grooming-software',
-    title: 'Mobile Grooming Software',
+    title: 'Mobile Grooming Software — Built for Van Groomers | GroomGrid',
     type: 'landing',
     path: '/mobile-grooming-software',
   },
@@ -86,7 +86,7 @@ const landingPages: ContentPage[] = [
   },
   {
     slug: 'moego-alternatives',
-    title: 'MoeGo Alternatives',
+    title: 'MoeGo Alternatives: Better Grooming Software for Less | GroomGrid',
     type: 'landing',
     path: '/moego-alternatives',
   },
@@ -110,7 +110,7 @@ const landingPages: ContentPage[] = [
   },
   {
     slug: 'pet-grooming-business-software',
-    title: 'Pet Grooming Business Software',
+    title: 'Pet Grooming Business Software — Manage Your Salon | GroomGrid',
     type: 'landing',
     path: '/pet-grooming-business-software',
   },
@@ -153,8 +153,8 @@ export const topicClusters: TopicCluster[] = [
     slug: 'software-comparison',
     pages: [
       { slug: 'dog-grooming-software', title: "Dog Grooming Software: The 2026 Buyer's Guide", type: 'blog', path: '/blog/dog-grooming-software' },
-      { slug: 'best-dog-grooming-software', title: 'Best Dog Grooming Software (2026)', type: 'landing', path: '/best-dog-grooming-software' },
-      { slug: 'moego-alternatives', title: 'MoeGo Alternatives', type: 'landing', path: '/moego-alternatives' },
+      { slug: 'best-dog-grooming-software', title: 'Best Dog Grooming Software (2026) — GroomGrid vs MoeGo vs DaySmart', type: 'landing', path: '/best-dog-grooming-software' },
+      { slug: 'moego-alternatives', title: 'MoeGo Alternatives: Better Grooming Software for Less | GroomGrid', type: 'landing', path: '/moego-alternatives' },
       { slug: 'daysmart-alternatives', title: 'DaySmart Alternatives', type: 'landing', path: '/daysmart-alternatives' },
       { slug: 'groomgrid-vs-moego', title: 'GroomGrid vs MoeGo', type: 'blog', path: '/blog/groomgrid-vs-moego' },
       { slug: 'groomgrid-vs-daysmart', title: 'GroomGrid vs DaySmart Pet', type: 'blog', path: '/blog/groomgrid-vs-daysmart' },
@@ -165,7 +165,7 @@ export const topicClusters: TopicCluster[] = [
       { slug: 'best-pet-grooming-software', title: 'Best Pet Grooming Software in 2026', type: 'blog', path: '/blog/best-pet-grooming-software' },
       { slug: 'dog-grooming-appointment-app', title: 'Best Dog Grooming Appointment App', type: 'blog', path: '/blog/dog-grooming-appointment-app' },
       { slug: '123-pet-grooming-software-alternatives', title: '123 Pet Grooming Software Alternatives', type: 'landing', path: '/123-pet-grooming-software-alternatives' },
-      { slug: 'pet-grooming-business-software', title: 'Pet Grooming Business Software', type: 'landing', path: '/pet-grooming-business-software' },
+      { slug: 'pet-grooming-business-software', title: 'Pet Grooming Business Software — Manage Your Salon | GroomGrid', type: 'landing', path: '/pet-grooming-business-software' },
       { slug: 'dog-grooming-scheduling-software', title: 'Dog Grooming Scheduling Software', type: 'landing', path: '/dog-grooming-scheduling-software' },
     ],
   },
@@ -196,7 +196,7 @@ export const topicClusters: TopicCluster[] = [
       { slug: 'mobile-dog-grooming-business-tips', title: 'Mobile Dog Grooming Business Tips', type: 'blog', path: '/blog/mobile-dog-grooming-business-tips' },
       { slug: 'how-to-build-mobile-grooming-trailer', title: 'How to Build a Mobile Grooming Trailer', type: 'blog', path: '/blog/how-to-build-mobile-grooming-trailer' },
       { slug: 'mobile-grooming-business', title: 'Mobile Grooming Business Guide', type: 'landing', path: '/mobile-grooming-business' },
-      { slug: 'mobile-grooming-software', title: 'Mobile Grooming Software', type: 'landing', path: '/mobile-grooming-software' },
+      { slug: 'mobile-grooming-software', title: 'Mobile Grooming Software — Built for Van Groomers | GroomGrid', type: 'landing', path: '/mobile-grooming-software' },
       { slug: 'features-mobile-groomer', title: 'Mobile Groomer Feature Spotlight', type: 'landing', path: '/features/mobile-groomer' },
     ],
   },
@@ -244,7 +244,7 @@ export const topicClusters: TopicCluster[] = [
     slug: 'cat-grooming',
     pages: [
       { slug: 'cat-grooming-business-guide', title: 'How to Start a Cat Grooming Business', type: 'blog', path: '/blog/cat-grooming-business-guide' },
-      { slug: 'cat-grooming-software', title: 'Cat Grooming Software', type: 'landing', path: '/cat-grooming-software' },
+      { slug: 'cat-grooming-software', title: 'Cat Grooming Software — Scheduling, Profiles & Reminders | GroomGrid', type: 'landing', path: '/cat-grooming-software' },
     ],
   },
   {
@@ -425,10 +425,6 @@ function deterministicSlice<T>(arr: T[], seed: string, count: number): T[] {
 // getFooterLinks — FOOTER LINK GENERATION
 // ────────────────────────────────────────────────────────
 
-/**
- * @deprecated Use getFooterColumns() instead for the new 4-column SEO footer.
- * This function is preserved for backward compatibility with the legacy SiteFooter links prop.
- */
 export function getFooterLinks(slug?: string): { href: string; label: string }[] {
   const baseLinks: { href: string; label: string }[] = [
     { href: '/plans', label: 'Pricing' },
@@ -493,148 +489,4 @@ export function getBreadcrumbs(slug: string): BreadcrumbItem[] {
   });
 
   return crumbs;
-}
-
-// ────────────────────────────────────────────────────────
-// TYPES: Footer columns
-// ────────────────────────────────────────────────────────
-
-export interface FooterColumnLink {
-  href: string;
-  label: string;
-}
-
-export interface FooterColumn {
-  heading: string;
-  links: FooterColumnLink[];
-}
-
-// ────────────────────────────────────────────────────────
-// getFooterColumns — 4-COLUMN SEO FOOTER LINK GENERATION
-// ────────────────────────────────────────────────────────
-
-/**
- * Column configuration for the SEO footer.
- * Each column can pull links from:
- *   - slugs: looked up in allContentPages by slug
- *   - clusterIds: all landing pages from the named cluster
- *   - specialLinks: static routes not in allContentPages
- */
-const FOOTER_COLUMN_CONFIG: Array<{
-  heading: string;
-  slugs?: string[];
-  clusterIds?: string[];
-  specialLinks?: FooterColumnLink[];
-}> = [
-  {
-    heading: 'Product',
-    slugs: [
-      'features-mobile-groomer',
-      'cat-grooming-software',
-      'dog-grooming-scheduling-software',
-    ],
-    specialLinks: [
-      { href: '/plans', label: 'Pricing' },
-      { href: '/signup', label: 'Get Started Free' },
-    ],
-  },
-  {
-    heading: 'Compare',
-    clusterIds: ['software-comparison'],
-  },
-  {
-    heading: 'Resources',
-    slugs: [
-      'grooming-business-operations',
-      'mobile-grooming-business',
-      'mobile-grooming-software',
-    ],
-    specialLinks: [
-      { href: '/blog', label: 'Blog' },
-      { href: '/sitemap.xml', label: 'Sitemap' },
-    ],
-  },
-  {
-    heading: 'Business Guides',
-    slugs: [
-      'how-to-start-mobile-grooming-business',
-      'dog-grooming-pricing-guide',
-      'reduce-no-shows-dog-grooming',
-      'dog-grooming-business-insurance',
-      'how-to-become-a-dog-groomer',
-      'dog-grooming-business-plan-template',
-      'is-dog-grooming-a-profitable-business',
-    ],
-  },
-];
-
-/**
- * Generate 4-column footer data for the SEO footer.
- * Links are derived from allContentPages and topicClusters.
- *
- * @param excludeSlug - Optional slug of current page to exclude (no self-referential links)
- * @returns Array of exactly 4 FooterColumn objects
- */
-export function getFooterColumns(excludeSlug?: string): FooterColumn[] {
-  const normalizedExclude = excludeSlug ? normalizeSlug(excludeSlug) : '';
-
-  // Build lookup for landing pages by cluster
-  const clusterLandingPages = new Map<string, ContentPage[]>();
-  topicClusters.forEach((cluster) => {
-    const landings = cluster.pages.filter((p) => p.type === 'landing');
-    clusterLandingPages.set(cluster.id, landings);
-  });
-
-  // Track all hrefs added across columns to prevent cross-column duplicates
-  const seenHrefs = new Set<string>();
-
-  const columns: FooterColumn[] = FOOTER_COLUMN_CONFIG.map((config) => {
-    const links: FooterColumnLink[] = [];
-
-    // Resolve slugs to content pages
-    if (config.slugs) {
-      for (const slug of config.slugs) {
-        const page = pageBySlug.get(slug);
-        if (page) {
-          // Skip if this is the current page or already added to a previous column
-          if (normalizedExclude && page.slug === normalizedExclude) continue;
-          if (seenHrefs.has(page.path)) continue;
-          seenHrefs.add(page.path);
-          links.push({ href: page.path, label: page.title });
-        }
-      }
-    }
-
-    // Resolve cluster IDs to landing pages
-    if (config.clusterIds) {
-      for (const clusterId of config.clusterIds) {
-        const landings = clusterLandingPages.get(clusterId) || [];
-        for (const page of landings) {
-          // Skip if this is the current page or already added (in this or previous column)
-          if (normalizedExclude && page.slug === normalizedExclude) continue;
-          if (seenHrefs.has(page.path)) continue;
-          seenHrefs.add(page.path);
-          links.push({ href: page.path, label: page.title });
-        }
-      }
-    }
-
-    // Add special (static) links
-    if (config.specialLinks) {
-      for (const link of config.specialLinks) {
-        // Skip if this matches the excluded slug path
-        if (normalizedExclude) {
-          const linkSlug = link.href.replace(/^\/+/, '').replace(/\/+$/, '').replace(/^blog\//, '');
-          if (linkSlug === normalizedExclude) continue;
-        }
-        if (seenHrefs.has(link.href)) continue;
-        seenHrefs.add(link.href);
-        links.push(link);
-      }
-    }
-
-    return { heading: config.heading, links };
-  });
-
-  return columns;
 }

@@ -6,14 +6,14 @@ import PageRelatedLinks from '@/components/marketing/PageRelatedLinks';
 import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
-  title: 'Cat Grooming Software — Scheduling & Reminders',
+  title: 'Cat Grooming Software — Scheduling, Profiles & Reminders | GroomGrid',
   description:
     'Temperament tracking, sedation notes, custom appointment slots, and client education tools — built for cat grooming specialists. Not another dog-first app. Start your free trial.',
   alternates: {
     canonical: 'https://getgroomgrid.com/cat-grooming-software',
   },
   openGraph: {
-    title: 'Cat Grooming Software — Scheduling & Reminders',
+    title: 'Cat Grooming Software — Scheduling, Profiles & Reminders | GroomGrid',
     description:
       'Temperament tracking, sedation notes, custom appointment slots, and client education tools — built for cat grooming specialists. Not another dog-first app.',
     url: 'https://getgroomgrid.com/cat-grooming-software',
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
 const serviceSchema = {
   '@context': 'https://schema.org',
   '@type': 'Service',
-  name: 'GroomGrid Cat Grooming Software',
+  name: 'Cat Grooming Software — Scheduling, Profiles & Reminders | GroomGrid',
   description:
     'AI-powered business management platform for cat grooming specialists. Temperament tracking, sedation notes, custom appointment slots, and client education tools.',
   provider: {
