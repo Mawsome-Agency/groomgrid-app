@@ -422,6 +422,61 @@ function deterministicSlice<T>(arr: T[], seed: string, count: number): T[] {
 }
 
 // ────────────────────────────────────────────────────────
+// Footer Column Types & Generation
+// ────────────────────────────────────────────────────────
+
+export interface FooterColumnLink {
+  href: string;
+  label: string;
+}
+
+export interface FooterColumn {
+  heading: string;
+  links: FooterColumnLink[];
+}
+
+export function getFooterColumns(slug?: string): FooterColumn[] {
+  const columns: FooterColumn[] = [
+    {
+      heading: 'Software',
+      links: [
+        { href: '/best-dog-grooming-software', label: 'Best Dog Grooming Software' },
+        { href: '/pet-grooming-business-software', label: 'Pet Grooming Business Software' },
+        { href: '/mobile-grooming-software', label: 'Mobile Grooming Software' },
+        { href: '/cat-grooming-software', label: 'Cat Grooming Software' },
+      ],
+    },
+    {
+      heading: 'Comparisons',
+      links: [
+        { href: '/moego-alternatives', label: 'MoeGo Alternatives' },
+        { href: '/dog-grooming-scheduling-software', label: 'Dog Grooming Scheduling' },
+      ],
+    },
+    {
+      heading: 'Resources',
+      links: [
+        { href: '/blog', label: 'Blog' },
+        { href: '/blog/dog-grooming-business-plan-template', label: 'Business Plan Template' },
+        { href: '/blog/reduce-no-shows-dog-grooming', label: 'Reduce No-Shows' },
+        { href: '/blog/free-dog-grooming-software', label: 'Free Grooming Software' },
+      ],
+    },
+    {
+      heading: 'Company',
+      links: [
+        { href: '/plans', label: 'Pricing' },
+        { href: '/signup', label: 'Start Free Trial' },
+        { href: '/privacy', label: 'Privacy Policy' },
+        { href: '/terms', label: 'Terms of Service' },
+      ],
+    },
+  ];
+
+  return columns;
+}
+
+// ────────────────────────────────────────────────────────
 // getFooterLinks — FOOTER LINK GENERATION
 // ────────────────────────────────────────────────────────
 
