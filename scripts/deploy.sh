@@ -49,7 +49,7 @@ if [ "$LOCAL_BUILD" = true ]; then
 
   # 5. Restart
   echo "[5/5] Restarting app..."
-  ssh -i "$DEPLOY_KEY" root@${DEPLOY_HOST} "pm2 restart ${PM2_NAME} || pm2 start 'node_modules/.bin/next start -p 3002' --name ${PM2_NAME}; pm2 save"
+  ssh -i "$DEPLOY_KEY" root@${DEPLOY_HOST} "pm2 restart ${PM2_NAME} || pm2 start ecosystem.config.js --only ${PM2_NAME}; pm2 save"
 
 else
   # === SERVER BUILD MODE (legacy — use --local-build for 1GB droplets) ===
@@ -68,10 +68,10 @@ else
   npx prisma migrate deploy
 
   echo "[5/6] Building..."
-  NODE_ENV=production node_modules/.bin/next build
+  NODE_ENV=production npx next build
 
   echo "[6/6] Starting app..."
-  pm2 restart "$PM2_NAME" || pm2 start "$PM2_NAME"
+  pm2 restart "$PM2_NAME" || pm2 start ecosystem.config.js --only "$PM2_NAME"
   pm2 save
 fi
 
