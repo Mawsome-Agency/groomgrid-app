@@ -41,3 +41,19 @@ CORTEX_PLAN.md
 e2e/.auth/user.json
 playwright-report/
 test-results/
+
+# Env backup files (security - never commit)
+.env.backup*
+.env.local.backup*
+.env.local.bak*
+
+# Deployment artifacts
+vercel.json
+
+# Dead design docs (internal only)
+CORTEX_DESIGN.md
+TASK_COMPLETION.md
+SCALING_ROADMAP.md
+tasks/
+design-specs/
+deployment-package/
