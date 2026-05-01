@@ -211,7 +211,7 @@ export function CheckoutCancelContent() {
                 <Calendar className="w-6 h-6 text-stone-600" aria-hidden="true" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-stone-900 mb-2">Checkout Cancelled</h1>
+                <h1 className="text-2xl font-bold text-stone-900 mb-2">Payment Cancelled</h1>
                 <p className="text-stone-600">
                   No worries! Your checkout was cancelled and no charge was made to your account.
                 </p>

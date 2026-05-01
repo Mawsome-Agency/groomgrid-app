@@ -27,15 +27,15 @@ export async function ensureIdempotentLockout(userId: string, paymentId: string)
 
 export async function POST(req: NextRequest) {
   try {
-    // Validate env
-    ensureEnv('stripe');
-    ensureEnv('app');
-
     // ── Authentication check ──────────────────────────────────────────
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Authentication required', errorType: 'generic' }, { status: 401 });
     }
+
+    // Validate env (after auth so unauthenticated requests get 401, not 500)
+    ensureEnv('stripe');
+    ensureEnv('app');
 
     const { userId, planType, customerEmail, clientId, coupon: rawCoupon } = await req.json();
 
