@@ -50,6 +50,7 @@ export async function GET(req: NextRequest) {
   const validPlan = plan as PlanType;
 
   try {
+    // Validate env after auth checks so missing envs don't mask auth errors
     ensureEnv('stripe');
     ensureEnv('app');
 
