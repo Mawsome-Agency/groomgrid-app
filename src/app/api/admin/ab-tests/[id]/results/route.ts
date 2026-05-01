@@ -12,7 +12,7 @@ export async function GET(
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
     return NextResponse.json(
-      { error: 'Authentication required' },
+      { error: 'Authentication required', errorType: 'generic' },
       { status: 401 },
     );
   }
@@ -21,14 +21,14 @@ export async function GET(
     const results = await getTestResults(params.id);
 
     if (!results) {
-      return NextResponse.json({ error: 'Test not found' }, { status: 404 });
+      return NextResponse.json({ error: 'Test not found', errorType: 'generic' }, { status: 404 });
     }
 
     return NextResponse.json({ results });
   } catch (error) {
     console.error('[Admin AB Test Results] GET Error:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch test results' },
+      { error: 'Failed to fetch test results', errorType: 'generic' },
       { status: 500 }
     );
   }

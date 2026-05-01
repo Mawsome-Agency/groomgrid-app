@@ -10,7 +10,7 @@ export async function POST(
   try {
     const user = await getCurrentUser();
     if (!user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized', errorType: 'generic' }, { status: 401 });
     }
 
     const clientId = params.id;
@@ -21,13 +21,13 @@ export async function POST(
     });
 
     if (!client || client.userId !== user.id) {
-      return NextResponse.json({ error: 'Client not found' }, { status: 404 });
+      return NextResponse.json({ error: 'Client not found', errorType: 'generic' }, { status: 404 });
     }
 
     const { name, breed, size, age, specialNotes } = await req.json();
 
     if (!name) {
-      return NextResponse.json({ error: 'Pet name is required' }, { status: 400 });
+      return NextResponse.json({ error: 'Pet name is required', errorType: 'generic' }, { status: 400 });
     }
 
     const pet = await prisma.pet.create({
@@ -44,6 +44,6 @@ export async function POST(
     return NextResponse.json({ pet });
   } catch (error) {
     console.error('Failed to create pet:', error);
-    return NextResponse.json({ error: 'Failed to create pet' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to create pet', errorType: 'generic' }, { status: 500 });
   }
 }

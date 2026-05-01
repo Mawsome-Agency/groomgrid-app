@@ -43,9 +43,10 @@ export async function GET(req: NextRequest) {
     }))
 
     return NextResponse.json({ data, total, limit, offset })
-  } catch (error: any) {
+  } catch (error) {
+    console.error('Engagement data fetch error:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch engagement data' },
+      { error: 'Failed to fetch engagement data', errorType: 'generic' },
       { status: 500 }
     )
   }

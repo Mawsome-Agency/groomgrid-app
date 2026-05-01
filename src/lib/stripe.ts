@@ -140,23 +140,26 @@ export function mapStripeErrorToErrorType(declineCode?: string): 'declined' | 'i
 /**
  * Extracts error details from a Stripe error for client-side display
  */
-export function getStripeErrorMessage(error: any): { type: string; message: string; declineCode?: string } {
-  if (!error) {
+export function getStripeErrorMessage(error: unknown): { type: string; message: string; declineCode?: string } {
+  if (!error || typeof error !== 'object') {
     return { type: 'generic', message: 'An unknown error occurred' };
   }
 
+  const err = error as Record<string, unknown>;
+
   // Handle Stripe API errors
-  if (error.type) {
+  if (typeof err.type === 'string') {
     const stripeError = error as Stripe.StripeRawError;
-    
+
     switch (stripeError.type) {
-      case 'card_error':
+      case 'card_error': {
         const cardError = stripeError as Stripe.StripeRawError & { code?: string };
         return {
           type: mapStripeErrorToErrorType(cardError.code),
           message: cardError.message || 'Payment failed',
           declineCode: cardError.code,
         };
+      }
       case 'rate_limit_error':
         return {
           type: 'generic',
@@ -181,9 +184,10 @@ export function getStripeErrorMessage(error: any): { type: string; message: stri
   }
 
   // Handle generic errors
+  const genericMessage = typeof err.message === 'string' ? err.message : 'An error occurred';
   return {
     type: 'generic',
-    message: error.message || 'An error occurred',
+    message: genericMessage,
   };
 }
 

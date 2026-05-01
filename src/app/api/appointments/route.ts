@@ -3,13 +3,14 @@ import { getCurrentUser } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 import { SERVICE_MAP } from '@/lib/services';
 import { estimateGroomingTime } from '@/lib/breed-intelligence';
+import { apiError } from '@/lib/api-errors';
 
 // GET /api/appointments - List appointments with optional date filtering
 export async function GET(req: NextRequest) {
   try {
     const user = await getCurrentUser();
     if (!user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return apiError('Unauthorized', 401);
     }
 
     const { searchParams } = new URL(req.url);
@@ -39,9 +40,9 @@ export async function GET(req: NextRequest) {
     });
 
     return NextResponse.json({ appointments });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to fetch appointments:', error);
-    return NextResponse.json({ error: 'Failed to fetch appointments' }, { status: 500 });
+    return apiError('Failed to fetch appointments', 500);
   }
 }
 
@@ -50,16 +51,13 @@ export async function POST(req: NextRequest) {
   try {
     const user = await getCurrentUser();
     if (!user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return apiError('Unauthorized', 401);
     }
 
     const { clientId, petId, service, date, time, notes } = await req.json();
 
     if (!clientId || !service || !date || !time) {
-      return NextResponse.json(
-        { error: 'Missing required fields: clientId, service, date, time' },
-        { status: 400 }
-      );
+      return apiError('Missing required fields: clientId, service, date, time', 400);
     }
 
     // Verify the client belongs to the current user
@@ -68,7 +66,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (!client || client.userId !== user.id) {
-      return NextResponse.json({ error: 'Client not found' }, { status: 404 });
+      return apiError('Client not found', 404);
     }
 
     // Look up pet for breed/size info (used for intelligent time estimation)
@@ -81,7 +79,7 @@ export async function POST(req: NextRequest) {
       });
 
       if (!pet || pet.clientId !== clientId) {
-        return NextResponse.json({ error: 'Pet not found' }, { status: 404 });
+        return apiError('Pet not found', 404);
       }
 
       petBreed = pet.breed;
@@ -91,7 +89,7 @@ export async function POST(req: NextRequest) {
     // Validate service and calculate breed-aware duration
     const serviceInfo = SERVICE_MAP[service];
     if (!serviceInfo) {
-      return NextResponse.json({ error: 'Invalid service' }, { status: 400 });
+      return apiError('Invalid service', 400);
     }
 
     const estimate = estimateGroomingTime(service, petBreed, petSize);
@@ -129,10 +127,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (conflicts.length > 0) {
-      return NextResponse.json(
-        { error: 'This time slot is already booked' },
-        { status: 409 }
-      );
+      return apiError('This time slot is already booked', 409);
     }
 
     // Create the appointment
@@ -155,8 +150,8 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json({ appointment });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to create appointment:', error);
-    return NextResponse.json({ error: 'Failed to create appointment' }, { status: 500 });
+    return apiError('Failed to create appointment', 500);
   }
 }

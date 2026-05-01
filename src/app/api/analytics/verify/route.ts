@@ -66,7 +66,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
     if (!body.eventName || !body.payload) {
       return NextResponse.json(
-        { error: 'eventName and payload are required' },
+        { error: 'eventName and payload are required', errorType: 'generic' },
         { status: 400 }
       );
     }
@@ -75,7 +75,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ result });
   } catch (error) {
     return NextResponse.json(
-      { error: 'Invalid request body', details: String(error) },
+      { error: 'Invalid request body', errorType: 'generic' },
       { status: 400 }
     );
   }

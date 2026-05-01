@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
     const { email } = await req.json()
 
     if (!email || typeof email !== 'string') {
-      return NextResponse.json({ error: 'Email is required' }, { status: 400 })
+      return NextResponse.json({ error: 'Email is required', errorType: 'generic' }, { status: 400 })
     }
 
     const normalizedEmail = email.toLowerCase().trim()

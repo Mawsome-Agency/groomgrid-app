@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 import { getCheckoutSession } from '@/lib/stripe';
 import prisma from '@/lib/prisma';
 import { createPaymentLockout } from '@/lib/payment-lockout';
+import { apiError } from '@/lib/api-errors';
 
 export async function GET(req: NextRequest) {
   try {
@@ -11,13 +12,13 @@ export async function GET(req: NextRequest) {
     const session_id = searchParams.get('session_id');
 
     if (!session_id) {
-      return NextResponse.json({ error: 'Missing session_id' }, { status: 400 });
+      return apiError('Missing session_id', 400);
     }
 
     const session = await getCheckoutSession(session_id);
 
     if (!session.metadata?.userId) {
-      return NextResponse.json({ error: 'Invalid session' }, { status: 400 });
+      return apiError('Invalid session', 400);
     }
 
     const userId = session.metadata.userId;
@@ -52,8 +53,8 @@ export async function GET(req: NextRequest) {
       metadata: session.metadata,
       trial_end_days_left: (() => { const sub = typeof session.subscription === 'object' ? session.subscription as { trial_end?: number | null } : null; return (sub?.trial_end) ? Math.max(0, Math.ceil((sub.trial_end * 1000 - Date.now()) / (1000 * 60 * 60 * 24))) : 0; })(),
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Checkout success error:', error);
-    return NextResponse.json({ error: 'Failed to fetch session' }, { status: 500 });
+    return apiError('Failed to fetch session', 500);
   }
 }

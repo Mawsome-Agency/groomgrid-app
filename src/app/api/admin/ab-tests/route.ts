@@ -14,7 +14,7 @@ async function requireAuth() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
     return NextResponse.json(
-      { error: 'Authentication required' },
+      { error: 'Authentication required', errorType: 'generic' },
       { status: 401 },
     );
   }
@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
   } catch (error) {
     console.error('[Admin AB Tests] GET Error:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch tests' },
+      { error: 'Failed to fetch tests', errorType: 'generic' },
       { status: 500 }
     );
   }
@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
 
     if (!name || !variantA || !variantB) {
       return NextResponse.json(
-        { error: 'Missing required fields: name, variantA, variantB' },
+        { error: 'Missing required fields: name, variantA, variantB', errorType: 'generic' },
         { status: 400 }
       );
     }
@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error('[Admin AB Tests] POST Error:', error);
     return NextResponse.json(
-      { error: 'Failed to create test' },
+      { error: 'Failed to create test', errorType: 'generic' },
       { status: 500 }
     );
   }

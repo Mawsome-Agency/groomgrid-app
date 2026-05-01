@@ -4,6 +4,7 @@ import {
   findAppointmentsForDayOfReminder,
   process24hReminder,
   processDayOfReminder,
+  type ReminderResult,
 } from '@/lib/reminders'
 
 /**
@@ -26,25 +27,25 @@ export async function POST(req: NextRequest) {
   // Auth check
   const secret = req.headers.get('CRON_SECRET') ?? req.headers.get('x-cron-secret')
   if (!secret || secret !== process.env.CRON_SECRET) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    return NextResponse.json({ error: 'Unauthorized', errorType: 'generic' }, { status: 401 })
   }
 
   // ── 24h reminders ──────────────────────────────────────────────────────────
   let upcoming24h: Awaited<ReturnType<typeof findAppointmentsFor24hReminder>> = []
   try {
     upcoming24h = await findAppointmentsFor24hReminder()
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('[reminder-check] Failed to query 24h appointments:', err)
-    return NextResponse.json({ error: 'Database error (24h query)' }, { status: 500 })
+    return NextResponse.json({ error: 'Database error (24h query)', errorType: 'generic' }, { status: 500 })
   }
 
   // ── Day-of reminders ───────────────────────────────────────────────────────
   let upcomingDayOf: Awaited<ReturnType<typeof findAppointmentsForDayOfReminder>> = []
   try {
     upcomingDayOf = await findAppointmentsForDayOfReminder()
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('[reminder-check] Failed to query day-of appointments:', err)
-    return NextResponse.json({ error: 'Database error (day-of query)' }, { status: 500 })
+    return NextResponse.json({ error: 'Database error (day-of query)', errorType: 'generic' }, { status: 500 })
   }
 
   const total = upcoming24h.length + upcomingDayOf.length
@@ -58,12 +59,12 @@ export async function POST(req: NextRequest) {
 
   // Process all reminders concurrently (allSettled so one failure doesn't block others)
   const [results24h, resultsDayOf] = await Promise.all([
-    Promise.allSettled(upcoming24h.map(({ id }: any) => process24hReminder(id))),
-    Promise.allSettled(upcomingDayOf.map(({ id }: any) => processDayOfReminder(id))),
+    Promise.allSettled(upcoming24h.map((appt) => process24hReminder(appt.id))),
+    Promise.allSettled(upcomingDayOf.map((appt) => processDayOfReminder(appt.id))),
   ])
 
   const allResults = [
-    ...results24h.map((r: any, i: number) => {
+    ...results24h.map((r, i) => {
       if (r.status === 'fulfilled') return r.value
       console.error(`[reminder-check] Unexpected error for 24h reminder ${upcoming24h[i].id}:`, r.reason)
       return {
@@ -74,7 +75,7 @@ export async function POST(req: NextRequest) {
         error: r.reason?.message ?? 'Unexpected error',
       }
     }),
-    ...resultsDayOf.map((r: any, i: number) => {
+    ...resultsDayOf.map((r, i) => {
       if (r.status === 'fulfilled') return r.value
       console.error(`[reminder-check] Unexpected error for day-of reminder ${upcomingDayOf[i].id}:`, r.reason)
       return {

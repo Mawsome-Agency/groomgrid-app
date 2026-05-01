@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/next-auth-options';
-import { createCheckoutSession } from '@/lib/stripe';
+import { createCheckoutSession, getStripeErrorMessage } from '@/lib/stripe';
 import prisma from '@/lib/prisma';
 import { ensureEnv } from '@/lib/validation';
 import { PLANS } from '@/app/pricing/pricing-data';
+import { apiError } from '@/lib/api-errors';
 
 // Use the public app URL as redirect base — req.url resolves to localhost:3002
 // behind nginx, which produces unreachable redirects in production.
@@ -40,11 +41,11 @@ export async function GET(req: NextRequest) {
   const plan = searchParams.get('plan');
 
   if (!plan) {
-    return NextResponse.json({ error: 'Missing plan parameter' }, { status: 400 });
+    return apiError('Missing plan parameter', 400);
   }
 
   if (!VALID_PLANS.includes(plan)) {
-    return NextResponse.json({ error: 'Invalid plan. Must be solo, salon, or enterprise.' }, { status: 400 });
+    return apiError('Invalid plan. Must be solo, salon, or enterprise.', 400);
   }
 
   const validPlan = plan as PlanType;
@@ -57,7 +58,7 @@ export async function GET(req: NextRequest) {
     // Look up profile for business name and trial status
     const profile = await prisma.profile.findUnique({ where: { userId: session.user.id } });
     if (!profile) {
-      return NextResponse.json({ error: 'Profile not found. Please complete signup first.' }, { status: 404 });
+      return apiError('Profile not found. Please complete signup first.', 404);
     }
 
     // Trial guard: trial users should select plans WITHOUT Stripe checkout.
@@ -92,12 +93,13 @@ export async function GET(req: NextRequest) {
     });
 
     if (!checkoutSession.url) {
-      return NextResponse.json({ error: 'Failed to create checkout session' }, { status: 500 });
+      return apiError('Failed to create checkout session', 500);
     }
 
     return NextResponse.redirect(checkoutSession.url, 307);
-  } catch (error: any) {
-    console.error('[/api/checkout/session] Stripe error:', error?.message || error);
-    return NextResponse.json({ error: 'Failed to create checkout session' }, { status: 500 });
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : String(error);
+    console.error('[/api/checkout/session] Stripe error:', msg);
+    return apiError('Failed to create checkout session', 500);
   }
 }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
 import prisma from '@/lib/prisma';
+import { apiError } from '@/lib/api-errors';
 
 // Service definitions with duration in minutes and price in cents
 const SERVICES: Record<string, { duration: number; price: number }> = {
@@ -18,7 +19,7 @@ export async function PATCH(
   try {
     const user = await getCurrentUser();
     if (!user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return apiError('Unauthorized', 401);
     }
 
     const appointmentId = params.id;
@@ -30,7 +31,7 @@ export async function PATCH(
     });
 
     if (!existing || existing.userId !== user.id) {
-      return NextResponse.json({ error: 'Appointment not found' }, { status: 404 });
+      return apiError('Appointment not found', 404);
     }
 
     // Prepare update data
@@ -40,7 +41,7 @@ export async function PATCH(
       // Validate status
       const validStatuses = ['scheduled', 'completed', 'cancelled', 'no_show'];
       if (!validStatuses.includes(updates.status)) {
-        return NextResponse.json({ error: 'Invalid status' }, { status: 400 });
+        return apiError('Invalid status', 400);
       }
       updateData.status = updates.status;
     }
@@ -53,7 +54,7 @@ export async function PATCH(
       // Calculate new start and end times
       const serviceInfo = SERVICES[service];
       if (!serviceInfo) {
-        return NextResponse.json({ error: 'Invalid service' }, { status: 400 });
+        return apiError('Invalid service', 400);
       }
 
       // Parse time (format: "10:00 AM")
@@ -103,7 +104,7 @@ export async function PATCH(
     if (updates.service) {
       const serviceInfo = SERVICES[updates.service];
       if (!serviceInfo) {
-        return NextResponse.json({ error: 'Invalid service' }, { status: 400 });
+        return NextResponse.json({ error: 'Invalid service', errorType: 'generic' }, { status: 400 });
       }
       updateData.service = updates.service;
       updateData.price = serviceInfo.price;
@@ -138,6 +139,6 @@ export async function PATCH(
     return NextResponse.json({ appointment });
   } catch (error) {
     console.error('Failed to update appointment:', error);
-    return NextResponse.json({ error: 'Failed to update appointment' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to update appointment', errorType: 'generic' }, { status: 500 });
   }
 }

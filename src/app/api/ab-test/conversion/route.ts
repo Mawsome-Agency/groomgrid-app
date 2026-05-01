@@ -9,14 +9,14 @@ export async function POST(request: NextRequest) {
     const { testName, event, userId, metadata } = body;
 
     if (!testName || !event) {
-      return NextResponse.json({ error: 'testName and event required' }, { status: 400 });
+      return NextResponse.json({ error: 'testName and event required', errorType: 'generic' }, { status: 400 });
     }
 
     // Verify session if userId is provided
     if (userId) {
       const session = await getServerSession(authOptions);
       if (!session?.user?.id || session.user.id !== userId) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        return NextResponse.json({ error: 'Unauthorized', errorType: 'generic' }, { status: 401 });
       }
     }
 
@@ -24,6 +24,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: true });
   } catch (error) {
     console.error('AB test conversion error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error', errorType: 'generic' }, { status: 500 });
   }
 }

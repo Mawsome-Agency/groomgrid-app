@@ -6,7 +6,7 @@ import prisma from '@/lib/prisma'
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions)
   if (!session?.user?.id) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    return NextResponse.json({ error: 'Unauthorized', errorType: 'generic' }, { status: 401 })
   }
 
   const profile = await prisma.profile.findUnique({
@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
 export async function PATCH(req: NextRequest) {
   const session = await getServerSession(authOptions)
   if (!session?.user?.id) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    return NextResponse.json({ error: 'Unauthorized', errorType: 'generic' }, { status: 401 })
   }
 
   try {
@@ -36,7 +36,7 @@ export async function PATCH(req: NextRequest) {
     if (rest.phone !== undefined) data.phone = rest.phone
     if (rest.planType !== undefined) {
       if (!VALID_PLAN_TYPES.includes(rest.planType)) {
-        return NextResponse.json({ error: 'Invalid plan type' }, { status: 400 })
+        return NextResponse.json({ error: 'Invalid plan type', errorType: 'generic' }, { status: 400 })
       }
       data.planType = rest.planType
     }
@@ -67,6 +67,6 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json(profile)
   } catch (error) {
     console.error('Profile update error:', error)
-    return NextResponse.json({ error: 'Failed to update profile' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to update profile', errorType: 'generic' }, { status: 500 })
   }
 }

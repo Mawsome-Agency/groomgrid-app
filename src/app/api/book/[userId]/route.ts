@@ -147,7 +147,7 @@ export async function GET(
     });
 
     if (!user) {
-      return NextResponse.json({ error: 'Groomer not found' }, { status: 404 });
+      return NextResponse.json({ error: 'Groomer not found', errorType: 'generic' }, { status: 404 });
     }
 
     const timezone = user.timezone || 'America/New_York';
@@ -312,7 +312,7 @@ export async function POST(
     });
 
     if (!user) {
-      return NextResponse.json({ error: 'Groomer not found' }, { status: 404 });
+      return NextResponse.json({ error: 'Groomer not found', errorType: 'generic' }, { status: 404 });
     }
 
     const timezone = user.timezone || 'America/New_York';
@@ -436,17 +436,17 @@ export async function POST(
         emailSent,
       },
     });
-  } catch (error: any) {
-    if (error.message === 'SLOT_TAKEN') {
+  } catch (error) {
+    if (error instanceof Error && error.message === 'SLOT_TAKEN') {
       return NextResponse.json(
-        { error: 'This time slot is no longer available' },
+        { error: 'This time slot is no longer available', errorType: 'generic' },
         { status: 409 },
       );
     }
 
     console.error('Failed to create booking:', error);
     return NextResponse.json(
-      { error: 'Failed to create booking' },
+      { error: 'Failed to create booking', errorType: 'generic' },
       { status: 500 },
     );
   }

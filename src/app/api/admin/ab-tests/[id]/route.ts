@@ -9,7 +9,7 @@ async function requireAuth() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
     return NextResponse.json(
-      { error: 'Authentication required' },
+      { error: 'Authentication required', errorType: 'generic' },
       { status: 401 },
     );
   }
@@ -38,14 +38,14 @@ export async function GET(
     });
 
     if (!test) {
-      return NextResponse.json({ error: 'Test not found' }, { status: 404 });
+      return NextResponse.json({ error: 'Test not found', errorType: 'generic' }, { status: 404 });
     }
 
     return NextResponse.json({ test });
   } catch (error) {
     console.error('[Admin AB Test] GET Error:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch test' },
+      { error: 'Failed to fetch test', errorType: 'generic' },
       { status: 500 }
     );
   }
@@ -82,7 +82,7 @@ export async function PATCH(
   } catch (error) {
     console.error('[Admin AB Test] PATCH Error:', error);
     return NextResponse.json(
-      { error: 'Failed to update test' },
+      { error: 'Failed to update test', errorType: 'generic' },
       { status: 500 }
     );
   }
@@ -103,7 +103,7 @@ export async function DELETE(
   } catch (error) {
     console.error('[Admin AB Test] DELETE Error:', error);
     return NextResponse.json(
-      { error: 'Failed to delete test' },
+      { error: 'Failed to delete test', errorType: 'generic' },
       { status: 500 }
     );
   }

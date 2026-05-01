@@ -9,6 +9,7 @@
  */
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { apiError } from '@/lib/api-errors';
 
 export async function GET() {
   try {
@@ -92,11 +93,8 @@ export async function GET() {
         'checkout_completed_server',
       ],
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('[Funnel Diagnostic] Error:', error);
-    return NextResponse.json(
-      { error: 'Failed to build funnel diagnostic' },
-      { status: 500 }
-    );
+    return apiError('Failed to build funnel diagnostic', 500);
   }
 }

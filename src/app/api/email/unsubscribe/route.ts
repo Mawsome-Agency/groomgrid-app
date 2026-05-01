@@ -60,13 +60,13 @@ export async function POST(req: NextRequest) {
   try {
     body = await req.json()
   } catch {
-    return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
+    return NextResponse.json({ error: 'Invalid request body', errorType: 'generic' }, { status: 400 })
   }
 
   const { token } = body
 
   if (!token) {
-    return NextResponse.json({ error: 'Missing unsubscribe token' }, { status: 400 })
+    return NextResponse.json({ error: 'Missing unsubscribe token', errorType: 'generic' }, { status: 400 })
   }
 
   const tokenRecord = await prisma.unsubscribeToken.findUnique({
@@ -75,7 +75,7 @@ export async function POST(req: NextRequest) {
   })
 
   if (!tokenRecord) {
-    return NextResponse.json({ error: 'Invalid token' }, { status: 404 })
+    return NextResponse.json({ error: 'Invalid token', errorType: 'generic' }, { status: 404 })
   }
 
   // Mark user as unsubscribed and cancel pending drip emails in a transaction

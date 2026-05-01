@@ -11,13 +11,13 @@ export async function POST(req: NextRequest) {
   try {
     body = await req.json()
   } catch {
-    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 })
+    return NextResponse.json({ error: 'Invalid JSON body', errorType: 'generic' }, { status: 400 })
   }
 
   const { userId, email } = body
   if (!userId || !email) {
     return NextResponse.json(
-      { error: 'userId and email are required' },
+      { error: 'userId and email are required', errorType: 'generic' },
       { status: 400 }
     )
   }
@@ -27,6 +27,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true })
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown error'
-    return NextResponse.json({ error: message }, { status: 500 })
+    return NextResponse.json({ error: message, errorType: 'generic' }, { status: 500 })
   }
 }

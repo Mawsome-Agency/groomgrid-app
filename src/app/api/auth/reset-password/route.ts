@@ -8,14 +8,14 @@ export async function POST(req: NextRequest) {
 
     if (!token || !newPassword || typeof newPassword !== 'string') {
       return NextResponse.json(
-        { error: 'Token and new password are required' },
+        { error: 'Token and new password are required', errorType: 'generic' },
         { status: 400 }
       )
     }
 
     if (newPassword.length < 8) {
       return NextResponse.json(
-        { error: 'Password must be at least 8 characters' },
+        { error: 'Password must be at least 8 characters', errorType: 'generic' },
         { status: 400 }
       )
     }
@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
 
     if (!resetToken) {
       return NextResponse.json(
-        { error: 'Invalid or expired reset link. Please request a new password reset.' },
+        { error: 'Invalid or expired reset link. Please request a new password reset.', errorType: 'generic' },
         { status: 400 }
       )
     }
@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
     // Check if token has expired
     if (resetToken.expiresAt < new Date()) {
       return NextResponse.json(
-        { error: 'This reset link has expired. Please request a new password reset.' },
+        { error: 'This reset link has expired. Please request a new password reset.', errorType: 'generic' },
         { status: 400 }
       )
     }
@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
     // Check if token has already been used
     if (resetToken.usedAt) {
       return NextResponse.json(
-        { error: 'This reset link has already been used. Please request a new password reset.' },
+        { error: 'This reset link has already been used. Please request a new password reset.', errorType: 'generic' },
         { status: 400 }
       )
     }
@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error('Password reset error:', error)
     return NextResponse.json(
-      { error: 'An error occurred. Please try again.' },
+      { error: 'An error occurred. Please try again.', errorType: 'generic' },
       { status: 500 }
     )
   }

@@ -20,14 +20,14 @@ export async function POST(req: NextRequest) {
   try {
     body = await req.json()
   } catch {
-    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 })
+    return NextResponse.json({ error: 'Invalid JSON body', errorType: 'generic' }, { status: 400 })
   }
 
   const { type, score, page, message, metadata } = body
 
   if (!type || !VALID_TYPES.includes(type)) {
     return NextResponse.json(
-      { error: `type must be one of: ${VALID_TYPES.join(', ')}` },
+      { error: `type must be one of: ${VALID_TYPES.join(', ')}`, errorType: 'generic' },
       { status: 400 }
     )
   }
@@ -49,9 +49,10 @@ export async function POST(req: NextRequest) {
     })
 
     return NextResponse.json({ success: true, id: feedback.id })
-  } catch (error: any) {
+  } catch (error) {
+    console.error('Feedback save error:', error);
     return NextResponse.json(
-      { error: 'Failed to save feedback' },
+      { error: 'Failed to save feedback', errorType: 'generic' },
       { status: 500 }
     )
   }

@@ -38,12 +38,12 @@ export async function POST(req: Request) {
 
     if (!expectedKey) {
       console.error('[Webhook] STRIPE_WEBHOOK_TEST_KEY not configured');
-      return NextResponse.json({ error: 'Test key not configured' }, { status: 500 });
+      return NextResponse.json({ error: 'Test key not configured', errorType: 'generic' }, { status: 500 });
     }
 
     if (!testKey || testKey !== expectedKey) {
       console.warn('[Webhook] Invalid or missing test key');
-      return NextResponse.json({ error: 'Invalid test key' }, { status: 401 });
+      return NextResponse.json({ error: 'Invalid test key', errorType: 'generic' }, { status: 401 });
     }
 
     // Layer 3: Request origin validation (for E2E tests)
@@ -67,9 +67,9 @@ export async function POST(req: Request) {
     // Production: always require valid Stripe signature
     try {
       event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
-    } catch (error: any) {
+    } catch (error) {
       console.error('Webhook signature verification failed:', error);
-      return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
+      return NextResponse.json({ error: 'Invalid signature', errorType: 'generic' }, { status: 400 });
     }
   }
 
@@ -78,6 +78,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ received: true });
   } catch (error: unknown) {
     console.error('Webhook processing error:', error);
-    return NextResponse.json({ error: 'Webhook processing failed' }, { status: 500 });
+    return NextResponse.json({ error: 'Webhook processing failed', errorType: 'generic' }, { status: 500 });
   }
 }

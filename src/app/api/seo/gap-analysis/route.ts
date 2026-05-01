@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
       return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
+        { error: 'Unauthorized', errorType: 'generic' },
         { status: 401 }
       );
     }
@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
 
     if (!allowed) {
       return NextResponse.json(
-        { success: false, error: 'Rate limit exceeded' },
+        { error: 'Rate limit exceeded', errorType: 'generic' },
         {
           status: 429,
           headers: { 'Retry-After': String(retryAfter) },
@@ -66,21 +66,21 @@ export async function POST(req: NextRequest) {
     // Validation
     if (!Array.isArray(competitors) || competitors.length === 0) {
       return NextResponse.json(
-        { success: false, error: 'competitors array required' },
+        { error: 'competitors array required', errorType: 'generic' },
         { status: 400 }
       );
     }
 
     if (competitors.length > MAX_COMPETITORS) {
       return NextResponse.json(
-        { success: false, error: `Maximum ${MAX_COMPETITORS} competitors allowed` },
+        { error: `Maximum ${MAX_COMPETITORS} competitors allowed`, errorType: 'generic' },
         { status: 400 }
       );
     }
 
     if (!ourDomain || !isValidDomain(ourDomain)) {
       return NextResponse.json(
-        { success: false, error: 'Valid ourDomain required' },
+        { error: 'Valid ourDomain required', errorType: 'generic' },
         { status: 400 }
       );
     }
@@ -89,7 +89,7 @@ export async function POST(req: NextRequest) {
     const validCompetitors = competitors.filter(isValidDomain);
     if (validCompetitors.length === 0) {
       return NextResponse.json(
-        { success: false, error: 'No valid competitor domains provided' },
+        { error: 'No valid competitor domains provided', errorType: 'generic' },
         { status: 400 }
       );
     }
@@ -149,13 +149,13 @@ export async function POST(req: NextRequest) {
 
     if (error instanceof SpyFuError) {
       return NextResponse.json(
-        { success: false, error: error.message },
+        { error: error.message, errorType: 'generic' },
         { status: error.statusCode || 500 }
       );
     }
 
     return NextResponse.json(
-      { success: false, error: 'Internal server error' },
+      { error: 'Internal server error', errorType: 'generic' },
       { status: 500 }
     );
   }

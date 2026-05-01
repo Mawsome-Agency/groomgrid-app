@@ -84,7 +84,7 @@ export function getRecoveryAction(type: ErrorType): { primary: string; secondary
 /**
  * Parses a Stripe error into a structured error object
  */
-export function parsePaymentError(error: any): ParsedPaymentError {
+export function parsePaymentError(error: unknown): ParsedPaymentError {
   const declineCode = error?.declineCode || error?.code;
   const type = mapStripeErrorCodeToErrorType(declineCode);
   const message = error?.message || getErrorMessageForType(type);

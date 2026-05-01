@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
     const { email, password, businessName, attributionData } = await req.json()
 
     if (!email || !password || !businessName) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
+      return NextResponse.json({ error: 'Missing required fields', errorType: 'generic' }, { status: 400 })
     }
 
     const existing = await prisma.user.findUnique({
@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
     })
 
     if (existing) {
-      return NextResponse.json({ error: 'Email already in use' }, { status: 409 })
+      return NextResponse.json({ error: 'Email already in use', errorType: 'generic' }, { status: 409 })
     }
 
     const passwordHash = await bcrypt.hash(password, 12)
@@ -125,6 +125,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true, userId: user.id }, { status: 201 })
   } catch (error) {
     console.error('Signup error:', error)
-    return NextResponse.json({ error: 'Failed to create account' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to create account', errorType: 'generic' }, { status: 500 })
   }
 }

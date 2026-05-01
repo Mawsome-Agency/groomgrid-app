@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
 
     if (!testId || !userId || !event) {
       return NextResponse.json(
-        { error: 'Missing required fields: testId, userId, event' },
+        { error: 'Missing required fields: testId, userId, event', errorType: 'generic' },
         { status: 400 }
       );
     }
@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
 
     if (!test) {
       return NextResponse.json(
-        { error: 'Test not found' },
+        { error: 'Test not found', errorType: 'generic' },
         { status: 404 }
       );
     }
@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error('[AB Test Track] Error:', error);
     return NextResponse.json(
-      { error: 'Failed to track conversion' },
+      { error: 'Failed to track conversion', errorType: 'generic' },
       { status: 500 }
     );
   }

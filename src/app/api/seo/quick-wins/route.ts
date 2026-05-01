@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
       return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
+        { error: 'Unauthorized', errorType: 'generic' },
         { status: 401 }
       );
     }
@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
 
     if (!allowed) {
       return NextResponse.json(
-        { success: false, error: 'Rate limit exceeded' },
+        { error: 'Rate limit exceeded', errorType: 'generic' },
         {
           status: 429,
           headers: { 'Retry-After': String(retryAfter) },
@@ -64,7 +64,7 @@ export async function POST(req: NextRequest) {
     // Validate keywords array
     if (!Array.isArray(keywords) || keywords.length === 0) {
       return NextResponse.json(
-        { success: false, error: 'keywords array required' },
+        { error: 'keywords array required', errorType: 'generic' },
         { status: 400 }
       );
     }
@@ -79,7 +79,7 @@ export async function POST(req: NextRequest) {
 
     if (validKeywords.length === 0) {
       return NextResponse.json(
-        { success: false, error: 'No valid keywords provided' },
+        { error: 'No valid keywords provided', errorType: 'generic' },
         { status: 400 }
       );
     }
@@ -123,13 +123,13 @@ export async function POST(req: NextRequest) {
 
     if (error instanceof SpyFuError) {
       return NextResponse.json(
-        { success: false, error: error.message },
+        { error: error.message, errorType: 'generic' },
         { status: error.statusCode || 500 }
       );
     }
 
     return NextResponse.json(
-      { success: false, error: 'Internal server error' },
+      { error: 'Internal server error', errorType: 'generic' },
       { status: 500 }
     );
   }

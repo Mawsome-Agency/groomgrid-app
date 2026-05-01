@@ -6,7 +6,7 @@ import * as Sentry from '@sentry/nextjs';
 export async function GET() {
   // Block in production — test endpoint only
   if (process.env.NODE_ENV === 'production') {
-    return NextResponse.json({ error: 'Not found' }, { status: 404 });
+    return NextResponse.json({ error: 'Not found', errorType: 'generic' }, { status: 404 });
   }
 
   // Require auth even in non-production

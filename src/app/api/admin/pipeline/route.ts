@@ -26,7 +26,7 @@ export async function GET() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
     return NextResponse.json(
-      { error: 'Authentication required' },
+      { error: 'Authentication required', errorType: 'generic' },
       { status: 401 },
     );
   }
@@ -36,7 +36,7 @@ export async function GET() {
   if (!token) {
     console.error('[Pipeline] GITHUB_TOKEN is not configured');
     return NextResponse.json(
-      { error: 'Server configuration error — GITHUB_TOKEN missing' },
+      { error: 'Server configuration error — GITHUB_TOKEN missing', errorType: 'generic' },
       { status: 503 },
     );
   }
@@ -61,13 +61,13 @@ export async function GET() {
     // NOT DOMException. Must check error.name, not instanceof DOMException.
     if (err instanceof Error && err.name === 'AbortError') {
       return NextResponse.json(
-        { error: 'GitHub API request timed out after 10 seconds' },
+        { error: 'GitHub API request timed out after 10 seconds', errorType: 'generic' },
         { status: 504 },
       );
     }
     console.error('[Pipeline] Network error fetching GitHub PRs:', err);
     return NextResponse.json(
-      { error: 'Failed to reach GitHub API' },
+      { error: 'Failed to reach GitHub API', errorType: 'generic' },
       { status: 500 },
     );
   } finally {
@@ -92,7 +92,7 @@ export async function GET() {
     }
 
     console.error(`[Pipeline] GitHub API error: ${status}`);
-    return NextResponse.json({ error: message }, { status: mappedStatus });
+    return NextResponse.json({ error: message, errorType: 'generic' }, { status: mappedStatus });
   }
 
   let pullRequests;
@@ -101,7 +101,7 @@ export async function GET() {
   } catch (jsonErr) {
     console.error('[Pipeline] Failed to parse GitHub response:', jsonErr);
     return NextResponse.json(
-      { error: 'Failed to parse GitHub response' },
+      { error: 'Failed to parse GitHub response', errorType: 'generic' },
       { status: 500 },
     );
   }

@@ -14,13 +14,13 @@ export async function POST(req: NextRequest) {
   try {
     body = await req.json()
   } catch {
-    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 })
+    return NextResponse.json({ error: 'Invalid JSON body', errorType: 'generic' }, { status: 400 })
   }
 
   const { eventName, properties, sessionId } = body
 
   if (!eventName) {
-    return NextResponse.json({ error: 'eventName is required' }, { status: 400 })
+    return NextResponse.json({ error: 'eventName is required', errorType: 'generic' }, { status: 400 })
   }
 
   // Auth is optional — anonymous pre-signup events (signup_viewed, signup_started)

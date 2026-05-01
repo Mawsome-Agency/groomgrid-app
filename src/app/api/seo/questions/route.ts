@@ -32,7 +32,7 @@ export async function GET(req: NextRequest) {
 
     if (!allowed) {
       return NextResponse.json(
-        { success: false, error: 'Rate limit exceeded' },
+        { error: 'Rate limit exceeded', errorType: 'generic' },
         {
           status: 429,
           headers: { 'Retry-After': String(retryAfter) },
@@ -46,7 +46,7 @@ export async function GET(req: NextRequest) {
 
     if (!keyword || !isValidKeyword(keyword)) {
       return NextResponse.json(
-        { success: false, error: 'Valid keyword required (2-100 characters)' },
+        { error: 'Valid keyword required (2-100 characters)', errorType: 'generic' },
         { status: 400 }
       );
     }
@@ -78,13 +78,13 @@ export async function GET(req: NextRequest) {
 
     if (error instanceof SpyFuError) {
       return NextResponse.json(
-        { success: false, error: error.message },
+        { error: error.message, errorType: 'generic' },
         { status: error.statusCode || 500 }
       );
     }
 
     return NextResponse.json(
-      { success: false, error: 'Internal server error' },
+      { error: 'Internal server error', errorType: 'generic' },
       { status: 500 }
     );
   }

@@ -15,7 +15,7 @@ export async function POST() {
     // If no session, return 401 Unauthorized
     if (!session) {
       return NextResponse.json(
-        { success: false, error: "Unauthorized" },
+        { error: 'Unauthorized', errorType: 'generic' },
         { status: 401, headers }
       );
     }
@@ -30,8 +30,8 @@ export async function POST() {
     console.error("Session extension error:", error);
     
     return NextResponse.json(
-      { success: false, error: error instanceof Error ? error.message : "Unknown error" },
-      { status: 500, headers: { "Cache-Control": "no-store" } }
+      { error: error instanceof Error ? error.message : 'Unknown error', errorType: 'generic' },
+      { status: 500, headers: { 'Cache-Control': 'no-store' } }
     );
   }
 }

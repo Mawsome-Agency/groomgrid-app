@@ -7,7 +7,7 @@ import { getUnsubscribeToken } from '@/lib/email/enroll-drip'
 export async function POST(req: NextRequest) {
   const cronSecret = req.headers.get('CRON_SECRET')
   if (!cronSecret || cronSecret !== process.env.CRON_SECRET) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    return NextResponse.json({ error: 'Unauthorized', errorType: 'generic' }, { status: 401 })
   }
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://getgroomgrid.com'

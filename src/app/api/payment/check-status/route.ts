@@ -4,7 +4,8 @@ import { authOptions } from '@/lib/next-auth-options';
 import prisma from '@/lib/prisma';
 import { updatePaymentLockoutStatus } from '@/lib/payment-lockout';
 import { triggerPaymentCompletionHandler } from '@/lib/payment-completion';
-import { stripe } from '@/lib/stripe';
+import { getStripeErrorMessage, stripe } from '@/lib/stripe';
+import { apiError } from '@/lib/api-errors';
 
 /**
  * GET /api/payment/check-status
@@ -18,7 +19,7 @@ export async function GET(req: NextRequest) {
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return apiError('Unauthorized', 401);
     }
 
     const userId = session.user.id;
@@ -75,12 +76,13 @@ export async function GET(req: NextRequest) {
         await updatePaymentLockoutStatus(lockout.id, 'failed', 'Payment session expired or failed');
         return NextResponse.json({ message: 'Payment session expired or failed' });
       }
-    } catch (stripeError: any) {
+    } catch (stripeError: unknown) {
       console.error('Stripe session retrieval error:', stripeError);
-      return NextResponse.json({ error: 'Failed to retrieve payment status' }, { status: 500 });
+      const errorDetails = getStripeErrorMessage(stripeError);
+      return apiError(errorDetails.message, 500, { type: errorDetails.type, declineCode: errorDetails.declineCode });
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Payment status check error:', error);
-    return NextResponse.json({ error: 'Failed to check payment status' }, { status: 500 });
+    return apiError('Failed to check payment status', 500);
   }
 }

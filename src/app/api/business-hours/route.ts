@@ -7,7 +7,7 @@ export async function GET(req: NextRequest) {
   try {
     const user = await getCurrentUser();
     if (!user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized', errorType: 'generic' }, { status: 401 });
     }
 
     const businessHours = await prisma.businessHours.findMany({
@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ businessHours });
   } catch (error) {
     console.error('Failed to fetch business hours:', error);
-    return NextResponse.json({ error: 'Failed to fetch business hours' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to fetch business hours', errorType: 'generic' }, { status: 500 });
   }
 }
 
@@ -27,13 +27,13 @@ export async function POST(req: NextRequest) {
   try {
     const user = await getCurrentUser();
     if (!user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized', errorType: 'generic' }, { status: 401 });
     }
 
     const { hours } = await req.json();
 
     if (!hours || !Array.isArray(hours)) {
-      return NextResponse.json({ error: 'Invalid hours data' }, { status: 400 });
+      return NextResponse.json({ error: 'Invalid hours data', errorType: 'generic' }, { status: 400 });
     }
 
     // Validate hours format
@@ -73,6 +73,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ businessHours });
   } catch (error) {
     console.error('Failed to save business hours:', error);
-    return NextResponse.json({ error: 'Failed to save business hours' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to save business hours', errorType: 'generic' }, { status: 500 });
   }
 }

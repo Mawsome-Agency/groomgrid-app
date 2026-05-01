@@ -7,7 +7,7 @@ export async function GET(req: NextRequest) {
   try {
     const user = await getCurrentUser();
     if (!user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized', errorType: 'generic' }, { status: 401 });
     }
 
     const clients = await prisma.client.findMany({
@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ clients });
   } catch (error) {
     console.error('Failed to fetch clients:', error);
-    return NextResponse.json({ error: 'Failed to fetch clients' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to fetch clients', errorType: 'generic' }, { status: 500 });
   }
 }
 
@@ -33,13 +33,13 @@ export async function POST(req: NextRequest) {
   try {
     const user = await getCurrentUser();
     if (!user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized', errorType: 'generic' }, { status: 401 });
     }
 
     const { name, email, phone, address, notes } = await req.json();
 
     if (!name) {
-      return NextResponse.json({ error: 'Name is required' }, { status: 400 });
+      return NextResponse.json({ error: 'Name is required', errorType: 'generic' }, { status: 400 });
     }
 
     const client = await prisma.client.create({
@@ -56,6 +56,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ client });
   } catch (error) {
     console.error('Failed to create client:', error);
-    return NextResponse.json({ error: 'Failed to create client' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to create client', errorType: 'generic' }, { status: 500 });
   }
 }
