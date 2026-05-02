@@ -198,10 +198,13 @@ describe('Blog Index Page', () => {
 
     it('renders legal links (Privacy & Terms)', () => {
       render(<BlogIndexPage />);
-      const privacyLink = screen.getByRole('link', { name: /privacy/i });
-      expect(privacyLink).toHaveAttribute('href', '/privacy');
-      const termsLink = screen.getByRole('link', { name: /terms/i });
-      expect(termsLink).toHaveAttribute('href', '/terms');
+      // Privacy appears in both Company column ("Privacy Policy") and bottom bar ("Privacy")
+      const privacyLinks = screen.getAllByRole('link', { name: /privacy/i });
+      expect(privacyLinks.length).toBeGreaterThanOrEqual(1);
+      expect(privacyLinks[0]).toHaveAttribute('href', '/privacy');
+      const termsLinks = screen.getAllByRole('link', { name: /terms/i });
+      expect(termsLinks.length).toBeGreaterThanOrEqual(1);
+      expect(termsLinks[0]).toHaveAttribute('href', '/terms');
     });
   });
 

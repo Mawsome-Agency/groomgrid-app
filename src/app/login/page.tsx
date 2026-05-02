@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { signIn } from 'next-auth/react';
-import { AlertCircle, ArrowRight, Lock, Mail } from 'lucide-react';
+import { AlertCircle, ArrowRight, CheckCircle2, Lock, Mail, Send } from 'lucide-react';
 import TrustSignals from '@/components/trust/TrustSignals';
 import SiteFooter from '@/components/marketing/SiteFooter';
 
@@ -14,11 +14,24 @@ function LoginForm() {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [needsVerification, setNeedsVerification] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
+  const [resendSent, setResendSent] = useState(false);
 
   useEffect(() => {
     const urlError = searchParams.get('error');
-    if (urlError) setError(decodeURIComponent(urlError));
+    if (urlError) {
+      const decoded = decodeURIComponent(urlError);
+      if (decoded === 'EMAIL_NOT_VERIFIED' || urlError === 'EMAIL_NOT_VERIFIED') {
+        setNeedsVerification(true);
+      } else {
+        setError(decoded);
+      }
+    }
+    // Show success message after email verification
   }, [searchParams]);
+
+  const justVerified = searchParams.get('verified') === 'true';
 
   // Mobile keyboard handling: scroll focused inputs into view
   useEffect(() => {
@@ -36,6 +49,24 @@ function LoginForm() {
     return () => document.removeEventListener('focusin', handleFocus);
   }, []);
 
+  const handleResendVerification = async () => {
+    setResendLoading(true);
+    try {
+      const res = await fetch('/api/auth/resend-verification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: formData.email }),
+      });
+      if (res.ok) {
+        setResendSent(true);
+      }
+    } catch {
+      setResendSent(true); // Don't reveal whether email exists
+    } finally {
+      setResendLoading(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -49,7 +80,34 @@ function LoginForm() {
       });
 
       if (result?.error) {
-        setError('Invalid email or password. Please check your credentials and try again.');
+        // Check if this is our custom email verification error
+        if (result.error === 'EMAIL_NOT_VERIFIED' || result.error.includes('EMAIL_NOT_VERIFIED')) {
+          setNeedsVerification(true);
+          return;
+        }
+        // For CredentialsSignin, could be wrong password or unverified email
+        if (result.error === 'CredentialsSignin') {
+          // Try to check if this user needs verification
+          try {
+            const checkRes = await fetch('/api/auth/check-verification', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email: formData.email }),
+            });
+            if (checkRes.ok) {
+              const checkData = await checkRes.json();
+              if (checkData.needsVerification) {
+                setNeedsVerification(true);
+                return;
+              }
+            }
+          } catch {
+            // Fall through to generic error
+          }
+          setError('Invalid email or password. Please check your credentials and try again.');
+        } else {
+          setError(result.error);
+        }
         return;
       }
 
@@ -76,8 +134,48 @@ function LoginForm() {
           <p className="text-stone-600">Sign in to your account</p>
         </div>
 
+        {/* Email Verified Success Banner */}
+        {justVerified && !needsVerification && (
+          <div className="flex items-start gap-2 p-3 rounded-lg bg-green-50 text-green-700 text-sm mb-6">
+            <CheckCircle2 className="w-5 h-5 flex-shrink-0 mt-0.5" />
+            <div>
+              <span className="font-medium">Email verified!</span> You can now sign in with your credentials.
+            </div>
+          </div>
+        )}
+
+        {/* Email Verification Required Banner */}
+        {needsVerification && (
+          <div className="p-4 rounded-lg bg-amber-50 border border-amber-200 mb-6">
+            <div className="flex items-start gap-2 mb-3">
+              <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5 text-amber-600" />
+              <div>
+                <p className="text-amber-800 font-medium">Please verify your email</p>
+                <p className="text-amber-700 text-sm mt-1">
+                  We sent a verification link to <strong>{formData.email}</strong>. Check your inbox and spam folder.
+                </p>
+              </div>
+            </div>
+            {resendSent ? (
+              <div className="flex items-center gap-2 text-green-700 text-sm mt-2">
+                <CheckCircle2 className="w-4 h-4" />
+                Verification email resent! Check your inbox.
+              </div>
+            ) : (
+              <button
+                onClick={handleResendVerification}
+                disabled={resendLoading}
+                className="flex items-center gap-2 text-sm font-medium text-amber-700 hover:text-amber-900 transition-colors mt-2 disabled:opacity-50"
+              >
+                <Send className="w-4 h-4" />
+                {resendLoading ? 'Sending...' : 'Resend verification email'}
+              </button>
+            )}
+          </div>
+        )}
+
         {/* Error Alert */}
-        {error && (
+        {error && !needsVerification && (
           <div className="flex items-start gap-2 p-3 rounded-lg bg-red-50 text-red-700 text-sm mb-6">
             <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
             <span>{error}</span>
@@ -96,7 +194,7 @@ function LoginForm() {
                 id="email"
                 type="email"
                 value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                onChange={(e) => { setFormData({ ...formData, email: e.target.value }); setNeedsVerification(false); setError(''); }}
                 placeholder="you@example.com"
                 required
                 autoComplete="email"
