@@ -66,6 +66,7 @@ function SignupPageInner() {
   const [showPassword, setShowPassword] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [showStickyBar, setShowStickyBar] = useState(false);
+  const [showVerificationPrompt, setShowVerificationPrompt] = useState(false);
 
   const formRef = useRef<HTMLFormElement>(null);
   const groomerCount = useCountUp(BASE_COUNT);
@@ -130,6 +131,27 @@ function SignupPageInner() {
     document.addEventListener('focusin', handleFocus);
     return () => document.removeEventListener('focusin', handleFocus);
   }, []);
+
+  const [resendLoading, setResendLoading] = useState(false);
+  const [resendSent, setResendSent] = useState(false);
+
+  const handleResendVerification = async () => {
+    setResendLoading(true);
+    try {
+      const res = await fetch('/api/auth/resend-verification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: formData.email }),
+      });
+      if (res.ok) {
+        setResendSent(true);
+      }
+    } catch {
+      setResendSent(true); // Don't reveal whether email exists
+    } finally {
+      setResendLoading(false);
+    }
+  };
 
   const handleFieldChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -217,10 +239,25 @@ function SignupPageInner() {
       });
 
       if (result?.error) {
+        // If EMAIL_NOT_VERIFIED, that's expected — show verification prompt
+        if (result.error === 'EMAIL_NOT_VERIFIED' || result.error.includes('EMAIL_NOT_VERIFIED')) {
+          setSubmitSuccess(true);
+          setShowVerificationPrompt(true);
+          setLoading(false);
+          return;
+        }
+        // For CredentialsSignin, could be wrong password or unverified email
+        if (result.error === 'CredentialsSignin') {
+          // Account was created but email isn't verified yet — this is the expected path
+          setSubmitSuccess(true);
+          setShowVerificationPrompt(true);
+          setLoading(false);
+          return;
+        }
         trackSignupError(result.error, 'sign_in');
-        setError('Account created but sign-in failed. Please sign in manually.');
+        setError('Account created but sign-in failed. Please check your email to verify your account, then sign in.');
         setLoading(false);
-        router.push('/login');
+        router.push('/login?next=/plans');
         return;
       }
 
@@ -490,6 +527,46 @@ function SignupPageInner() {
               ))}
             </div>
           </form>
+
+          {/* Email verification prompt — shown after successful signup */}
+          {showVerificationPrompt && submitSuccess && (
+            <div className="mt-4 p-4 rounded-xl bg-green-50 border border-green-200">
+              <div className="flex items-start gap-3 mb-3">
+                <Mail className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" aria-hidden="true" />
+                <div>
+                  <h3 className="font-semibold text-green-800 text-sm">Check your email!</h3>
+                  <p className="text-green-700 text-sm mt-1">
+                    We sent a verification link to <strong>{formData.email}</strong>. Please verify your email before signing in.
+                  </p>
+                </div>
+              </div>
+              <p className="text-green-600 text-xs mt-2">
+                Didn&apos;t receive it? Check your spam folder, or:
+              </p>
+              {resendSent ? (
+                <div className="flex items-center gap-2 text-green-700 text-sm mt-2">
+                  <Check className="w-4 h-4" />
+                  Verification email resent!
+                </div>
+              ) : (
+                <button
+                  onClick={handleResendVerification}
+                  disabled={resendLoading}
+                  className="mt-2 text-sm font-medium text-green-700 hover:text-green-900 underline transition-colors disabled:opacity-50"
+                >
+                  {resendLoading ? 'Sending...' : 'Resend verification email'}
+                </button>
+              )}
+              <div className="mt-3 pt-3 border-t border-green-200">
+                <Link
+                  href="/login"
+                  className="text-sm font-medium text-green-600 hover:text-green-800 transition-colors"
+                >
+                  Sign in after verifying →
+                </Link>
+              </div>
+            </div>
+          )}
 
           <p className="text-center text-sm text-stone-600 mt-5">
             Already have an account?{' '}
