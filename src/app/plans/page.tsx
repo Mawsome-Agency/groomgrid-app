@@ -108,9 +108,10 @@ function PlansPageInner() {
       try {
         const res = await fetch('/api/profile');
         if (res.ok) {
-          const profile = await res.json();
-          const isTrial = profile.subscriptionStatus === 'trial';
-          const endsAt = profile.trialEndsAt ? new Date(profile.trialEndsAt) : null;
+          const data = await res.json();
+          const profile = data.profile;
+          const isTrial = profile?.subscriptionStatus === 'trial';
+          const endsAt = profile?.trialEndsAt ? new Date(profile.trialEndsAt) : null;
           const isActive = isTrial && endsAt && endsAt > new Date();
           setIsOnTrial(!!isActive);
           setTrialEndsAt(endsAt);

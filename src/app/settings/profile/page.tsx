@@ -45,9 +45,10 @@ export default function ProfileSettingsPage() {
       const res = await fetch('/api/profile');
       if (res.ok) {
         const data = await res.json();
+        const profile = data?.profile;
         const loaded = {
-          businessName: data?.business_name || data?.businessName || '',
-          phone: data?.phone || '',
+          businessName: profile?.business_name || profile?.businessName || '',
+          phone: profile?.phone || '',
         };
         setForm(loaded);
         setOriginal(loaded);
