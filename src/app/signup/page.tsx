@@ -232,6 +232,10 @@ function SignupPageInner() {
       trackSignupCompleted(data.userId, attribution);
       trackAccountCreated(data.userId, formData.businessName, attribution);
 
+      // Always show verification prompt — email verification is important for account
+      // security and recovery. The user can still browse, but we remind them to verify.
+      setShowVerificationPrompt(true);
+
       const result = await signIn('credentials', {
         email: formData.email,
         password: formData.password,
@@ -239,18 +243,16 @@ function SignupPageInner() {
       });
 
       if (result?.error) {
-        // If EMAIL_NOT_VERIFIED, that's expected — show verification prompt
+        // If EMAIL_NOT_VERIFIED, that's expected — verification prompt already showing
         if (result.error === 'EMAIL_NOT_VERIFIED' || result.error.includes('EMAIL_NOT_VERIFIED')) {
           setSubmitSuccess(true);
-          setShowVerificationPrompt(true);
           setLoading(false);
           return;
         }
         // For CredentialsSignin, could be wrong password or unverified email
+        // Account was created but email isn't verified yet — this is the expected path
         if (result.error === 'CredentialsSignin') {
-          // Account was created but email isn't verified yet — this is the expected path
           setSubmitSuccess(true);
-          setShowVerificationPrompt(true);
           setLoading(false);
           return;
         }
@@ -262,6 +264,9 @@ function SignupPageInner() {
       }
 
       setSubmitSuccess(true);
+      // Delay redirect so user can see the email verification prompt.
+      // They'll be auto-signed-in already, but we want them to notice the
+      // verification reminder before navigating away.
       setTimeout(() => {
         // When a coupon param is present, skip welcome and go straight to plans
         if (couponParam) {
@@ -269,7 +274,7 @@ function SignupPageInner() {
         } else {
           router.push('/welcome');
         }
-      }, 400);
+      }, 5000); // 5 seconds to read the verification prompt
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Failed to create account';
       trackSignupError(message, 'catch_block');
@@ -528,15 +533,15 @@ function SignupPageInner() {
             </div>
           </form>
 
-          {/* Email verification prompt — shown after successful signup */}
+          {/* Email verification prompt — always shown after successful signup */}
           {showVerificationPrompt && submitSuccess && (
             <div className="mt-4 p-4 rounded-xl bg-green-50 border border-green-200">
               <div className="flex items-start gap-3 mb-3">
                 <Mail className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" aria-hidden="true" />
                 <div>
-                  <h3 className="font-semibold text-green-800 text-sm">Check your email!</h3>
+                  <h3 className="font-semibold text-green-800 text-sm">Verify your email!</h3>
                   <p className="text-green-700 text-sm mt-1">
-                    We sent a verification link to <strong>{formData.email}</strong>. Please verify your email before signing in.
+                    We sent a verification link to <strong>{formData.email}</strong>. Check your inbox and spam folder.
                   </p>
                 </div>
               </div>
@@ -559,10 +564,10 @@ function SignupPageInner() {
               )}
               <div className="mt-3 pt-3 border-t border-green-200">
                 <Link
-                  href="/login"
+                  href={couponParam ? `/plans?coupon=${encodeURIComponent(couponParam)}` : '/welcome'}
                   className="text-sm font-medium text-green-600 hover:text-green-800 transition-colors"
                 >
-                  Sign in after verifying →
+                  Continue to GroomGrid →
                 </Link>
               </div>
             </div>

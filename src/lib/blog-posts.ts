@@ -128,8 +128,8 @@ export const blogPosts: BlogPost[] = [
   },
   {
     slug: 'free-dog-grooming-software',
-    title: 'Free Dog Grooming Software: What You Actually Get (And What You Don\'t)',
-    description: 'Honest look at free dog grooming software — what features free tiers include, where they fall short, and when paying $29/month actually saves you money. Plus alternatives that offer free trials.',
+    title: 'Free Pet Grooming Software: What You Actually Get (And What You Don\'t)',
+    description: 'Honest look at free pet grooming software — what features free tiers include, where they fall short, and when paying $29/month actually saves you money. Works for dog and cat groomers.',
     publishedAt: '2026-04-23',
   },
   {
@@ -182,8 +182,8 @@ export const blogPosts: BlogPost[] = [
   },
   {
     slug: 'dog-grooming-appointment-app',
-    title: 'Best Dog Grooming Appointment App (2026): Scheduling, Reminders & Payments',
-    description: 'Compare the best dog grooming appointment apps for 2026 — scheduling, automated reminders, online booking, payment processing, and client management features.',
+    title: 'Best Pet Grooming App & Scheduling Software (2026)',
+    description: 'Compare the best pet grooming apps for 2026 — scheduling, automated reminders, online booking, payment processing, and client management. Works for dogs, cats, and all breeds.',
     publishedAt: '2026-04-27',
   },
   {
@@ -191,5 +191,17 @@ export const blogPosts: BlogPost[] = [
     title: 'Dog Grooming Business Plan Template: Free Download for 2026',
     description: 'Free dog grooming business plan template with executive summary, market analysis, financial projections, and operational plan for mobile, salon, and home-based businesses.',
     publishedAt: '2026-04-28',
+  },
+  {
+    slug: 'how-to-start-dog-grooming-business-no-money',
+    title: 'How to Start a Dog Grooming Business With No Money (2026 Guide)',
+    description: 'Start a dog grooming business with zero budget — free tools, creative client acquisition, bartering strategies, and the 6-month bootstrap plan that turns $0 into a real business.',
+    publishedAt: '2026-05-02',
+  },
+  {
+    slug: 'dog-grooming-schedule-template',
+    title: 'Free Dog Grooming Schedule Template (Printable) + Daily Planner',
+    description: 'Free printable dog grooming schedule template for solo groomers and salons. Includes daily planner, weekly schedule, and tips for going digital with automated reminders.',
+    publishedAt: '2026-05-02',
   },
 ].sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());

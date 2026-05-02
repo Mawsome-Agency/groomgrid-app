@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useSession, signOut } from 'next-auth/react';
+import { useSession, signOut, SessionProvider as NextAuthSessionProvider } from 'next-auth/react';
 import Script from 'next/script';
 import Link from 'next/link';
 import { Plan } from '@/types';
@@ -71,6 +71,16 @@ function PlansSkeleton() {
   );
 }
 
+// Known promo codes — labels and discount info for the UI.
+// Unknown codes are still passed to Stripe (which validates them server-side).
+const KNOWN_PROMO_CODES: Record<string, { label: string; discount: string; description: string }> = {
+  BETA50: {
+    label: 'BETA50',
+    discount: '50% off first month',
+    description: 'Launch pricing — lock in $14.50/mo for Solo Groomer',
+  },
+};
+
 function PlansPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -86,9 +96,43 @@ function PlansPageInner() {
 
   const coupon = searchParams.get('coupon') || undefined;
 
+  // Promo code input state
+  const [promoInput, setPromoInput] = useState(coupon || '');
+  const [appliedPromo, setAppliedPromo] = useState<string | null>(coupon || null);
+  const [promoError, setPromoError] = useState<string | null>(null);
+
+  const handleApplyPromo = () => {
+    const code = promoInput.trim().toUpperCase();
+    if (!code) {
+      setPromoError('Enter a promo code');
+      return;
+    }
+    // Apply the code — Stripe validates server-side on checkout
+    setAppliedPromo(code);
+    setPromoError(null);
+    // Update URL search params so coupon persists through navigation
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('coupon', code);
+    router.replace(`/plans?${params.toString()}`, { scroll: false });
+  };
+
+  const handleRemovePromo = () => {
+    setAppliedPromo(null);
+    setPromoInput('');
+    setPromoError(null);
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete('coupon');
+    router.replace(`/plans?${params.toString() || ''}`, { scroll: false });
+  };
+
+  // Sync coupon param with promo state
+  const effectiveCoupon = appliedPromo || coupon;
+
   // Get billing summary data for selected plan
   const getBillingData = (): BillingSummaryData | null => {
     if (!selectedPlan) return null;
+
+    const promoInfo = effectiveCoupon ? KNOWN_PROMO_CODES[effectiveCoupon] : null;
 
     return {
       planName: selectedPlan.name,
@@ -97,6 +141,8 @@ function PlansPageInner() {
       currency: "$",
       isTrial: true,
       trialDays: 14,
+      promoCode: effectiveCoupon || undefined,
+      promoDescription: promoInfo?.description,
     };
   };
 
@@ -160,8 +206,8 @@ function PlansPageInner() {
 
     // Unauthenticated users → send to signup with plan + coupon context
     if (status !== 'authenticated' || !session?.user?.id) {
-      const signupUrl = coupon
-        ? `/signup?coupon=${encodeURIComponent(coupon)}&plan=${plan.id}`
+      const signupUrl = effectiveCoupon
+        ? `/signup?coupon=${encodeURIComponent(effectiveCoupon)}&plan=${plan.id}`
         : `/signup?plan=${plan.id}`;
       router.push(signupUrl);
       return;
@@ -184,7 +230,7 @@ function PlansPageInner() {
           userId: session.user.id,
           planType: plan.type,
           customerEmail: session.user.email,
-          coupon,
+          coupon: effectiveCoupon,
         }),
       });
 
@@ -258,6 +304,55 @@ function PlansPageInner() {
         <p className="text-sm font-semibold">
           🐾 Launch pricing — <span className="font-bold">$14.50/mo for founding groomers</span> (code BETA50). Lock it in forever.
         </p>
+      </div>
+
+      {/* Promo Code Input */}
+      <div className="bg-white border-b border-stone-200">
+        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-center gap-2">
+          {appliedPromo ? (
+            <div className="flex items-center gap-2 bg-green-50 border border-green-200 rounded-lg px-4 py-2">
+              <span className="text-green-800 font-medium text-sm">
+                ✅ Code <strong>{appliedPromo}</strong> applied
+                {KNOWN_PROMO_CODES[appliedPromo] && (
+                  <span className="text-green-600 ml-1">— {KNOWN_PROMO_CODES[appliedPromo].discount}</span>
+                )}
+              </span>
+              <button
+                onClick={handleRemovePromo}
+                className="text-green-600 hover:text-green-800 text-sm font-medium ml-1"
+                aria-label="Remove promo code"
+              >
+                Remove
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <label htmlFor="promo-code" className="text-sm text-stone-600 font-medium">
+                Promo code:
+              </label>
+              <input
+                id="promo-code"
+                type="text"
+                value={promoInput}
+                onChange={(e) => { setPromoInput(e.target.value.toUpperCase()); setPromoError(null); }}
+                onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleApplyPromo(); } }}
+                placeholder="BETA50"
+                className="w-36 px-3 py-1.5 text-sm border border-stone-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none"
+                disabled={isCheckoutInFlight}
+              />
+              <button
+                onClick={handleApplyPromo}
+                disabled={isCheckoutInFlight || !promoInput.trim()}
+                className="px-4 py-1.5 text-sm font-medium bg-stone-800 text-white rounded-lg hover:bg-stone-900 disabled:bg-stone-300 disabled:cursor-not-allowed transition-colors"
+              >
+                Apply
+              </button>
+              {promoError && (
+                <span className="text-red-600 text-sm">{promoError}</span>
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
       <main className="max-w-7xl mx-auto px-4 py-12">
@@ -395,7 +490,7 @@ function PlansPageInner() {
         {!isAuthenticated && (
           <div className="text-center mt-12">
             <Link
-              href={coupon ? `/signup?coupon=${encodeURIComponent(coupon)}` : '/signup'}
+              href={effectiveCoupon ? `/signup?coupon=${encodeURIComponent(effectiveCoupon)}` : '/signup'}
               className="inline-block bg-green-600 hover:bg-green-700 text-white font-semibold px-8 py-3 rounded-xl transition-colors"
             >
               Start Free Trial — 14 Days Free
@@ -419,8 +514,10 @@ function PlansPageInner() {
 
 export default function PlansPage() {
   return (
-    <Suspense fallback={<PlansSkeleton />}>
-      <PlansPageInner />
-    </Suspense>
+    <NextAuthSessionProvider>
+      <Suspense fallback={<PlansSkeleton />}>
+        <PlansPageInner />
+      </Suspense>
+    </NextAuthSessionProvider>
   );
 }

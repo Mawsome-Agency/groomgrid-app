@@ -105,7 +105,7 @@ describe('Sitemap Generation', () => {
 
   it('should have appropriate priorities for landing pages', () => {
     const result = sitemap();
-    const landingSlugs = ['best-dog-grooming-software', 'cat-grooming-software', 'grooming-business-operations', 'mobile-grooming-business', 'mobile-grooming-software', 'moego-alternatives', 'daysmart-alternatives', 'pawfinity-alternatives', 'pet-grooming-business-software', '123-pet-grooming-software-alternatives'];
+    const landingSlugs = ['best-dog-grooming-software', 'cat-grooming-software', 'grooming-business-operations', 'mobile-grooming-business', 'mobile-grooming-software', 'moego-alternatives', 'daysmart-alternatives', 'pawfinity-alternatives', 'pet-grooming-business-software', '123-pet-grooming-software-alternatives', 'dog-grooming-schedule-template'];
     
     landingSlugs.forEach(slug => {
       const page = result.find(p => p.url === `https://getgroomgrid.com/${slug}`);
@@ -158,12 +158,12 @@ describe('Sitemap Generation', () => {
   it('should have total entries matching all pages', () => {
     const result = sitemap();
 
-    // 4 static pages (/, /signup, /plans, /blog)
-    // + 10 landing pages
+    // 6 static pages (/, /signup, /plans, /blog, /privacy, /terms)
+    // + 12 landing pages
     // + 1 feature page
-    // + 31 blog posts
-    // = 46 total
+    // + 33 blog posts
+    // = 52 total
     // (update this count when pages are added/removed)
-    expect(result.length).toBeGreaterThanOrEqual(46);
+    expect(result.length).toBeGreaterThanOrEqual(52);
   });
 });

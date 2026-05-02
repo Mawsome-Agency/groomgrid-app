@@ -375,9 +375,7 @@ describe('performance migration — 20260424000001_add_missing_indexes', () => {
         'payment_lockouts',
         'password_reset_tokens',
         'email_verification_tokens',
-        'ab_tests',
-        'ab_test_assignments',
-        'ab_test_conversions',
+        'unsubscribe_tokens',
       ];
       const tableRefs = (sql.match(/ON\s+"([^"]+)"/gi) ?? []).map(
         (m) => m.replace(/ON\s+"/i, '').replace('"', ''),

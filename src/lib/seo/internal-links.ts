@@ -62,7 +62,7 @@ const landingPages: ContentPage[] = [
   },
   {
     slug: 'dog-grooming-scheduling-software',
-    title: 'Dog Grooming Scheduling Software',
+    title: 'Dog Grooming Scheduling Software — Automated Booking',
     type: 'landing',
     path: '/dog-grooming-scheduling-software',
   },
@@ -92,19 +92,19 @@ const landingPages: ContentPage[] = [
   },
   {
     slug: 'daysmart-alternatives',
-    title: 'DaySmart Alternatives: Why Groomers Are Switching',
+    title: 'DaySmart Alternatives: Modern Grooming Software',
     type: 'landing',
     path: '/daysmart-alternatives',
   },
   {
     slug: 'pawfinity-alternatives',
-    title: 'Pawfinity Alternatives: Why Groomers Are Switching',
+    title: 'Pawfinity Alternatives: AI-Powered Grooming Software',
     type: 'landing',
     path: '/pawfinity-alternatives',
   },
   {
     slug: '123-pet-grooming-software-alternatives',
-    title: '123 Pet Grooming Software Alternatives',
+    title: '123Pet Grooming Software Alternatives — Better Options for 2026',
     type: 'landing',
     path: '/123-pet-grooming-software-alternatives',
   },
@@ -120,18 +120,29 @@ const landingPages: ContentPage[] = [
     type: 'landing',
     path: '/features/mobile-groomer',
   },
+  {
+    slug: 'dog-grooming-schedule-template',
+    title: 'Free Dog Grooming Schedule Template (2026) — Download & Customize | GroomGrid',
+    type: 'landing',
+    path: '/dog-grooming-schedule-template',
+  },
 ];
 
 // ────────────────────────────────────────────────────────
 // DATA: BLOG PAGES (derived from blog-posts.ts)
 // ────────────────────────────────────────────────────────
 
-const blogPages: ContentPage[] = blogPosts.map((post) => ({
-  slug: post.slug,
-  title: post.title,
-  type: 'blog' as const,
-  path: `/blog/${post.slug}`,
-}));
+// Filter out blog posts whose slug collides with a landing page
+// (e.g., dog-grooming-schedule-template exists as both landing + blog)
+const landingSlugs = new Set(landingPages.map((p) => p.slug));
+const blogPages: ContentPage[] = blogPosts
+  .filter((post) => !landingSlugs.has(post.slug))
+  .map((post) => ({
+    slug: post.slug,
+    title: post.title,
+    type: 'blog' as const,
+    path: `/blog/${post.slug}`,
+  }));
 
 // ────────────────────────────────────────────────────────
 // DATA: ALL CONTENT PAGES
@@ -155,15 +166,15 @@ export const topicClusters: TopicCluster[] = [
       { slug: 'dog-grooming-software', title: "Dog Grooming Software: The 2026 Buyer's Guide", type: 'blog', path: '/blog/dog-grooming-software' },
       { slug: 'best-dog-grooming-software', title: 'Best Dog Grooming Software (2026) — GroomGrid vs MoeGo vs DaySmart', type: 'landing', path: '/best-dog-grooming-software' },
       { slug: 'moego-alternatives', title: 'MoeGo Alternatives: Better Grooming Software for Less | GroomGrid', type: 'landing', path: '/moego-alternatives' },
-      { slug: 'daysmart-alternatives', title: 'DaySmart Alternatives', type: 'landing', path: '/daysmart-alternatives' },
+      { slug: 'daysmart-alternatives', title: 'DaySmart Alternatives: Modern Grooming Software', type: 'landing', path: '/daysmart-alternatives' },
       { slug: 'groomgrid-vs-moego', title: 'GroomGrid vs MoeGo', type: 'blog', path: '/blog/groomgrid-vs-moego' },
       { slug: 'groomgrid-vs-daysmart', title: 'GroomGrid vs DaySmart Pet', type: 'blog', path: '/blog/groomgrid-vs-daysmart' },
       { slug: 'groomgrid-vs-pawfinity', title: 'GroomGrid vs Pawfinity', type: 'blog', path: '/blog/groomgrid-vs-pawfinity' },
-      { slug: 'pawfinity-alternatives', title: 'Pawfinity Alternatives', type: 'landing', path: '/pawfinity-alternatives' },
+      { slug: 'pawfinity-alternatives', title: 'Pawfinity Alternatives: AI-Powered Grooming Software', type: 'landing', path: '/pawfinity-alternatives' },
       { slug: 'pet-grooming-software', title: 'Pet Grooming Software: What It Is and Why Your Business Needs It', type: 'blog', path: '/blog/pet-grooming-software' },
-      { slug: 'free-dog-grooming-software', title: 'Free Dog Grooming Software: What You Actually Get', type: 'blog', path: '/blog/free-dog-grooming-software' },
+      { slug: 'free-dog-grooming-software', title: 'Free Pet Grooming Software: What You Actually Get', type: 'blog', path: '/blog/free-dog-grooming-software' },
       { slug: 'best-pet-grooming-software', title: 'Best Pet Grooming Software in 2026', type: 'blog', path: '/blog/best-pet-grooming-software' },
-      { slug: 'dog-grooming-appointment-app', title: 'Best Dog Grooming Appointment App', type: 'blog', path: '/blog/dog-grooming-appointment-app' },
+      { slug: 'dog-grooming-appointment-app', title: 'Best Pet Grooming App & Scheduling Software (2026)', type: 'blog', path: '/blog/dog-grooming-appointment-app' },
       { slug: '123-pet-grooming-software-alternatives', title: '123 Pet Grooming Software Alternatives', type: 'landing', path: '/123-pet-grooming-software-alternatives' },
       { slug: 'pet-grooming-business-software', title: 'Pet Grooming Business Software — Manage Your Salon | GroomGrid', type: 'landing', path: '/pet-grooming-business-software' },
       { slug: 'dog-grooming-scheduling-software', title: 'Dog Grooming Scheduling Software', type: 'landing', path: '/dog-grooming-scheduling-software' },
@@ -183,6 +194,7 @@ export const topicClusters: TopicCluster[] = [
       { slug: 'dog-grooming-business-plan-template', title: 'Dog Grooming Business Plan Template', type: 'blog', path: '/blog/dog-grooming-business-plan-template' },
       { slug: 'mobile-dog-grooming-business-plan', title: 'Mobile Dog Grooming Business Plan', type: 'blog', path: '/blog/mobile-dog-grooming-business-plan' },
       { slug: 'mobile-grooming-business', title: 'Mobile Grooming Business Guide', type: 'landing', path: '/mobile-grooming-business' },
+      { slug: 'how-to-start-dog-grooming-business-no-money', title: 'How to Start a Dog Grooming Business With No Money', type: 'blog', path: '/blog/how-to-start-dog-grooming-business-no-money' },
     ],
   },
   {
@@ -212,6 +224,8 @@ export const topicClusters: TopicCluster[] = [
       { slug: 'dog-grooming-contract-template', title: 'Dog Grooming Contract Template', type: 'blog', path: '/blog/dog-grooming-contract-template' },
       { slug: 'dog-grooming-waiver-template', title: 'Dog Grooming Waiver Template', type: 'blog', path: '/blog/dog-grooming-waiver-template' },
       { slug: 'grooming-business-operations', title: 'Grooming Business Operations Hub', type: 'landing', path: '/grooming-business-operations' },
+      { slug: 'dog-grooming-schedule-template', title: 'Free Dog Grooming Schedule Template (2026)', type: 'landing', path: '/dog-grooming-schedule-template' },
+      { slug: 'dog-grooming-schedule-template', title: 'Free Dog Grooming Schedule Template (Printable)', type: 'blog', path: '/blog/dog-grooming-schedule-template' },
     ],
   },
   {
@@ -444,6 +458,7 @@ export function getFooterColumns(slug?: string): FooterColumn[] {
         { href: '/pet-grooming-business-software', label: 'Pet Grooming Business Software' },
         { href: '/mobile-grooming-software', label: 'Mobile Grooming Software' },
         { href: '/cat-grooming-software', label: 'Cat Grooming Software' },
+        { href: '/dog-grooming-schedule-template', label: 'Schedule Template' },
       ],
     },
     {
@@ -460,6 +475,7 @@ export function getFooterColumns(slug?: string): FooterColumn[] {
         { href: '/blog/dog-grooming-business-plan-template', label: 'Business Plan Template' },
         { href: '/blog/reduce-no-shows-dog-grooming', label: 'Reduce No-Shows' },
         { href: '/blog/free-dog-grooming-software', label: 'Free Grooming Software' },
+        { href: '/blog/how-to-start-dog-grooming-business-no-money', label: 'Start With No Money' },
       ],
     },
     {

@@ -12,6 +12,8 @@ export interface BillingSummaryData {
   currency: string;
   isTrial: boolean;
   trialDays?: number;
+  promoCode?: string;
+  promoDescription?: string;
 }
 
 interface BillingSummaryProps {
@@ -48,11 +50,16 @@ export default function BillingSummary({ data, className, compact = false }: Bil
             <div>
               <p className="text-sm font-medium text-stone-700">{data.planName}</p>
               <p className="text-xs text-stone-500">
-                {data.isTrial 
-                  ? `Free for ${data.trialDays || 14} days, then ${formatAmount(data.recurringAmount)}/mo` 
+                {data.isTrial
+                  ? `Free for ${data.trialDays || 14} days, then ${formatAmount(data.recurringAmount)}/mo`
                   : `${formatAmount(data.recurringAmount)}/mo`
                 }
               </p>
+              {data.promoCode && (
+                <p className="text-xs text-green-600 font-medium mt-0.5">
+                  Code {data.promoCode} applied{data.promoDescription ? ` — ${data.promoDescription}` : ''}
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -104,6 +111,18 @@ export default function BillingSummary({ data, className, compact = false }: Bil
             <p className="text-sm text-green-700">
               <span className="font-medium">{data.trialDays}-day free trial</span>
               {" "}No charge until trial ends. Cancel anytime.
+            </p>
+          </div>
+        )}
+
+        {/* Promo code note */}
+        {data.promoCode && (
+          <div className="flex items-start gap-2 py-2 bg-green-50 rounded-md px-3">
+            <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" aria-hidden="true" />
+            <p className="text-sm text-green-700">
+              <span className="font-medium">Promo code {data.promoCode} applied</span>
+              {data.promoDescription && <>{": "}{data.promoDescription}</>}
+              {" "}Discount applied at checkout.
             </p>
           </div>
         )}

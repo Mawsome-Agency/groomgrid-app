@@ -5,7 +5,6 @@
  *
  * Shows current GitHub PR pipeline status for groomgrid-app.
  * Auto-refreshes every 30 seconds (only when tab is visible).
- * Follows the ab-tests page pattern.
  */
 
 import React, { useEffect, useState, useCallback } from 'react';

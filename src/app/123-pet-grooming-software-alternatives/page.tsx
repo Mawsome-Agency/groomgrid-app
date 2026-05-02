@@ -6,16 +6,16 @@ import PageRelatedLinks from '@/components/marketing/PageRelatedLinks';
 import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
-  title: '123Pet Grooming Software Alternatives: Best Pet Grooming Software for 2026 | GroomGrid',
+  title: '123Pet Grooming Software Alternatives — Better Options for 2026 | GroomGrid',
   description:
-    'Looking for 123Pet grooming software alternatives? 123Pet is now DaySmart Pet — compare GroomGrid, MoeGo, and Pawfinity on pricing, features, AI tools, and mobile access.',
+    '123Pet is now DaySmart Pet. Compare better alternatives — GroomGrid, MoeGo, Pawfinity — on AI features, pricing, and mobile access. Try GroomGrid free.',
   alternates: {
     canonical: 'https://getgroomgrid.com/123-pet-grooming-software-alternatives',
   },
   openGraph: {
-    title: '123Pet Grooming Software Alternatives: Best Pet Grooming Software for 2026',
+    title: '123Pet Grooming Software Alternatives — Better Options for 2026',
     description:
-      'Looking for 123Pet grooming software alternatives? Compare GroomGrid, MoeGo, and Pawfinity on pricing, features, and mobile access.',
+      '123Pet is now DaySmart Pet. Compare better alternatives — GroomGrid, MoeGo, Pawfinity — on AI features, pricing, and mobile access.',
     url: 'https://getgroomgrid.com/123-pet-grooming-software-alternatives',
     type: 'article',
   },
@@ -24,9 +24,9 @@ export const metadata: Metadata = {
 const articleSchema = {
   '@context': 'https://schema.org',
   '@type': 'Article',
-  headline: '123Pet Grooming Software Alternatives: Best Pet Grooming Software for 2026',
+  headline: '123Pet Grooming Software Alternatives — Better Options for 2026',
   description:
-    'Looking for 123Pet grooming software alternatives? 123Pet is now DaySmart Pet — compare GroomGrid, MoeGo, and Pawfinity on pricing, features, and mobile access.',
+    '123Pet is now DaySmart Pet. Compare better alternatives — GroomGrid, MoeGo, Pawfinity — on AI features, pricing, and mobile access. Try GroomGrid free.',
   url: 'https://getgroomgrid.com/123-pet-grooming-software-alternatives',
   datePublished: '2026-04-28',
   dateModified: '2026-04-28',
@@ -141,7 +141,7 @@ export default function Pet123GroomingSoftwareAlternativesPage() {
             Software Comparison · Updated April 2026
           </p>
           <h1 className="text-4xl sm:text-5xl font-extrabold text-stone-900 leading-tight mb-6">
-            123Pet Grooming Software Alternatives:<br className="hidden sm:block" /> Best Pet Grooming Software for 2026
+            123Pet Grooming Software Alternatives:<br className="hidden sm:block" /> Better Options for 2026
           </h1>
           <p className="text-xl text-stone-600 leading-relaxed max-w-3xl">
             123Pet is now DaySmart Pet — and while the name changed, the desktop-first design

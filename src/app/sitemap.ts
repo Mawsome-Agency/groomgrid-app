@@ -49,6 +49,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     'best-dog-grooming-software',
     'cat-grooming-software',
     'dog-grooming-scheduling-software',
+    'dog-grooming-schedule-template',
     'grooming-business-operations',
     'mobile-grooming-business',
     'mobile-grooming-software',

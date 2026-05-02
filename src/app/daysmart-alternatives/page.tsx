@@ -6,16 +6,16 @@ import PageRelatedLinks from '@/components/marketing/PageRelatedLinks';
 import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
-  title: 'DaySmart Alternatives: Best Pet Grooming Software for 2026 | GroomGrid',
+  title: 'DaySmart Alternatives: Modern Grooming Software | GroomGrid',
   description:
-    'Comparing DaySmart Pet alternatives? See how GroomGrid, MoeGo, and Pawfinity stack up on pricing, features, ease of use, and mobile access — and why groomers are switching.',
+    'DaySmart Pet feels dated? Compare modern alternatives — GroomGrid, MoeGo, Pawfinity — on AI features, pricing, and mobile access. Try GroomGrid free.',
   alternates: {
     canonical: 'https://getgroomgrid.com/daysmart-alternatives',
   },
   openGraph: {
-    title: 'DaySmart Alternatives: Best Pet Grooming Software for 2026',
+    title: 'DaySmart Alternatives: Modern Grooming Software',
     description:
-      'Comparing DaySmart Pet alternatives? See how GroomGrid, MoeGo, and Pawfinity stack up on pricing, features, ease of use, and mobile access.',
+      'DaySmart Pet feels dated? Compare modern alternatives — GroomGrid, MoeGo, Pawfinity — on AI features, pricing, and mobile access.',
     url: 'https://getgroomgrid.com/daysmart-alternatives',
     type: 'article',
   },
@@ -24,9 +24,9 @@ export const metadata: Metadata = {
 const articleSchema = {
   '@context': 'https://schema.org',
   '@type': 'Article',
-  headline: 'DaySmart Alternatives: Best Pet Grooming Software for 2026',
+  headline: 'DaySmart Alternatives: Modern Grooming Software',
   description:
-    'Comparing DaySmart Pet alternatives? See how GroomGrid, MoeGo, and Pawfinity stack up on pricing, features, ease of use, and mobile access — and why groomers are switching.',
+    'DaySmart Pet feels dated? Compare modern alternatives — GroomGrid, MoeGo, Pawfinity — on AI features, pricing, and mobile access. Try GroomGrid free.',
   url: 'https://getgroomgrid.com/daysmart-alternatives',
   datePublished: '2026-04-23',
   dateModified: '2026-04-23',
@@ -140,7 +140,7 @@ export default function DaySmartAlternativesPage() {
             Software Comparison · Updated April 2026
           </p>
           <h1 className="text-4xl sm:text-5xl font-extrabold text-stone-900 leading-tight mb-6">
-            DaySmart Alternatives:<br className="hidden sm:block" /> Best Pet Grooming Software for 2026
+            DaySmart Alternatives:<br className="hidden sm:block" /> Modern Grooming Software
           </h1>
           <p className="text-xl text-stone-600 leading-relaxed max-w-3xl">
             DaySmart Pet has been around for years — but that longevity comes with legacy design

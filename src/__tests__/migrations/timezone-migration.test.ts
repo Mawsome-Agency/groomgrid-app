@@ -140,13 +140,11 @@ describe('timezone migration — 20260417000002_add_timezone_to_users', () => {
   // Migration ordering (sequential safety)
   // ──────────────────────────────────────────────
   describe('migration ordering', () => {
-    it('migration timestamp 20260417000002 sorts after payment_lockouts (000000) and ab_tests (000001)', () => {
+    it('migration timestamp 20260417000002 sorts after payment_lockouts (000000) and token_models (000002)', () => {
       const PAYMENT_LOCKOUTS = '20260417000000';
-      const AB_TESTS = '20260417000001';
       const TIMEZONE = '20260417000002';
 
       expect(TIMEZONE > PAYMENT_LOCKOUTS).toBe(true);
-      expect(TIMEZONE > AB_TESTS).toBe(true);
     });
 
     it('migration directory name follows Prisma naming convention (timestamp_description)', () => {

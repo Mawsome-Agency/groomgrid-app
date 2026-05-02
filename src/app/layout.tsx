@@ -2,13 +2,6 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import Script from 'next/script';
-import { SessionProvider } from '@/components/SessionProvider';
-import { ABTestProvider } from '@/components/ab-test';
-import SessionExpirationDetector from '@/components/session-expiration/SessionExpirationDetector';
-import { NetworkStatusProvider } from '@/context/NetworkStatusContext';
-import { RequestQueueProvider } from '@/context/RequestQueueContext';
-import { OfflineBanner } from '@/components/network';
-import DeploymentVersionCheck from '@/components/deployment/DeploymentVersionCheck';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -116,18 +109,7 @@ export default function RootLayout({
         </Script>
       </head>
       <body className={inter.className}>
-        <SessionProvider>
-          <ABTestProvider>
-            <NetworkStatusProvider>
-              <RequestQueueProvider>
-                <OfflineBanner position="top" className="fixed inset-x-0 top-0" />
-                {children}
-                <SessionExpirationDetector />
-                <DeploymentVersionCheck />
-              </RequestQueueProvider>
-            </NetworkStatusProvider>
-          </ABTestProvider>
-        </SessionProvider>
+        {children}
       </body>
     </html>
   );

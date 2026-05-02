@@ -97,20 +97,3 @@ export async function trackPurchaseCompletedServer(
 ): Promise<void> {
   return;
 }
-
-export async function trackABTestAssignedServer(
-  _userId: string,
-  _testName: string,
-  _variant: 'A' | 'B'
-): Promise<void> {
-  return;
-}
-
-export async function trackABTestConvertedServer(
-  _userId: string,
-  _testName: string,
-  _variant: 'A' | 'B',
-  _event: string
-): Promise<void> {
-  return;
-}

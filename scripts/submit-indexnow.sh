@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Submit all 32 GroomGrid URLs to IndexNow (Bing/Yandex/Seznam).
+# Submit all GroomGrid URLs to IndexNow (Bing/Yandex/Seznam).
 #
 # Prerequisites:
 #   - public/f47ac10b58cc4372a5670e02b2c3d479.txt must be deployed and returning 200
@@ -15,20 +15,29 @@ KEY="f47ac10b58cc4372a5670e02b2c3d479"
 KEY_LOCATION="https://${HOST}/${KEY}.txt"
 API_ENDPOINT="https://api.indexnow.org/indexnow"
 
-# All 32 URLs derived from src/app/sitemap.ts + src/lib/blog-posts.ts
+# All URLs derived from src/app/sitemap.ts + src/lib/blog-posts.ts
+# Auto-generated from: static pages + landing pages + feature pages + all blog posts
 URLS=$(cat <<'EOF'
 [
   "https://getgroomgrid.com",
   "https://getgroomgrid.com/signup",
   "https://getgroomgrid.com/plans",
   "https://getgroomgrid.com/blog",
+  "https://getgroomgrid.com/privacy",
+  "https://getgroomgrid.com/terms",
   "https://getgroomgrid.com/best-dog-grooming-software",
+  "https://getgroomgrid.com/cat-grooming-software",
+  "https://getgroomgrid.com/dog-grooming-scheduling-software",
+  "https://getgroomgrid.com/dog-grooming-schedule-template",
   "https://getgroomgrid.com/grooming-business-operations",
   "https://getgroomgrid.com/mobile-grooming-business",
   "https://getgroomgrid.com/mobile-grooming-software",
   "https://getgroomgrid.com/moego-alternatives",
   "https://getgroomgrid.com/daysmart-alternatives",
   "https://getgroomgrid.com/pawfinity-alternatives",
+  "https://getgroomgrid.com/pet-grooming-business-software",
+  "https://getgroomgrid.com/123-pet-grooming-software-alternatives",
+  "https://getgroomgrid.com/features/mobile-groomer",
   "https://getgroomgrid.com/blog/dog-grooming-waiver-template",
   "https://getgroomgrid.com/blog/dog-grooming-software",
   "https://getgroomgrid.com/blog/dog-grooming-business-management",
@@ -49,7 +58,20 @@ URLS=$(cat <<'EOF'
   "https://getgroomgrid.com/blog/how-to-start-dog-grooming-business-at-home",
   "https://getgroomgrid.com/blog/how-to-open-a-pet-grooming-business",
   "https://getgroomgrid.com/blog/how-to-build-mobile-grooming-trailer",
-  "https://getgroomgrid.com/blog/free-dog-grooming-software"
+  "https://getgroomgrid.com/blog/free-dog-grooming-software",
+  "https://getgroomgrid.com/blog/groomgrid-vs-daysmart",
+  "https://getgroomgrid.com/blog/groomgrid-vs-pawfinity",
+  "https://getgroomgrid.com/blog/cat-grooming-business-guide",
+  "https://getgroomgrid.com/blog/dog-grooming-pricing-guide",
+  "https://getgroomgrid.com/blog/how-to-become-a-dog-groomer",
+  "https://getgroomgrid.com/blog/do-you-tip-dog-groomers",
+  "https://getgroomgrid.com/blog/how-much-do-dog-groomers-make",
+  "https://getgroomgrid.com/blog/dog-grooming-business-insurance",
+  "https://getgroomgrid.com/blog/dog-grooming-appointment-app",
+  "https://getgroomgrid.com/blog/dog-grooming-business-plan-template",
+  "https://getgroomgrid.com/blog/dog-grooming-scheduling-software-guide",
+  "https://getgroomgrid.com/blog/how-to-start-dog-grooming-business-no-money",
+  "https://getgroomgrid.com/blog/dog-grooming-schedule-template"
 ]
 EOF
 )

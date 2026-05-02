@@ -130,8 +130,6 @@ jest.mock('@/lib/ga4-server', () => ({
   trackPaymentInitiatedServer: jest.fn().mockResolvedValue(undefined),
   trackPaymentSuccessServer: jest.fn().mockResolvedValue(undefined),
   trackPaymentFailedServer: jest.fn().mockResolvedValue(undefined),
-  trackABTestAssignedServer: jest.fn().mockResolvedValue(undefined),
-  trackABTestConvertedServer: jest.fn().mockResolvedValue(undefined),
 }));
 jest.mock('@/lib/payment-lockout', () => ({
   updatePaymentLockoutStatus: jest.fn(),

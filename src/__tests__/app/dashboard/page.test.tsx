@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import DashboardPage from '@/app/dashboard/page';
+import DashboardPage from '@/app/(dashboard)/dashboard/page';
 import { useSession } from 'next-auth/react';
 
 // Mock next-auth

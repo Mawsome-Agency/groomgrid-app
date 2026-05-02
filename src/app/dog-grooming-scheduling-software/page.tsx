@@ -7,15 +7,15 @@ import SiteFooter from '@/components/marketing/SiteFooter';
 import { generateBreadcrumbListSchema, generateOpenGraph } from '@/lib/seo/schema';
 
 export const metadata: Metadata = {
-  title: 'Dog Grooming Scheduling Software — Easy Booking & Reminders | GroomGrid',
+  title: 'Dog Grooming Scheduling Software — Automated Booking | GroomGrid',
   description:
-    'Grooming scheduling software that auto-sends reminders, blocks double bookings, and works from your phone. Try free 14 days.',
+    'Dog grooming scheduling software with automated booking, SMS reminders, and no-show prevention. Works from your phone. Start your free trial.',
   alternates: {
     canonical: 'https://getgroomgrid.com/dog-grooming-scheduling-software',
   },
   openGraph: generateOpenGraph(
-    'Dog Grooming Scheduling Software — Easy Booking & Reminders',
-    'Grooming scheduling software that auto-sends reminders, blocks double bookings, and works from your phone. Try free 14 days.',
+    'Dog Grooming Scheduling Software — Automated Booking',
+    'Dog grooming scheduling software with automated booking, SMS reminders, and no-show prevention. Start your free trial.',
     'https://getgroomgrid.com/dog-grooming-scheduling-software'
   ),
 };
@@ -23,9 +23,9 @@ export const metadata: Metadata = {
 const serviceSchema = {
   '@context': 'https://schema.org',
   '@type': 'Service',
-  name: 'GroomGrid Dog Grooming Scheduling Software',
+  name: 'Dog Grooming Scheduling Software — Automated Booking | GroomGrid',
   description:
-    'AI-powered scheduling software for dog groomers with automated reminders, conflict blocking, and mobile-first booking.',
+    'AI-powered dog grooming scheduling software with automated booking, SMS reminders, no-show prevention, and mobile-first design.',
   provider: {
     '@type': 'Organization',
     name: 'GroomGrid',
@@ -413,7 +413,7 @@ export default function DogGroomingSchedulingSoftwarePage() {
             Scheduling Software • Updated April 2026
           </p>
           <h1 className="text-4xl sm:text-5xl font-extrabold text-stone-900 leading-tight mb-6">
-            Dog Grooming Scheduling Software<br className="hidden sm:block" /> — Book Appointments in 2 Taps
+            Dog Grooming Scheduling Software<br className="hidden sm:block" /> — Automated Booking
           </h1>
           <p className="text-xl text-stone-600 leading-relaxed max-w-3xl">
             Stop double bookings, no-shows, and phone-tag forever. GroomGrid's scheduling software

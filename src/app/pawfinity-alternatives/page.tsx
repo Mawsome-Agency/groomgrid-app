@@ -6,16 +6,16 @@ import PageRelatedLinks from '@/components/marketing/PageRelatedLinks';
 import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
-  title: 'Pawfinity Alternatives: Best Pet Grooming Software for 2026 | GroomGrid',
+  title: 'Pawfinity Alternatives: AI-Powered Grooming Software | GroomGrid',
   description:
-    'Looking for Pawfinity alternatives? Compare GroomGrid, MoeGo, and DaySmart on pricing, features, mobile access, and ease of use — and see why groomers are making the switch.',
+    'Pawfinity not cutting it? Compare AI-powered alternatives — GroomGrid, MoeGo, DaySmart — on pricing, features, and mobile access. Start your free trial.',
   alternates: {
     canonical: 'https://getgroomgrid.com/pawfinity-alternatives',
   },
   openGraph: {
-    title: 'Pawfinity Alternatives: Best Pet Grooming Software for 2026',
+    title: 'Pawfinity Alternatives: AI-Powered Grooming Software',
     description:
-      'Looking for Pawfinity alternatives? Compare GroomGrid, MoeGo, and DaySmart on pricing, features, mobile access, and ease of use.',
+      'Pawfinity not cutting it? Compare AI-powered alternatives — GroomGrid, MoeGo, DaySmart — on pricing, features, and mobile access.',
     url: 'https://getgroomgrid.com/pawfinity-alternatives',
     type: 'article',
   },
@@ -24,9 +24,9 @@ export const metadata: Metadata = {
 const articleSchema = {
   '@context': 'https://schema.org',
   '@type': 'Article',
-  headline: 'Pawfinity Alternatives: Best Pet Grooming Software for 2026',
+  headline: 'Pawfinity Alternatives: AI-Powered Grooming Software',
   description:
-    'Looking for Pawfinity alternatives? Compare GroomGrid, MoeGo, and DaySmart on pricing, features, mobile access, and ease of use — and see why groomers are making the switch.',
+    'Pawfinity not cutting it? Compare AI-powered alternatives — GroomGrid, MoeGo, DaySmart — on pricing, features, and mobile access. Start your free trial.',
   url: 'https://getgroomgrid.com/pawfinity-alternatives',
   datePublished: '2026-04-23',
   dateModified: '2026-04-23',
@@ -140,7 +140,7 @@ export default function PawfinityAlternativesPage() {
             Software Comparison · Updated April 2026
           </p>
           <h1 className="text-4xl sm:text-5xl font-extrabold text-stone-900 leading-tight mb-6">
-            Pawfinity Alternatives:<br className="hidden sm:block" /> Best Pet Grooming Software for 2026
+            Pawfinity Alternatives:<br className="hidden sm:block" /> AI-Powered Grooming Software
           </h1>
           <p className="text-xl text-stone-600 leading-relaxed max-w-3xl">
             Pawfinity is a popular choice for indie groomers — affordable and simple. But

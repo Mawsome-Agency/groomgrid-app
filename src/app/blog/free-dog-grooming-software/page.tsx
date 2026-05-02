@@ -6,15 +6,15 @@ import PageRelatedLinks from '@/components/marketing/PageRelatedLinks';
 import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
-  title: 'Free Dog Grooming Software 2026: Reviews, Hidden Costs & Better Alternatives | GroomGrid',
+  title: 'Free Pet Grooming Software 2026: Reviews, Hidden Costs & Better Alternatives | GroomGrid',
   description:
-    'Searching for free dog grooming software? We review every real option — Google Calendar stacks, Setmore, SimplyBook — calculate their hidden costs, and show why a $29/mo trial beats free every time.',
+    'Searching for free pet grooming software? We review every real option — Google Calendar stacks, Setmore, SimplyBook — calculate their hidden costs, and show why a $29/mo trial beats free every time. Works for dogs and cats.',
   alternates: {
     canonical: 'https://getgroomgrid.com/blog/free-dog-grooming-software',
   },
   openGraph: {
-    title: 'Free Dog Grooming Software: Reviews, Hidden Costs & Better Alternatives',
-    description: 'Why free grooming tools cost solo groomers more than they save — and what to use instead.',
+    title: 'Free Pet Grooming Software: Reviews, Hidden Costs & Better Alternatives',
+    description: 'Honest look at free pet grooming software — what features free tiers include, where they fall short, and when paying $29/month actually saves you money.',
     url: 'https://getgroomgrid.com/blog/free-dog-grooming-software',
     type: 'article',
   },

@@ -197,15 +197,15 @@ describe('allContentPages', () => {
     });
   });
 
-  it('includes all blog post slugs from blog-posts.ts', () => {
-    // This test ensures the registry doesn't miss any blog posts
-    // We'll import blogPosts to cross-reference
+  it('includes all blog post slugs from blog-posts.ts (or landing page equivalent)', () => {
+    // Blog posts whose slug matches a landing page are excluded from the blog
+    // list to prevent duplicates — the landing page version is kept instead.
+    // This test ensures every blog post slug appears in allContentPages
+    // (either as a blog or landing page type).
     const { blogPosts } = require('@/lib/blog-posts');
-    const registrySlugs = allContentPages
-      .filter((p) => p.type === 'blog')
-      .map((p) => p.slug);
+    const allSlugs = new Set(allContentPages.map((p) => p.slug));
     blogPosts.forEach((post: { slug: string }) => {
-      expect(registrySlugs).toContain(post.slug);
+      expect(allSlugs.has(post.slug)).toBe(true);
     });
   });
 
