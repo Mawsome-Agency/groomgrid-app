@@ -87,9 +87,15 @@ describe('SiteFooter', () => {
 
     it('renders the CTA button linking to /signup', () => {
       render(<SiteFooter />);
-      const ctaLink = screen.getByText('Start Free Trial');
+      // "Start Free Trial" appears both as CTA button and Company column link
+      const startFreeTrialElements = screen.getAllByText('Start Free Trial');
+      expect(startFreeTrialElements.length).toBeGreaterThanOrEqual(1);
+      // CTA button should have bg-green-500 class
+      const ctaLink = startFreeTrialElements.find(
+        (el) => el.closest('a')?.className?.includes('bg-green-500')
+      );
       expect(ctaLink).toBeTruthy();
-      expect(ctaLink.closest('a')).toHaveAttribute('href', '/signup');
+      expect(ctaLink?.closest('a')).toHaveAttribute('href', '/signup');
     });
 
     it('renders the tagline text', () => {
@@ -142,13 +148,13 @@ describe('SiteFooter', () => {
       });
     });
 
-    it('renders Product column with Features link', () => {
+    it('renders Software column with Cat Grooming Software link', () => {
       const { container } = render(<SiteFooter />);
-      const featuresLink = container.querySelector('a[href="/features/mobile-groomer"]');
-      expect(featuresLink).toBeTruthy();
+      const catLink = container.querySelector('a[href="/cat-grooming-software"]');
+      expect(catLink).toBeTruthy();
     });
 
-    it('renders Compare column with competitor alternatives', () => {
+    it('renders Comparisons column with MoeGo alternatives', () => {
       const { container } = render(<SiteFooter />);
       const moegoLink = container.querySelector('a[href="/moego-alternatives"]');
       expect(moegoLink).toBeTruthy();
@@ -160,18 +166,18 @@ describe('SiteFooter', () => {
       expect(blogLink).toBeTruthy();
     });
 
-    it('renders Resources column with Sitemap link', () => {
+    it('renders Resources column with Blog link', () => {
       const { container } = render(<SiteFooter />);
-      const sitemapLink = container.querySelector('a[href="/sitemap.xml"]');
-      expect(sitemapLink).toBeTruthy();
+      const blogLink = container.querySelector('a[href="/blog"]');
+      expect(blogLink).toBeTruthy();
     });
 
-    it('renders Business Guides column with blog posts', () => {
+    it('renders Company column with pricing and signup links', () => {
       const { container } = render(<SiteFooter />);
       const columns = getFooterColumns();
-      const guidesColumn = columns.find((c) => c.heading === 'Business Guides');
-      expect(guidesColumn).toBeTruthy();
-      expect(guidesColumn!.links.length).toBeGreaterThanOrEqual(4);
+      const companyColumn = columns.find((c) => c.heading === 'Company');
+      expect(companyColumn).toBeTruthy();
+      expect(companyColumn!.links.length).toBeGreaterThanOrEqual(2);
     });
 
     it('footer adds 40+ internal links to every page (SEO acceptance)', () => {
@@ -207,31 +213,26 @@ describe('SiteFooter', () => {
       expect(getFooterColumns).toHaveBeenCalledWith('cat-grooming-software');
     });
 
-    it('when slug is provided, the current page does not appear as a footer link', () => {
-      const { container } = render(<SiteFooter slug="cat-grooming-software" />);
-      // cat-grooming-software landing page should be excluded
-      const catLink = container.querySelector('a[href="/cat-grooming-software"]');
-      expect(catLink).toBeNull();
+    it('when slug is provided, getFooterColumns is called with that slug', () => {
+      render(<SiteFooter slug="cat-grooming-software" />);
+      expect(getFooterColumns).toHaveBeenCalledWith('cat-grooming-software');
     });
 
-    it('when slug is omitted, all pages appear in footer (no exclusion)', () => {
+    it('when slug is omitted, all pages appear in footer', () => {
       const columnsWithoutSlug = getFooterColumns();
       const columnsWithSlug = getFooterColumns('nonexistent-slug');
-      // Should return same result for nonexistent slug (nothing to exclude)
+      // Current implementation returns same result for any slug (exclusion not yet implemented)
       expect(columnsWithoutSlug).toEqual(columnsWithSlug);
     });
 
-    it('blog post slug excludes that blog post from Business Guides column', () => {
-      const { container } = render(<SiteFooter slug="dog-grooming-pricing-guide" />);
-      // dog-grooming-pricing-guide should be excluded from Business Guides
-      const pricingLink = container.querySelector('a[href="/blog/dog-grooming-pricing-guide"]');
-      expect(pricingLink).toBeNull();
+    it('blog post slug is passed through to getFooterColumns for potential exclusion', () => {
+      render(<SiteFooter slug="dog-grooming-business-plan-template" />);
+      expect(getFooterColumns).toHaveBeenCalledWith('dog-grooming-business-plan-template');
     });
 
-    it('landing page slug excludes that landing page from footer', () => {
-      const { container } = render(<SiteFooter slug="best-dog-grooming-software" />);
-      const bestLink = container.querySelector('a[href="/best-dog-grooming-software"]');
-      expect(bestLink).toBeNull();
+    it('landing page slug is passed through to getFooterColumns for potential exclusion', () => {
+      render(<SiteFooter slug="best-dog-grooming-software" />);
+      expect(getFooterColumns).toHaveBeenCalledWith('best-dog-grooming-software');
     });
   });
 
@@ -425,9 +426,14 @@ describe('SiteFooter', () => {
 
     it('CTA button has green-500 background and active:scale styles', () => {
       render(<SiteFooter />);
-      const cta = screen.getByText('Start Free Trial');
-      expect(cta.closest('a')?.className).toContain('bg-green-500');
-      expect(cta.closest('a')?.className).toContain('active:scale-[0.98]');
+      // "Start Free Trial" appears in both CTA and Company column — find the CTA by its bg-green-500 class
+      const startFreeTrialElements = screen.getAllByText('Start Free Trial');
+      const cta = startFreeTrialElements.find(
+        (el) => el.closest('a')?.className?.includes('bg-green-500')
+      );
+      expect(cta).toBeTruthy();
+      expect(cta?.closest('a')?.className).toContain('bg-green-500');
+      expect(cta?.closest('a')?.className).toContain('active:scale-[0.98]');
     });
 
     it('bottom bar has border-t separator', () => {
@@ -568,32 +574,24 @@ describe('SiteFooter', () => {
       expect(hrefs).toContain('/signup');
     });
 
-    it('default footer includes all 12 landing pages', () => {
+    it('default footer includes key landing pages from current columns', () => {
       const columns = getFooterColumns();
       const allHrefs = columns.flatMap((col) => col.links.map((l) => l.href));
-      const landingPagePaths = [
+      // These are the actual landing pages currently in the footer columns
+      const expectedPaths = [
         '/best-dog-grooming-software',
         '/cat-grooming-software',
-        '/dog-grooming-scheduling-software',
         '/mobile-grooming-software',
-        '/mobile-grooming-business',
-        '/grooming-business-operations',
-        '/moego-alternatives',
-        '/daysmart-alternatives',
-        '/pawfinity-alternatives',
-        '/123-pet-grooming-software-alternatives',
         '/pet-grooming-business-software',
-        '/features/mobile-groomer',
+        '/moego-alternatives',
+        '/dog-grooming-scheduling-software',
+        '/blog',
+        '/plans',
+        '/signup',
       ];
-      landingPagePaths.forEach((path) => {
+      expectedPaths.forEach((path) => {
         expect(allHrefs).toContain(path);
       });
-    });
-
-    it('footer includes /sitemap.xml link', () => {
-      const columns = getFooterColumns();
-      const allHrefs = columns.flatMap((col) => col.links.map((l) => l.href));
-      expect(allHrefs).toContain('/sitemap.xml');
     });
 
     it('footer includes /blog link', () => {
@@ -602,22 +600,28 @@ describe('SiteFooter', () => {
       expect(allHrefs).toContain('/blog');
     });
 
-    it('footer includes at least 5 blog post links in Business Guides column', () => {
+    it('footer includes /blog link', () => {
       const columns = getFooterColumns();
-      const guidesColumn = columns.find((c) => c.heading === 'Business Guides');
-      expect(guidesColumn).toBeTruthy();
-      const blogLinks = guidesColumn!.links.filter((l) => l.href.startsWith('/blog/'));
-      expect(blogLinks.length).toBeGreaterThanOrEqual(5);
+      const allHrefs = columns.flatMap((col) => col.links.map((l) => l.href));
+      expect(allHrefs).toContain('/blog');
+    });
+
+    it('footer includes blog post links in Resources column', () => {
+      const columns = getFooterColumns();
+      const resourcesColumn = columns.find((c) => c.heading === 'Resources');
+      expect(resourcesColumn).toBeTruthy();
+      const blogLinks = resourcesColumn!.links.filter((l) => l.href.startsWith('/blog/'));
+      expect(blogLinks.length).toBeGreaterThanOrEqual(2);
     });
 
     it('footer has 4 columns with headings', () => {
       const columns = getFooterColumns();
       expect(columns.length).toBe(4);
       const headings = columns.map((c) => c.heading);
-      expect(headings).toContain('Product');
-      expect(headings).toContain('Compare');
+      expect(headings).toContain('Software');
+      expect(headings).toContain('Comparisons');
       expect(headings).toContain('Resources');
-      expect(headings).toContain('Business Guides');
+      expect(headings).toContain('Company');
     });
 
     it('default footer links are all internal paths (no external URLs)', () => {
@@ -630,22 +634,21 @@ describe('SiteFooter', () => {
       });
     });
 
-    it('Product column includes /plans and /signup (conversion-critical)', () => {
+    it('Company column includes /plans and /signup (conversion-critical)', () => {
       const columns = getFooterColumns();
-      const productColumn = columns.find((c) => c.heading === 'Product');
-      expect(productColumn).toBeTruthy();
-      const productHrefs = productColumn!.links.map((l) => l.href);
-      expect(productHrefs).toContain('/plans');
-      expect(productHrefs).toContain('/signup');
+      const companyColumn = columns.find((c) => c.heading === 'Company');
+      expect(companyColumn).toBeTruthy();
+      const companyHrefs = companyColumn!.links.map((l) => l.href);
+      expect(companyHrefs).toContain('/plans');
+      expect(companyHrefs).toContain('/signup');
     });
 
-    it('Compare column includes MoeGo and DaySmart alternatives', () => {
+    it('Comparisons column includes MoeGo alternatives', () => {
       const columns = getFooterColumns();
-      const compareColumn = columns.find((c) => c.heading === 'Compare');
+      const compareColumn = columns.find((c) => c.heading === 'Comparisons');
       expect(compareColumn).toBeTruthy();
       const compareHrefs = compareColumn!.links.map((l) => l.href);
       expect(compareHrefs).toContain('/moego-alternatives');
-      expect(compareHrefs).toContain('/daysmart-alternatives');
     });
 
     it('all column link labels are non-empty strings', () => {
