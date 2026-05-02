@@ -152,7 +152,7 @@ describe('CheckoutCancelContent', () => {
   describe('Cancelled State', () => {
     it('clicking "Not Ready" hides recovery offer and shows cancelled state', async () => {
       render(<CheckoutCancelContent />);
-      
+
       await waitFor(() => {
         expect(screen.getByText(/you were so close/i)).toBeTruthy();
       });
@@ -161,7 +161,7 @@ describe('CheckoutCancelContent', () => {
       fireEvent.click(notReadyBtn);
 
       await waitFor(() => {
-        expect(screen.getByText(/checkout cancelled/i)).toBeTruthy();
+        expect(screen.getByText(/payment cancelled/i)).toBeTruthy();
         expect(screen.queryByText(/you were so close/i)).toBeNull();
       });
     });
