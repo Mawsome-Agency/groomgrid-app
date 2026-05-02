@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
     where: { userId: session.user.id },
   })
 
-  return NextResponse.json(profile)
+  return NextResponse.json({ profile })
 }
 
 export async function PATCH(req: NextRequest) {
@@ -64,7 +64,7 @@ export async function PATCH(req: NextRequest) {
       data,
     })
 
-    return NextResponse.json(profile)
+    return NextResponse.json({ profile })
   } catch (error) {
     console.error('Profile update error:', error)
     return NextResponse.json({ error: 'Failed to update profile', errorType: 'generic' }, { status: 500 })

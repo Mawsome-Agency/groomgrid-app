@@ -3,10 +3,11 @@
 import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
-import { Calendar, Users, DollarSign, Plus, LogOut, Settings, Menu, X, AlertCircle, RefreshCw, CheckCircle, CreditCard } from 'lucide-react';
+import { Calendar, Users, DollarSign, Plus, LogOut, Settings, Menu, X, AlertCircle, RefreshCw, CheckCircle, CreditCard, Sparkles, ArrowRight } from 'lucide-react';
 import { trackPageView, trackDashboardFirstView } from '@/lib/ga4';
 import PaymentProcessingBanner from '@/components/PaymentProcessingBanner';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import OnboardingChecklist from '@/components/dashboard/OnboardingChecklist';
 
 interface Appointment {
   id: string;
@@ -58,6 +59,7 @@ function DashboardContent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<DashboardError | null>(null);
   const [isRetrying, setIsRetrying] = useState(false);
+  const [hasBusinessHours, setHasBusinessHours] = useState(false);
 
   // Plan selection confirmation (from /plans redirect for trial users)
   const planSelectedName = searchParams.get('plan_selected');
@@ -91,10 +93,11 @@ function DashboardContent() {
         AbortSignal.any([signal, controller.signal]) :
         controller.signal;
 
-      const [profileRes, appointmentsRes, clientsRes] = await Promise.all([
+      const [profileRes, appointmentsRes, clientsRes, businessHoursRes] = await Promise.all([
         fetch(`/api/profile?userId=${session?.user?.id}`, { signal: combinedSignal }),
-        fetch('/api/clients', { signal: combinedSignal }),
         fetch('/api/appointments', { signal: combinedSignal }),
+        fetch('/api/clients', { signal: combinedSignal }),
+        fetch('/api/business-hours', { signal: combinedSignal }),
       ]);
 
       clearTimeout(timeoutId);
@@ -111,18 +114,25 @@ function DashboardContent() {
       if (!appointmentsRes.ok) {
         errors.push(`Appointments: ${appointmentsRes.status}`);
       }
+      // Business hours endpoint failure is non-critical — don't block dashboard load
 
       if (errors.length > 0) {
         throw new Error(`Server errors: ${errors.join(', ')}`);
       }
 
       // Parse responses
-      let profileData, clientsData, appointmentsData;
+      let profileData, clientsData, appointmentsData, businessHoursData;
 
       try {
         profileData = await profileRes.json();
         clientsData = await clientsRes.json();
         appointmentsData = await appointmentsRes.json();
+        // Business hours fetch may fail (e.g. 401) — handle gracefully
+        try {
+          businessHoursData = businessHoursRes.ok ? await businessHoursRes.json() : null;
+        } catch {
+          businessHoursData = null;
+        }
       } catch (parseErr) {
         console.error('Failed to parse API responses:', parseErr);
         throw new Error('Unable to process server response');
@@ -130,7 +140,10 @@ function DashboardContent() {
 
       // Set state with parsed data
       setProfile(profileData.profile);
-      setClientCount(clientsData.clients.length);
+      setClientCount(clientsData.clients?.length || 0);
+      setHasBusinessHours(
+        Array.isArray(businessHoursData?.businessHours) && businessHoursData.businessHours.length > 0
+      );
 
       const today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -283,12 +296,14 @@ function DashboardContent() {
     );
   }
 
-  const isTrial = profile?.subscription_status === 'trial';
-  const trialDaysLeft = profile?.trial_ends_at
-    ? Math.max(0, Math.ceil((new Date(profile.trial_ends_at).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
+  const isTrial = profile?.subscriptionStatus === 'trial';
+  const trialDaysLeft = profile?.trialEndsAt
+    ? Math.max(0, Math.ceil((new Date(profile.trialEndsAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
     : 0;
+  const onboardingCompleted = profile?.onboardingCompleted ?? false;
+  const onboardingStep = profile?.onboardingStep ?? 0;
 
-  const businessName = profile?.business_name || session?.user?.name || 'My Business';
+  const businessName = profile?.businessName || session?.user?.name || 'My Business';
 
   return (
     <div className="min-h-screen bg-stone-50">
@@ -395,15 +410,18 @@ function DashboardContent() {
 
             {/* Trial Banner */}
             {isTrial && (
-              <div className="bg-green-500 text-white rounded-2xl p-6">
-                <div className="flex items-center justify-between">
+              <div className="bg-gradient-to-r from-green-500 to-green-600 text-white rounded-2xl p-6 shadow-lg">
+                <div className="flex items-center justify-between flex-wrap gap-4">
                   <div>
-                    <h2 className="text-lg font-semibold mb-1">Free Trial Active</h2>
+                    <h2 className="text-lg font-semibold mb-1">14-Day Free Trial Active</h2>
                     <p className="text-green-100 text-sm">
                       {trialDaysLeft} day{trialDaysLeft !== 1 ? 's' : ''} remaining
-                      {profile?.plan_type && profile.plan_type !== 'solo' && (
-                        <> · {profile.plan_type.charAt(0).toUpperCase() + profile.plan_type.slice(1)} plan</>
+                      {profile?.planType && profile.planType !== 'solo' && (
+                        <> · {profile.planType.charAt(0).toUpperCase() + profile.planType.slice(1)} plan</>
                       )}
+                    </p>
+                    <p className="text-green-100 text-xs mt-2">
+                      Use code <span className="font-mono font-bold bg-white/20 px-1.5 py-0.5 rounded">BETA50</span> for 50% off your first month when you subscribe
                     </p>
                   </div>
                   <a
@@ -415,6 +433,17 @@ function DashboardContent() {
                   </a>
                 </div>
               </div>
+            )}
+
+            {/* Onboarding Checklist — shown for users who haven't completed setup */}
+            {!onboardingCompleted && (
+              <OnboardingChecklist
+                onboardingStep={onboardingStep}
+                onboardingCompleted={onboardingCompleted}
+                clientCount={clientCount}
+                appointmentCount={todayAppointments.length}
+                hasBusinessHours={hasBusinessHours}
+              />
             )}
 
             {/* Stats Cards */}
@@ -520,27 +549,57 @@ function DashboardContent() {
               <Plus className="w-6 h-6" />
             </button>
 
-            {/* Welcome Card (shown only if no data) */}
-            {todayAppointments.length === 0 && clientCount === 0 && weekRevenue === 0 && (
+            {/* Welcome Card — shown for new users with no activity */}
+            {todayAppointments.length === 0 && clientCount === 0 && weekRevenue === 0 && !onboardingCompleted && (
               <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-2xl p-8 text-white">
-                <h2 className="text-2xl font-bold mb-2">Welcome to GroomGrid!</h2>
-                <p className="text-green-100 mb-6">
-                  Your account is set up and ready. Here's how to get started:
-                </p>
-                <div className="space-y-3">
-                  <div className="flex items-start gap-3">
-                    <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center text-sm flex-shrink-0">1</div>
-                    <p>Add your first client from the <a href="/clients" className="underline">Clients tab</a></p>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center text-sm flex-shrink-0">2</div>
-                    <p>Book your first appointment</p>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center text-sm flex-shrink-0">3</div>
-                    <p>Set your business hours in Settings</p>
-                  </div>
+                <div className="flex items-center gap-2 mb-2">
+                  <Sparkles className="w-6 h-6" />
+                  <h2 className="text-2xl font-bold">Welcome to GroomGrid!</h2>
                 </div>
+                <p className="text-green-100 mb-6">
+                  Your account is set up and ready. Complete the steps above or jump right in:
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <a
+                    href="/clients"
+                    className="flex items-center gap-3 px-4 py-3 bg-white/20 rounded-xl hover:bg-white/30 transition-colors"
+                  >
+                    <Users className="w-5 h-5 flex-shrink-0" />
+                    <div>
+                      <p className="font-semibold text-sm">Add Your First Client</p>
+                      <p className="text-green-100 text-xs">Start building your client list</p>
+                    </div>
+                  </a>
+                  <a
+                    href="/schedule"
+                    className="flex items-center gap-3 px-4 py-3 bg-white/20 rounded-xl hover:bg-white/30 transition-colors"
+                  >
+                    <Calendar className="w-5 h-5 flex-shrink-0" />
+                    <div>
+                      <p className="font-semibold text-sm">Quick Schedule</p>
+                      <p className="text-green-100 text-xs">Book your first appointment</p>
+                    </div>
+                  </a>
+                </div>
+              </div>
+            )}
+
+            {/* Empty state for onboarding-completed users with no data */}
+            {todayAppointments.length === 0 && clientCount === 0 && weekRevenue === 0 && onboardingCompleted && (
+              <div className="bg-white rounded-2xl shadow-sm p-8 text-center">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-100 flex items-center justify-center">
+                  <Calendar className="w-8 h-8 text-green-600" />
+                </div>
+                <h3 className="text-lg font-semibold text-stone-900 mb-2">No appointments yet</h3>
+                <p className="text-stone-500 mb-4">
+                  Schedule your first appointment to see it here.
+                </p>
+                <a
+                  href="/schedule"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+                >
+                  <Plus className="w-4 h-4" /> Book Appointment
+                </a>
               </div>
             )}
           </main>

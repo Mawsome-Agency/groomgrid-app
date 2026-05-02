@@ -136,13 +136,13 @@ export default function OnboardingPage() {
         return;
       }
 
-      if (profile.onboarding_completed) {
+      if (profile.onboardingCompleted) {
         router.push('/dashboard');
         return;
       }
 
-      if (profile.onboarding_step > 0) {
-        setStep(profile.onboarding_step + 1);
+      if (profile.onboardingStep > 0) {
+        setStep(profile.onboardingStep + 1);
       }
     } catch (err) {
       console.error('Profile check failed:', err);

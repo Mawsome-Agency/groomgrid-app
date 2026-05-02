@@ -55,21 +55,22 @@ function WelcomePageInner() {
         }
 
         const data = await res.json();
+        const profile = data.profile;
 
         // Check if welcome was already shown - if so, redirect to plans
-        if (data.welcomeShown) {
+        if (profile?.welcomeShown) {
           const plansUrl = couponParam ? `/plans?coupon=${encodeURIComponent(couponParam)}` : '/plans';
           router.replace(plansUrl);
           return;
         }
 
         if (isMounted) {
-          setBusinessName(data.businessName || 'your business');
+          setBusinessName(profile?.businessName || 'your business');
           setLoading(false);
 
           // Track GA4 event
           if (session?.user?.id) {
-            trackWelcomeViewed(session.user.id, data.businessName || '');
+            trackWelcomeViewed(session.user.id, profile?.businessName || '');
           }
 
           // Mark welcome as shown in profile
