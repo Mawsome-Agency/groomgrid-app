@@ -4,6 +4,7 @@ import prisma from '@/lib/prisma';
 import { SERVICE_MAP } from '@/lib/services';
 import { estimateGroomingTime } from '@/lib/breed-intelligence';
 import { apiError } from '@/lib/api-errors';
+import { checkTrialWriteAccess } from '@/lib/trial-gate';
 
 // GET /api/appointments - List appointments with optional date filtering
 export async function GET(req: NextRequest) {
@@ -52,6 +53,15 @@ export async function POST(req: NextRequest) {
     const user = await getCurrentUser();
     if (!user?.id) {
       return apiError('Unauthorized', 401);
+    }
+
+    // Trial gate: block appointment creation for expired trials
+    const trialAccess = await checkTrialWriteAccess(user.id);
+    if (!trialAccess.allowed) {
+      return NextResponse.json(
+        { error: trialAccess.reason, errorType: 'trial_expired' },
+        { status: 403 }
+      );
     }
 
     const { clientId, petId, service, date, time, notes } = await req.json();

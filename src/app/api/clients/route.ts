@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
 import prisma from '@/lib/prisma';
+import { checkTrialWriteAccess } from '@/lib/trial-gate';
 
 // GET /api/clients - List all clients for the current user
 export async function GET(req: NextRequest) {
@@ -34,6 +35,15 @@ export async function POST(req: NextRequest) {
     const user = await getCurrentUser();
     if (!user?.id) {
       return NextResponse.json({ error: 'Unauthorized', errorType: 'generic' }, { status: 401 });
+    }
+
+    // Trial gate: block client creation for expired trials
+    const trialAccess = await checkTrialWriteAccess(user.id);
+    if (!trialAccess.allowed) {
+      return NextResponse.json(
+        { error: trialAccess.reason, errorType: 'trial_expired' },
+        { status: 403 }
+      );
     }
 
     const { name, email, phone, address, notes } = await req.json();

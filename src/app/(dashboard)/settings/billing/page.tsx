@@ -5,10 +5,11 @@ import { useRouter } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
 import {
   Settings, Calendar, Users, LogOut, Menu, X,
-  ArrowLeft, CreditCard, Check, AlertCircle, ExternalLink, RefreshCw, Mail,
+  ArrowLeft, CreditCard, Check, AlertCircle, ExternalLink, RefreshCw, Mail, Lock, ArrowRight,
 } from 'lucide-react';
 import { trackPageView } from '@/lib/ga4';
 import { PLANS as PRICING_PLANS } from '@/app/pricing/pricing-data';
+import { useTrialStatus } from '@/hooks/use-trial-status';
 
 // Billing display plans derived from the single source of truth (pricing-data.ts).
 // Price and features come from pricing-data.ts; description/period are billing-UI only.
@@ -46,6 +47,9 @@ export default function BillingSettingsPage() {
   const [loading, setLoading] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [paymentFailedDismissed, setPaymentFailedDismissed] = useState(false);
+
+  // Trial status
+  const trialStatus = useTrialStatus(profile);
 
   useEffect(() => {
     trackPageView('/settings/billing', 'Settings - Billing');
@@ -94,7 +98,7 @@ export default function BillingSettingsPage() {
   }
 
   const planType = profile?.plan_type || profile?.planType || 'trial';
-  const subStatus = profile?.subscription_status || 'trial';
+  const subStatus = profile?.subscription_status || profile?.subscriptionStatus || 'trial';
   const trialEndsAt = profile?.trial_ends_at || profile?.trialEndsAt;
   const trialDaysLeft = trialEndsAt
     ? Math.max(0, Math.ceil((new Date(trialEndsAt).getTime() - Date.now()) / 86400000))
@@ -169,6 +173,38 @@ export default function BillingSettingsPage() {
               <span className="text-stone-900 font-medium">Billing & Plan</span>
             </div>
 
+            {/* Trial Expired Alert */}
+            {trialStatus.isExpired && (
+              <div
+                className="bg-red-50 border-2 border-red-200 rounded-2xl p-6 mb-6"
+                role="alert"
+                aria-live="polite"
+              >
+                <div className="flex items-start gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+                    <Lock className="w-5 h-5 text-red-600" />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-semibold text-red-900">Your trial has expired</h2>
+                    <p className="text-red-700 text-sm mt-1">
+                      Your 14-day free trial ended. Upgrade to a paid plan to continue creating appointments and managing your grooming business.
+                    </p>
+                  </div>
+                </div>
+                <a
+                  href="/plans"
+                  className="inline-flex items-center justify-center gap-2 w-full px-5 py-3 bg-green-500 text-white rounded-xl font-semibold hover:bg-green-600 transition-colors"
+                >
+                  <CreditCard className="w-5 h-5" />
+                  Choose a Plan & Upgrade
+                  <ArrowRight className="w-5 h-5" />
+                </a>
+                <p className="text-center text-xs text-red-600 mt-3">
+                  Use code <span className="font-mono font-bold">GROOMERFOUNDING</span> for founding member pricing
+                </p>
+              </div>
+            )}
+
             {/* Payment Failed Banner */}
             {showPaymentFailed && (
               <div
@@ -238,7 +274,7 @@ export default function BillingSettingsPage() {
                   </div>
                 </div>
 
-                <div className="rounded-xl border-2 border-stone-200 p-4">
+                <div className={`rounded-xl border-2 p-4 ${trialStatus.isExpired ? 'border-red-200 bg-red-50' : 'border-stone-200'}`}>
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="flex items-center gap-2 mb-1">
@@ -246,15 +282,23 @@ export default function BillingSettingsPage() {
                         <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${planDisplay.color}`}>
                           {planDisplay.label}
                         </span>
-                        <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${subDisplay.color}`}>
-                          <span aria-hidden="true">{subDisplay.icon}</span> {subDisplay.label}
-                        </span>
+                        {trialStatus.isExpired ? (
+                          <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-red-100 text-red-700">
+                            ⏰ Expired
+                          </span>
+                        ) : (
+                          <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${subDisplay.color}`}>
+                            <span aria-hidden="true">{subDisplay.icon}</span> {subDisplay.label}
+                          </span>
+                        )}
                       </div>
                       {subStatus === 'trial' && (
-                        <p className="text-sm text-stone-500">
-                          {trialDaysLeft > 0
-                            ? `Trial expires in ${trialDaysLeft} day${trialDaysLeft !== 1 ? 's' : ''}`
-                            : 'Trial has expired'}
+                        <p className={`text-sm ${trialStatus.isExpired ? 'text-red-600 font-medium' : 'text-stone-500'}`}>
+                          {trialStatus.isExpired
+                            ? 'Trial has expired — upgrade to continue'
+                            : trialDaysLeft > 0
+                              ? `Trial expires in ${trialDaysLeft} day${trialDaysLeft !== 1 ? 's' : ''}`
+                              : 'Trial has expired'}
                         </p>
                       )}
                       {subStatus === 'active' && (
@@ -274,7 +318,7 @@ export default function BillingSettingsPage() {
                   </div>
                 </div>
 
-                {subStatus === 'trial' && (
+                {subStatus === 'trial' && !trialStatus.isExpired && (
                   <div className="mt-4 bg-amber-50 border border-amber-100 rounded-xl p-4 flex items-start gap-3">
                     <AlertCircle className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
                     <div>
@@ -293,7 +337,9 @@ export default function BillingSettingsPage() {
               <div className="bg-white rounded-2xl shadow-sm p-6">
                 <h3 className="font-semibold text-stone-900 mb-1">Choose a Plan</h3>
                 <p className="text-sm text-stone-500 mb-5">
-                  All plans include a 14-day free trial. Cancel anytime.
+                  {trialStatus.isExpired
+                    ? 'Select a plan to unlock full access to your account.'
+                    : 'All plans include a 14-day free trial. Cancel anytime.'}
                 </p>
                 <div className="space-y-4">
                   {PLANS.map((plan) => {
@@ -340,9 +386,13 @@ export default function BillingSettingsPage() {
                         {!isCurrent && (
                           <a
                             href="/plans"
-                            className="block w-full text-center px-4 py-2.5 bg-green-500 text-white rounded-xl hover:bg-green-600 transition-colors text-sm font-medium"
+                            className={`block w-full text-center px-4 py-2.5 rounded-xl transition-colors text-sm font-medium ${
+                              trialStatus.isExpired
+                                ? 'bg-green-500 text-white hover:bg-green-600 shadow-md'
+                                : 'bg-green-500 text-white hover:bg-green-600'
+                            }`}
                           >
-                            {subStatus === 'trial' ? 'Start with' : 'Switch to'} {plan.name}
+                            {trialStatus.isExpired ? 'Upgrade Now' : subStatus === 'trial' ? 'Start with' : 'Switch to'} {plan.name}
                           </a>
                         )}
                       </div>

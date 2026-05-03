@@ -8,6 +8,8 @@ import { trackPageView, trackDashboardFirstView } from '@/lib/ga4';
 import PaymentProcessingBanner from '@/components/PaymentProcessingBanner';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import OnboardingChecklist from '@/components/dashboard/OnboardingChecklist';
+import { TrialExpiredOverlay, TrialExpiringBanner } from '@/components/trial';
+import { useTrialStatus } from '@/hooks/use-trial-status';
 
 interface Appointment {
   id: string;
@@ -60,6 +62,9 @@ function DashboardContent() {
   const [error, setError] = useState<DashboardError | null>(null);
   const [isRetrying, setIsRetrying] = useState(false);
   const [hasBusinessHours, setHasBusinessHours] = useState(false);
+
+  // Trial status derived from profile
+  const trialStatus = useTrialStatus(profile);
 
   // Plan selection confirmation (from /plans redirect for trial users)
   const planSelectedName = searchParams.get('plan_selected');
@@ -307,6 +312,9 @@ function DashboardContent() {
 
   return (
     <div className="min-h-screen bg-stone-50">
+      {/* Trial Expired Gate — blocks all interaction */}
+      {trialStatus.shouldShowGate && <TrialExpiredOverlay />}
+
       {/* Mobile Header */}
       <header className="bg-white border-b border-stone-200 lg:hidden">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
@@ -408,8 +416,13 @@ function DashboardContent() {
               </div>
             )}
 
-            {/* Trial Banner */}
-            {isTrial && (
+            {/* Trial Expiring Warning Banner — 1-3 days remaining */}
+            {trialStatus.shouldShowWarning && (
+              <TrialExpiringBanner daysLeft={trialStatus.daysLeft} />
+            )}
+
+            {/* Trial Banner — shown for active trial users with >3 days left */}
+            {isTrial && !trialStatus.shouldShowWarning && !trialStatus.shouldShowGate && (
               <div className="bg-gradient-to-r from-green-500 to-green-600 text-white rounded-2xl p-6 shadow-lg">
                 <div className="flex items-center justify-between flex-wrap gap-4">
                   <div>
@@ -429,7 +442,7 @@ function DashboardContent() {
                     className="inline-flex items-center gap-2 px-4 py-2 bg-white text-green-600 rounded-lg text-sm font-medium hover:bg-green-50 transition-colors"
                   >
                     <CreditCard className="w-4 h-4" />
-                    {trialDaysLeft <= 3 ? 'Set Up Payment Now' : 'Set Up Payment'}
+                    Set Up Payment
                   </a>
                 </div>
               </div>
@@ -494,12 +507,14 @@ function DashboardContent() {
               {todayAppointments.length === 0 ? (
                 <div className="text-center py-8">
                   <p className="text-stone-500 mb-4">No appointments scheduled for today</p>
-                  <a
-                    href="/schedule"
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
-                  >
-                    <Plus className="w-4 h-4" /> Book Appointment
-                  </a>
+                  {trialStatus.canWrite && (
+                    <a
+                      href="/schedule"
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+                    >
+                      <Plus className="w-4 h-4" /> Book Appointment
+                    </a>
+                  )}
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -541,13 +556,15 @@ function DashboardContent() {
               )}
             </div>
 
-            {/* FAB */}
-            <button
-              onClick={() => router.push('/schedule')}
-              className="fixed bottom-6 right-6 lg:hidden w-14 h-14 rounded-full bg-green-500 text-white shadow-lg hover:bg-green-600 transition-colors flex items-center justify-center"
-            >
-              <Plus className="w-6 h-6" />
-            </button>
+            {/* FAB — only show if user can write */}
+            {trialStatus.canWrite && (
+              <button
+                onClick={() => router.push('/schedule')}
+                className="fixed bottom-6 right-6 lg:hidden w-14 h-14 rounded-full bg-green-500 text-white shadow-lg hover:bg-green-600 transition-colors flex items-center justify-center"
+              >
+                <Plus className="w-6 h-6" />
+              </button>
+            )}
 
             {/* Welcome Card — shown for new users with no activity */}
             {todayAppointments.length === 0 && clientCount === 0 && weekRevenue === 0 && !onboardingCompleted && (
@@ -594,12 +611,14 @@ function DashboardContent() {
                 <p className="text-stone-500 mb-4">
                   Schedule your first appointment to see it here.
                 </p>
-                <a
-                  href="/schedule"
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
-                >
-                  <Plus className="w-4 h-4" /> Book Appointment
-                </a>
+                {trialStatus.canWrite && (
+                  <a
+                    href="/schedule"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+                  >
+                    <Plus className="w-4 h-4" /> Book Appointment
+                  </a>
+                )}
               </div>
             )}
           </main>

@@ -197,7 +197,7 @@ describe('DashboardPage', () => {
     expect(screen.getByText('Set Up Payment')).toBeInTheDocument();
   });
 
-  it('shows trial banner with urgent CTA when 3 or fewer days remain', async () => {
+  it('shows trial expiring warning banner when 3 or fewer days remain', async () => {
     const soonDate = new Date();
     soonDate.setDate(soonDate.getDate() + 2);
     mockSuccessfulDashboardFetch({
@@ -207,10 +207,31 @@ describe('DashboardPage', () => {
     render(<DashboardPage />);
 
     await waitFor(() => {
-      expect(screen.getByText('14-Day Free Trial Active')).toBeInTheDocument();
+      // Should show the expiring banner, not the regular trial banner
+      expect(screen.getByText(/Your trial expires in 2 days/i)).toBeInTheDocument();
     });
-    // When trialDaysLeft <= 3, the CTA reads "Set Up Payment Now"
-    expect(screen.getByText('Set Up Payment Now')).toBeInTheDocument();
+    // Should show "Upgrade Now" CTA
+    expect(screen.getByText('Upgrade Now')).toBeInTheDocument();
+    // Should NOT show the regular "14-Day Free Trial Active" banner
+    expect(screen.queryByText('14-Day Free Trial Active')).not.toBeInTheDocument();
+  });
+
+  it('shows full-screen expired overlay when trial is expired', async () => {
+    const expiredDate = new Date();
+    expiredDate.setDate(expiredDate.getDate() - 2); // 2 days ago
+    mockSuccessfulDashboardFetch({
+      profile: { trialEndsAt: expiredDate.toISOString() },
+    });
+
+    render(<DashboardPage />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Your 14-day free trial has ended')).toBeInTheDocument();
+    });
+    // Should have upgrade CTA
+    expect(screen.getByText('View Plans & Upgrade')).toBeInTheDocument();
+    // Should mention founding member code
+    expect(screen.getByText('GROOMERFOUNDING')).toBeInTheDocument();
   });
 
   it('shows plan type in trial banner when plan is not solo', async () => {
@@ -248,5 +269,23 @@ describe('DashboardPage', () => {
       expect(screen.getByText('Test Grooming')).toBeInTheDocument();
     });
     expect(screen.queryByText('14-Day Free Trial Active')).not.toBeInTheDocument();
+    expect(screen.queryByText('Your 14-day free trial has ended')).not.toBeInTheDocument();
+    expect(screen.queryByText(/Your trial expires/)).not.toBeInTheDocument();
+  });
+
+  it('hides "Book Appointment" button for expired trial users', async () => {
+    const expiredDate = new Date();
+    expiredDate.setDate(expiredDate.getDate() - 1);
+    mockSuccessfulDashboardFetch({
+      profile: { trialEndsAt: expiredDate.toISOString() },
+    });
+
+    render(<DashboardPage />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Your 14-day free trial has ended')).toBeInTheDocument();
+    });
+    // "Book Appointment" CTA should not be shown for expired users
+    expect(screen.queryByText('Book Appointment')).not.toBeInTheDocument();
   });
 });
