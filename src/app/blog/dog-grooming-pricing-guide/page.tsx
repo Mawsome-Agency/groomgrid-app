@@ -7,15 +7,13 @@ import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
   title: 'Dog Grooming Pricing Guide: How Much to Charge in 2026 | GroomGrid',
-  description:
-    'Complete dog grooming pricing guide with average costs by breed size, service type, and region. Includes mobile vs salon pricing, add-on rates, and strategies for setting your prices.',
+  description: '2026 dog grooming prices: small dogs $40–$60, medium $50–$80, large $70–$120+. Includes mobile vs salon rates, add-on pricing, and the formula to set your own prices profitably.',
   alternates: {
     canonical: 'https://getgroomgrid.com/blog/dog-grooming-pricing-guide',
   },
   openGraph: {
     title: 'Dog Grooming Pricing Guide: How Much to Charge in 2026',
-    description:
-      'Complete dog grooming pricing guide with average costs by breed size, service type, and region. Includes mobile vs salon pricing, add-on rates, and strategies for setting your prices.',
+    description: '2026 dog grooming prices: small dogs $40–$60, medium $50–$80, large $70–$120+. Includes mobile vs salon rates, add-on pricing, and the formula to set your own prices profitably.',
     url: 'https://getgroomgrid.com/blog/dog-grooming-pricing-guide',
     type: 'article',
   },
@@ -25,7 +23,7 @@ const articleSchema = {
   '@context': 'https://schema.org',
   '@type': 'Article',
   headline: 'Dog Grooming Pricing Guide: How Much to Charge in 2026',
-  description: 'Complete dog grooming pricing guide with average costs by breed size, service type, and region.',
+  description: '2026 dog grooming prices: small dogs $40–$60, medium $50–$80, large $70–$120+. Includes mobile vs salon rates, add-on pricing, and the formula to set your own prices profitably.',
   url: 'https://getgroomgrid.com/blog/dog-grooming-pricing-guide',
   datePublished: '2026-04-27',
   dateModified: '2026-04-27',

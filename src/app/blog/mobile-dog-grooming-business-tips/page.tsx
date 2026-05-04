@@ -7,15 +7,13 @@ import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
   title: 'Mobile Dog Grooming Business Tips: Run a Tighter, More Profitable Operation | GroomGrid',
-  description:
-    'Practical mobile dog grooming business tips from experienced operators — route optimization, van organization, client communication, pricing, and the tools that keep mobile businesses running smoothly.',
+  description: '12 mobile grooming tips that save 6+ hours/week — cut drive time 30%, reduce no-shows to under 5%, and add $500/mo with smarter route planning and automated reminders.',
   alternates: {
     canonical: 'https://getgroomgrid.com/blog/mobile-dog-grooming-business-tips',
   },
   openGraph: {
     title: 'Mobile Dog Grooming Business Tips: Run a Tighter, More Profitable Operation',
-    description:
-      'Practical mobile dog grooming business tips from experienced operators — route optimization, van organization, client communication, pricing, and the tools that keep mobile businesses running smoothly.',
+    description: '12 mobile grooming tips that save 6+ hours/week — cut drive time 30%, reduce no-shows to under 5%, and add $500/mo with smarter route planning and automated reminders.',
     url: 'https://getgroomgrid.com/blog/mobile-dog-grooming-business-tips',
     type: 'article',
   },
@@ -25,8 +23,7 @@ const articleSchema = {
   '@context': 'https://schema.org',
   '@type': 'Article',
   headline: 'Mobile Dog Grooming Business Tips: Run a Tighter, More Profitable Operation',
-  description:
-    'Practical mobile dog grooming business tips from experienced operators — route optimization, van organization, client communication, pricing, and the tools that keep mobile businesses running smoothly.',
+  description: '12 mobile grooming tips that save 6+ hours/week — cut drive time 30%, reduce no-shows to under 5%, and add $500/mo with smarter route planning and automated reminders.',
   url: 'https://getgroomgrid.com/blog/mobile-dog-grooming-business-tips',
   publisher: {
     '@type': 'Organization',

@@ -7,15 +7,13 @@ import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
   title: 'Dog Grooming Tools & Equipment List: Everything You Need | GroomGrid',
-  description:
-    'Complete dog grooming tools and equipment list for professional groomers. Covers clippers, shears, dryers, tables, tubs, and estimated costs for mobile and salon setups.',
+  description: 'Full grooming equipment list with real costs: clippers ($150–$400), dryers ($200–$600), tables ($200–$1,200). Budget breakdowns for mobile ($5K–$15K) and salon ($10K–$30K) setups.',
   alternates: {
     canonical: 'https://getgroomgrid.com/blog/dog-grooming-tools-equipment-list',
   },
   openGraph: {
     title: 'Dog Grooming Tools & Equipment List: Everything You Need',
-    description:
-      'Complete dog grooming tools and equipment list for professional groomers. Covers clippers, shears, dryers, tables, tubs, and estimated costs for mobile and salon setups.',
+    description: 'Full grooming equipment list with real costs: clippers ($150–$400), dryers ($200–$600), tables ($200–$1,200). Budget breakdowns for mobile ($5K–$15K) and salon ($10K–$30K) setups.',
     url: 'https://getgroomgrid.com/blog/dog-grooming-tools-equipment-list',
     type: 'article',
   },
@@ -25,8 +23,7 @@ const articleSchema = {
   '@context': 'https://schema.org',
   '@type': 'Article',
   headline: 'Dog Grooming Tools & Equipment List: Everything You Need',
-  description:
-    'Complete dog grooming tools and equipment list for professional groomers. Covers clippers, shears, dryers, tables, tubs, and estimated costs for mobile and salon setups.',
+  description: 'Full grooming equipment list with real costs: clippers ($150–$400), dryers ($200–$600), tables ($200–$1,200). Budget breakdowns for mobile ($5K–$15K) and salon ($10K–$30K) setups.',
   url: 'https://getgroomgrid.com/blog/dog-grooming-tools-equipment-list',
   publisher: {
     '@type': 'Organization',

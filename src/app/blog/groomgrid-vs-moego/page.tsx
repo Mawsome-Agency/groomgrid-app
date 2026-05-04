@@ -7,15 +7,13 @@ import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
   title: 'GroomGrid vs MoeGo: Which Dog Grooming Software is Right for You? | GroomGrid',
-  description:
-    'Comparing GroomGrid vs MoeGo for dog grooming businesses? See how pricing, features, and ease of use stack up — and why independent groomers are switching.',
+  description: 'GroomGrid starts at $29/mo vs MoeGo\'s $49/mo — plus AI scheduling and 5-minute setup. Side-by-side pricing, features, and mobile usability comparison for solo and mobile groomers.',
   alternates: {
     canonical: 'https://getgroomgrid.com/blog/groomgrid-vs-moego',
   },
   openGraph: {
     title: 'GroomGrid vs MoeGo: Which Dog Grooming Software is Right for You?',
-    description:
-      'Comparing GroomGrid vs MoeGo for dog grooming businesses? See how pricing, features, and ease of use stack up — and why independent groomers are switching.',
+    description: 'GroomGrid starts at $29/mo vs MoeGo\'s $49/mo — plus AI scheduling and 5-minute setup. Side-by-side pricing, features, and mobile usability comparison for solo and mobile groomers.',
     url: 'https://getgroomgrid.com/blog/groomgrid-vs-moego',
     type: 'article',
   },
@@ -25,8 +23,7 @@ const articleSchema = {
   '@context': 'https://schema.org',
   '@type': 'Article',
   headline: 'GroomGrid vs MoeGo: Which Dog Grooming Software is Right for You?',
-  description:
-    'Comparing GroomGrid vs MoeGo for dog grooming businesses? See how pricing, features, and ease of use stack up — and why independent groomers are switching.',
+  description: 'GroomGrid starts at $29/mo vs MoeGo\'s $49/mo — plus AI scheduling and 5-minute setup. Side-by-side pricing, features, and mobile usability comparison for solo and mobile groomers.',
   url: 'https://getgroomgrid.com/blog/groomgrid-vs-moego',
   publisher: {
     '@type': 'Organization',

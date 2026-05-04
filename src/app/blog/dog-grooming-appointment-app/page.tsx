@@ -7,15 +7,13 @@ import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
   title: 'Best Pet Grooming App & Scheduling Software (2026) | GroomGrid',
-  description:
-    'Compare the best pet grooming apps for 2026 — scheduling, automated reminders, online booking, payment processing, and client management. Works for dogs, cats, and all breeds.',
+  description: 'The 5 best dog grooming apps for 2026 — automated reminders that cut no-shows 40%, online booking, and payment processing. Most groomers set up in under 10 minutes.',
   alternates: {
     canonical: 'https://getgroomgrid.com/blog/dog-grooming-appointment-app',
   },
   openGraph: {
     title: 'Best Pet Grooming App & Scheduling Software (2026)',
-    description:
-      'Compare the best pet grooming apps — scheduling, automated reminders, online booking, payment processing, and client management for dogs, cats, and all breeds.',
+    description: 'The 5 best dog grooming apps for 2026 — automated reminders that cut no-shows 40%, online booking, and payment processing. Most groomers set up in under 10 minutes.',
     url: 'https://getgroomgrid.com/blog/dog-grooming-appointment-app',
     type: 'article',
   },
@@ -25,7 +23,7 @@ const articleSchema = {
   '@context': 'https://schema.org',
   '@type': 'Article',
   headline: 'Best Dog Grooming Appointment App (2026): Scheduling, Reminders & Payments',
-  description: 'Compare the best dog grooming appointment apps for 2026 — scheduling, automated reminders, online booking, payment processing.',
+  description: 'The 5 best dog grooming apps for 2026 — automated reminders that cut no-shows 40%, online booking, and payment processing. Most groomers set up in under 10 minutes.',
   url: 'https://getgroomgrid.com/blog/dog-grooming-appointment-app',
   datePublished: '2026-04-27',
   dateModified: '2026-04-27',

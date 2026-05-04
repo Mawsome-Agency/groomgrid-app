@@ -7,15 +7,13 @@ import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
   title: 'Dog Grooming Scheduling Software: The Complete Guide for 2026 | GroomGrid',
-  description:
-    'Everything you need to know about dog grooming scheduling software in 2026. Compare features, pricing, and mobile-specific tools. Learn how the right scheduler reduces no-shows, saves hours of admin, and grows your grooming business.',
+  description: 'Dog grooming scheduling software cuts no-shows 40% and saves 5+ hours/week on admin. Compare the top 5 tools by pricing, mobile features, and automated reminders for 2026.',
   alternates: {
     canonical: 'https://getgroomgrid.com/blog/dog-grooming-scheduling-software-guide',
   },
   openGraph: {
     title: 'Dog Grooming Scheduling Software: The Complete Guide for 2026',
-    description:
-      'The complete guide to dog grooming scheduling software — features, pricing, mobile needs, and how to choose the right platform for your grooming business.',
+    description: 'Dog grooming scheduling software cuts no-shows 40% and saves 5+ hours/week on admin. Compare the top 5 tools by pricing, mobile features, and automated reminders for 2026.',
     url: 'https://getgroomgrid.com/blog/dog-grooming-scheduling-software-guide',
     type: 'article',
   },
@@ -25,8 +23,7 @@ const articleSchema = {
   '@context': 'https://schema.org',
   '@type': 'Article',
   headline: 'Dog Grooming Scheduling Software: The Complete Guide for 2026',
-  description:
-    'Everything you need to know about dog grooming scheduling software in 2026. Compare features, pricing, and mobile-specific tools.',
+  description: 'Dog grooming scheduling software cuts no-shows 40% and saves 5+ hours/week on admin. Compare the top 5 tools by pricing, mobile features, and automated reminders for 2026.',
   url: 'https://getgroomgrid.com/blog/dog-grooming-scheduling-software-guide',
   datePublished: '2026-04-30',
   dateModified: '2026-04-30',

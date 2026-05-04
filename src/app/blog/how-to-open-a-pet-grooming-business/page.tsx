@@ -7,15 +7,13 @@ import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
   title: 'How to Open a Pet Grooming Business: Complete Guide for 2026 | GroomGrid',
-  description:
-    'Everything you need to open a pet grooming business — business plans, licensing, location, equipment, staffing, pricing, and the software that ties it all together.',
+  description: 'Open a pet grooming business in 30 days: licensing checklist, equipment budget ($5K–$50K), pricing strategy, and the first-month plan that fills your appointment book fast.',
   alternates: {
     canonical: 'https://getgroomgrid.com/blog/how-to-open-a-pet-grooming-business',
   },
   openGraph: {
     title: 'How to Open a Pet Grooming Business: Complete Guide for 2026',
-    description:
-      'Everything you need to open a pet grooming business — business plans, licensing, location, equipment, staffing, pricing, and the software that ties it all together.',
+    description: 'Open a pet grooming business in 30 days: licensing checklist, equipment budget ($5K–$50K), pricing strategy, and the first-month plan that fills your appointment book fast.',
     url: 'https://getgroomgrid.com/blog/how-to-open-a-pet-grooming-business',
     type: 'article',
   },
@@ -25,8 +23,7 @@ const articleSchema = {
   '@context': 'https://schema.org',
   '@type': 'Article',
   headline: 'How to Open a Pet Grooming Business: Complete Guide for 2026',
-  description:
-    'Everything you need to open a pet grooming business — business plans, licensing, location, equipment, staffing, pricing, and the software that ties it all together.',
+  description: 'Open a pet grooming business in 30 days: licensing checklist, equipment budget ($5K–$50K), pricing strategy, and the first-month plan that fills your appointment book fast.',
   url: 'https://getgroomgrid.com/blog/how-to-open-a-pet-grooming-business',
   datePublished: '2026-04-23',
   dateModified: '2026-04-23',

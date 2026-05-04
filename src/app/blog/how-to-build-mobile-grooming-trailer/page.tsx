@@ -7,14 +7,13 @@ import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
   title: 'How to Build a Mobile Grooming Trailer: Complete Guide (2026 Costs & Tips) | GroomGrid',
-  description:
-    'Building a mobile grooming trailer? Compare van vs trailer, get equipment lists, plumbing and electrical setup guides, $10K–$50K budgets, and layouts for your mobile pet spa.',
+  description: 'Build a mobile grooming trailer for $10K–$50K: van vs trailer comparison, equipment lists, plumbing/electrical guides, and 3 floor plan layouts for your mobile pet spa.',
   alternates: {
     canonical: 'https://getgroomgrid.com/blog/how-to-build-mobile-grooming-trailer',
   },
   openGraph: {
     title: 'How to Build a Mobile Grooming Trailer: Complete Guide (2026)',
-    description: 'Van vs trailer, equipment, plumbing, electrical, costs, and licensing — everything to build your mobile grooming setup.',
+    description: 'Build a mobile grooming trailer for $10K–$50K: van vs trailer comparison, equipment lists, plumbing/electrical guides, and 3 floor plan layouts for your mobile pet spa.',
     url: 'https://getgroomgrid.com/blog/how-to-build-mobile-grooming-trailer',
     type: 'article',
   },
@@ -24,8 +23,7 @@ const articleSchema = {
   '@context': 'https://schema.org',
   '@type': 'Article',
   headline: 'How to Build a Mobile Grooming Trailer: Complete Guide (2026 Costs & Tips)',
-  description:
-    'Compare van vs trailer, get equipment lists, plumbing and electrical guides, $10K–$50K budgets, and mobile grooming layouts.',
+  description: 'Build a mobile grooming trailer for $10K–$50K: van vs trailer comparison, equipment lists, plumbing/electrical guides, and 3 floor plan layouts for your mobile pet spa.',
   url: 'https://getgroomgrid.com/blog/how-to-build-mobile-grooming-trailer',
   datePublished: '2026-04-23',
   dateModified: '2026-04-23',

@@ -7,15 +7,13 @@ import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
   title: 'How to Become a Dog Groomer: Certification, Training & Career Guide | GroomGrid',
-  description:
-    'Step-by-step guide to becoming a professional dog groomer — certification programs, training costs, apprenticeships, salary expectations, and how to start your own grooming business.',
+  description: 'Become a dog groomer in 3–6 months: training costs $3K–$18K, starting pay $30K–$45K, experienced groomers earn $60K+. The exact path from zero experience to first paying client.',
   alternates: {
     canonical: 'https://getgroomgrid.com/blog/how-to-become-a-dog-groomer',
   },
   openGraph: {
     title: 'How to Become a Dog Groomer: Certification, Training & Career Guide',
-    description:
-      'Step-by-step guide to becoming a professional dog groomer — certification, training costs, salary, and how to start your own business.',
+    description: 'Become a dog groomer in 3–6 months: training costs $3K–$18K, starting pay $30K–$45K, experienced groomers earn $60K+. The exact path from zero experience to first paying client.',
     url: 'https://getgroomgrid.com/blog/how-to-become-a-dog-groomer',
     type: 'article',
   },
@@ -25,7 +23,7 @@ const articleSchema = {
   '@context': 'https://schema.org',
   '@type': 'Article',
   headline: 'How to Become a Dog Groomer: Certification, Training & Career Guide',
-  description: 'Step-by-step guide to becoming a professional dog groomer — certification programs, training costs, apprenticeships, salary expectations.',
+  description: 'Become a dog groomer in 3–6 months: training costs $3K–$18K, starting pay $30K–$45K, experienced groomers earn $60K+. The exact path from zero experience to first paying client.',
   url: 'https://getgroomgrid.com/blog/how-to-become-a-dog-groomer',
   datePublished: '2026-04-27',
   dateModified: '2026-04-27',

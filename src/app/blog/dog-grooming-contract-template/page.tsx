@@ -7,15 +7,13 @@ import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
   title: 'Dog Grooming Contract Template: What to Include and Why | GroomGrid',
-  description:
-    'Protect your grooming business with a solid client contract. Here\'s exactly what to include, plus a ready-to-use dog grooming contract template.',
+  description: 'Free dog grooming contract template — covers liability, matting consent, late pickup fees, and emergency authorization. Download and customize in under 10 minutes.',
   alternates: {
     canonical: 'https://getgroomgrid.com/blog/dog-grooming-contract-template',
   },
   openGraph: {
     title: 'Dog Grooming Contract Template: What to Include and Why',
-    description:
-      'Protect your grooming business with a solid client contract. Here\'s exactly what to include, plus a ready-to-use dog grooming contract template.',
+    description: 'Free dog grooming contract template — covers liability, matting consent, late pickup fees, and emergency authorization. Download and customize in under 10 minutes.',
     url: 'https://getgroomgrid.com/blog/dog-grooming-contract-template',
     type: 'article',
   },
@@ -25,8 +23,7 @@ const articleSchema = {
   '@context': 'https://schema.org',
   '@type': 'Article',
   headline: 'Dog Grooming Contract Template: What to Include and Why',
-  description:
-    'Protect your grooming business with a solid client contract. Here\'s exactly what to include, plus a ready-to-use dog grooming contract template.',
+  description: 'Free dog grooming contract template — covers liability, matting consent, late pickup fees, and emergency authorization. Download and customize in under 10 minutes.',
   url: 'https://getgroomgrid.com/blog/dog-grooming-contract-template',
   publisher: {
     '@type': 'Organization',

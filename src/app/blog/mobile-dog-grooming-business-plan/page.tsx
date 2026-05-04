@@ -7,15 +7,13 @@ import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
   title: 'Mobile Dog Grooming Business Plan: The Complete Template | GroomGrid',
-  description:
-    'Build a profitable mobile dog grooming business with this complete business plan guide — covering pricing, routes, equipment, and client acquisition.',
+  description: 'Free mobile grooming business plan: pricing at $75–$120/dog, a 6-dog/day route model earning $8K+/mo, and break-even in 4–6 months. Ready to customize and download.',
   alternates: {
     canonical: 'https://getgroomgrid.com/blog/mobile-dog-grooming-business-plan',
   },
   openGraph: {
     title: 'Mobile Dog Grooming Business Plan: The Complete Template',
-    description:
-      'Build a profitable mobile dog grooming business with this complete business plan guide — pricing, routes, equipment, and client acquisition.',
+    description: 'Free mobile grooming business plan: pricing at $75–$120/dog, a 6-dog/day route model earning $8K+/mo, and break-even in 4–6 months. Ready to customize and download.',
     url: 'https://getgroomgrid.com/blog/mobile-dog-grooming-business-plan',
     type: 'article',
   },
@@ -25,8 +23,7 @@ const articleSchema = {
   '@context': 'https://schema.org',
   '@type': 'Article',
   headline: 'Mobile Dog Grooming Business Plan: The Complete Template',
-  description:
-    'Build a profitable mobile dog grooming business with this complete business plan guide — pricing, routes, equipment, and client acquisition.',
+  description: 'Free mobile grooming business plan: pricing at $75–$120/dog, a 6-dog/day route model earning $8K+/mo, and break-even in 4–6 months. Ready to customize and download.',
   url: 'https://getgroomgrid.com/blog/mobile-dog-grooming-business-plan',
   publisher: {
     '@type': 'Organization',

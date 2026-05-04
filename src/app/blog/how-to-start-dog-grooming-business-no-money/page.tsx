@@ -8,14 +8,13 @@ import { generateArticleSchema, generateFAQPageSchema, generateHowToSchema, comb
 
 export const metadata: Metadata = {
   title: 'How to Start a Dog Grooming Business With No Money (2026 Guide) | GroomGrid',
-  description:
-    'Start a dog grooming business with zero budget — free tools, creative client acquisition, bartering strategies, and the 6-month bootstrap plan that turns $0 into a real business.',
+  description: 'Start a dog grooming business with $0: free tools, bartering for equipment, and a 6-month bootstrap plan from first groom to $3K/mo revenue. No loans or savings needed.',
   alternates: {
     canonical: 'https://getgroomgrid.com/blog/how-to-start-dog-grooming-business-no-money',
   },
   openGraph: {
     title: 'How to Start a Dog Grooming Business With No Money (2026 Guide)',
-    description: 'Start a dog grooming business with zero budget — free tools, creative client acquisition, bartering strategies, and the 6-month bootstrap plan.',
+    description: 'Start a dog grooming business with $0: free tools, bartering for equipment, and a 6-month bootstrap plan from first groom to $3K/mo revenue. No loans or savings needed.',
     url: 'https://getgroomgrid.com/blog/how-to-start-dog-grooming-business-no-money',
     type: 'article',
   },
@@ -23,7 +22,7 @@ export const metadata: Metadata = {
 
 const articleSchema = generateArticleSchema(
   'How to Start a Dog Grooming Business With No Money (2026 Guide)',
-  'Start a dog grooming business with zero budget — free tools, creative client acquisition, bartering strategies, and the 6-month bootstrap plan that turns $0 into a real business.',
+  'Start a dog grooming business with $0: free tools, bartering for equipment, and a 6-month bootstrap plan from first groom to $3K/mo revenue. No loans or savings needed.',
   'https://getgroomgrid.com/blog/how-to-start-dog-grooming-business-no-money',
   '2026-05-02',
   '2026-05-02'

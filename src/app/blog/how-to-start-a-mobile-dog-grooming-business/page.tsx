@@ -7,15 +7,13 @@ import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
   title: 'How to Start a Mobile Dog Grooming Business: The Complete Guide | GroomGrid',
-  description:
-    'Everything you need to start a mobile dog grooming business — van setup, licensing, pricing, finding first clients, and the tools to manage it all from day one.',
+  description: 'Start a mobile dog grooming business for $15K–$30K: van setup, licensing, pricing at $60–$150/dog, and how to book your first 20 clients in 30 days.',
   alternates: {
     canonical: 'https://getgroomgrid.com/blog/how-to-start-a-mobile-dog-grooming-business',
   },
   openGraph: {
     title: 'How to Start a Mobile Dog Grooming Business: The Complete Guide',
-    description:
-      'Everything you need to start a mobile dog grooming business — van setup, licensing, pricing, finding first clients, and the tools to manage it all from day one.',
+    description: 'Start a mobile dog grooming business for $15K–$30K: van setup, licensing, pricing at $60–$150/dog, and how to book your first 20 clients in 30 days.',
     url: 'https://getgroomgrid.com/blog/how-to-start-a-mobile-dog-grooming-business',
     type: 'article',
   },
@@ -25,8 +23,7 @@ const articleSchema = {
   '@context': 'https://schema.org',
   '@type': 'Article',
   headline: 'How to Start a Mobile Dog Grooming Business: The Complete Guide',
-  description:
-    'Everything you need to start a mobile dog grooming business — van setup, licensing, pricing, finding first clients, and the tools to manage it all from day one.',
+  description: 'Start a mobile dog grooming business for $15K–$30K: van setup, licensing, pricing at $60–$150/dog, and how to book your first 20 clients in 30 days.',
   url: 'https://getgroomgrid.com/blog/how-to-start-a-mobile-dog-grooming-business',
   publisher: {
     '@type': 'Organization',

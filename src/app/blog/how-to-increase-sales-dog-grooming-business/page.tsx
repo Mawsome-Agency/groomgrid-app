@@ -7,15 +7,13 @@ import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
   title: 'How to Increase Sales in Your Dog Grooming Business: 8 Proven Strategies | GroomGrid',
-  description:
-    'Increase revenue in your dog grooming business without adding more appointments. Learn upselling, service packages, rebooking strategies, and the operational changes that drive growth.',
+  description: '8 ways to increase grooming revenue 20–40% without booking more dogs — upsell add-ons, automate rebooking, restructure pricing, and recover $500+/mo in no-show losses.',
   alternates: {
     canonical: 'https://getgroomgrid.com/blog/how-to-increase-sales-dog-grooming-business',
   },
   openGraph: {
     title: 'How to Increase Sales in Your Dog Grooming Business: 8 Proven Strategies',
-    description:
-      'Increase revenue in your dog grooming business without adding more appointments. Learn upselling, service packages, rebooking strategies, and the operational changes that drive growth.',
+    description: '8 ways to increase grooming revenue 20–40% without booking more dogs — upsell add-ons, automate rebooking, restructure pricing, and recover $500+/mo in no-show losses.',
     url: 'https://getgroomgrid.com/blog/how-to-increase-sales-dog-grooming-business',
     type: 'article',
   },
@@ -25,8 +23,7 @@ const articleSchema = {
   '@context': 'https://schema.org',
   '@type': 'Article',
   headline: 'How to Increase Sales in Your Dog Grooming Business: 8 Proven Strategies',
-  description:
-    'Increase revenue in your dog grooming business without adding more appointments. Learn upselling, service packages, rebooking strategies, and the operational changes that drive growth.',
+  description: '8 ways to increase grooming revenue 20–40% without booking more dogs — upsell add-ons, automate rebooking, restructure pricing, and recover $500+/mo in no-show losses.',
   url: 'https://getgroomgrid.com/blog/how-to-increase-sales-dog-grooming-business',
   publisher: {
     '@type': 'Organization',

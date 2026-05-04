@@ -7,15 +7,13 @@ import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
   title: 'How to Reduce No-Shows in Your Dog Grooming Business | GroomGrid',
-  description:
-    'Cut grooming no-shows by 60% with automated reminders, deposit policies, and a multi-touch follow-up strategy. Real tactics groomers use every day.',
+  description: 'Cut dog grooming no-shows by 60% in 2 weeks — automated reminders, $25 deposit policies, and the 3-touch follow-up sequence top groomers use. Free strategy template included.',
   alternates: {
     canonical: 'https://getgroomgrid.com/blog/reduce-no-shows-dog-grooming',
   },
   openGraph: {
     title: 'How to Reduce No-Shows in Your Dog Grooming Business',
-    description:
-      'Cut grooming no-shows by 60% with automated reminders, deposit policies, and a multi-touch follow-up strategy.',
+    description: 'Cut dog grooming no-shows by 60% in 2 weeks — automated reminders, $25 deposit policies, and the 3-touch follow-up sequence top groomers use. Free strategy template included.',
     url: 'https://getgroomgrid.com/blog/reduce-no-shows-dog-grooming',
     type: 'article',
   },
@@ -25,8 +23,7 @@ const articleSchema = {
   '@context': 'https://schema.org',
   '@type': 'Article',
   headline: 'How to Reduce No-Shows in Your Dog Grooming Business',
-  description:
-    'Cut grooming no-shows by 60% with automated reminders, deposit policies, and a multi-touch follow-up strategy.',
+  description: 'Cut dog grooming no-shows by 60% in 2 weeks — automated reminders, $25 deposit policies, and the 3-touch follow-up sequence top groomers use. Free strategy template included.',
   url: 'https://getgroomgrid.com/blog/reduce-no-shows-dog-grooming',
   publisher: {
     '@type': 'Organization',

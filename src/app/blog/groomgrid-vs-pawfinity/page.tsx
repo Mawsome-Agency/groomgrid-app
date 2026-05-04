@@ -7,15 +7,13 @@ import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
   title: 'GroomGrid vs Pawfinity: Best Grooming Software for Mobile Groomers | GroomGrid',
-  description:
-    'Comparing GroomGrid vs Pawfinity for your mobile grooming business? See how AI features, mobile-first design, automated reminders, and pricing compare — and why groomers are upgrading.',
+  description: 'GroomGrid vs Pawfinity: AI-powered scheduling, 40% fewer no-shows, and mobile-first design at $29/mo. See which grooming software fits your business better.',
   alternates: {
     canonical: 'https://getgroomgrid.com/blog/groomgrid-vs-pawfinity',
   },
   openGraph: {
     title: 'GroomGrid vs Pawfinity: Best Grooming Software for Mobile Groomers',
-    description:
-      'Comparing GroomGrid vs Pawfinity for your mobile grooming business? See how AI features, mobile-first design, automated reminders, and pricing compare.',
+    description: 'GroomGrid vs Pawfinity: AI-powered scheduling, 40% fewer no-shows, and mobile-first design at $29/mo. See which grooming software fits your business better.',
     url: 'https://getgroomgrid.com/blog/groomgrid-vs-pawfinity',
     type: 'article',
   },
@@ -25,8 +23,7 @@ const articleSchema = {
   '@context': 'https://schema.org',
   '@type': 'Article',
   headline: 'GroomGrid vs Pawfinity: Best Grooming Software for Mobile Groomers',
-  description:
-    'Comparing GroomGrid vs Pawfinity for your mobile grooming business? See how AI features, mobile-first design, automated reminders, and pricing compare — and why groomers are upgrading.',
+  description: 'GroomGrid vs Pawfinity: AI-powered scheduling, 40% fewer no-shows, and mobile-first design at $29/mo. See which grooming software fits your business better.',
   url: 'https://getgroomgrid.com/blog/groomgrid-vs-pawfinity',
   datePublished: '2026-04-24',
   dateModified: '2026-04-24',

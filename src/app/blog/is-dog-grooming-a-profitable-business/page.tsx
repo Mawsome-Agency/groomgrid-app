@@ -7,15 +7,13 @@ import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
   title: 'Is Dog Grooming a Profitable Business? Real Numbers, Real Talk | GroomGrid',
-  description:
-    'Dog grooming can be highly profitable — but only if the numbers work. Here\'s the real breakdown: revenue potential, expenses, margins, and what it takes to actually make money grooming dogs.',
+  description: 'Solo dog groomers net $50K–$80K/year. Salon owners: $100K–$200K+. But margins depend on 3 things most groomers get wrong. Real P&L numbers and profitability benchmarks inside.',
   alternates: {
     canonical: 'https://getgroomgrid.com/blog/is-dog-grooming-a-profitable-business',
   },
   openGraph: {
     title: 'Is Dog Grooming a Profitable Business? Real Numbers, Real Talk',
-    description:
-      'Dog grooming can be highly profitable — but only if the numbers work. Here\'s the real breakdown: revenue potential, expenses, margins, and what it takes to actually make money grooming dogs.',
+    description: 'Solo dog groomers net $50K–$80K/year. Salon owners: $100K–$200K+. But margins depend on 3 things most groomers get wrong. Real P&L numbers and profitability benchmarks inside.',
     url: 'https://getgroomgrid.com/blog/is-dog-grooming-a-profitable-business',
     type: 'article',
   },
@@ -25,8 +23,7 @@ const articleSchema = {
   '@context': 'https://schema.org',
   '@type': 'Article',
   headline: 'Is Dog Grooming a Profitable Business? Real Numbers, Real Talk',
-  description:
-    'Dog grooming can be highly profitable — but only if the numbers work. Here\'s the real breakdown: revenue potential, expenses, margins, and what it takes to actually make money grooming dogs.',
+  description: 'Solo dog groomers net $50K–$80K/year. Salon owners: $100K–$200K+. But margins depend on 3 things most groomers get wrong. Real P&L numbers and profitability benchmarks inside.',
   url: 'https://getgroomgrid.com/blog/is-dog-grooming-a-profitable-business',
   publisher: {
     '@type': 'Organization',

@@ -7,15 +7,13 @@ import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
   title: 'How Much Does It Cost to Start a Dog Grooming Business? | GroomGrid',
-  description:
-    'Detailed cost breakdown to start a dog grooming business in 2026 — equipment, licensing, insurance, marketing, and software. Includes home salon, mobile, and retail location estimates.',
+  description: 'Start a dog grooming business for $2,000 (home) to $30K (mobile van) to $150K (salon). Full 2026 cost breakdown: equipment, licensing, insurance, marketing, and software.',
   alternates: {
     canonical: 'https://getgroomgrid.com/blog/how-much-to-start-dog-grooming-business',
   },
   openGraph: {
     title: 'How Much Does It Cost to Start a Dog Grooming Business?',
-    description:
-      'Detailed cost breakdown to start a dog grooming business in 2026 — equipment, licensing, insurance, marketing, and software. Includes home salon, mobile, and retail location estimates.',
+    description: 'Start a dog grooming business for $2,000 (home) to $30K (mobile van) to $150K (salon). Full 2026 cost breakdown: equipment, licensing, insurance, marketing, and software.',
     url: 'https://getgroomgrid.com/blog/how-much-to-start-dog-grooming-business',
     type: 'article',
   },
@@ -25,8 +23,7 @@ const articleSchema = {
   '@context': 'https://schema.org',
   '@type': 'Article',
   headline: 'How Much Does It Cost to Start a Dog Grooming Business?',
-  description:
-    'Detailed cost breakdown to start a dog grooming business in 2026 — equipment, licensing, insurance, marketing, and software. Includes home salon, mobile, and retail location estimates.',
+  description: 'Start a dog grooming business for $2,000 (home) to $30K (mobile van) to $150K (salon). Full 2026 cost breakdown: equipment, licensing, insurance, marketing, and software.',
   url: 'https://getgroomgrid.com/blog/how-much-to-start-dog-grooming-business',
   publisher: {
     '@type': 'Organization',

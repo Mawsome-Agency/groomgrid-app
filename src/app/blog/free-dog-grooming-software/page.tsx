@@ -7,14 +7,13 @@ import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
   title: 'Free Pet Grooming Software 2026: Reviews, Hidden Costs & Better Alternatives | GroomGrid',
-  description:
-    'Searching for free pet grooming software? We review every real option — Google Calendar stacks, Setmore, SimplyBook — calculate their hidden costs, and show why a $29/mo trial beats free every time. Works for dogs and cats.',
+  description: 'Free pet grooming software sounds great until you count the hidden costs. We tested Google Calendar, Setmore, and SimplyBook — a $29/mo tool saves $400+/mo in lost revenue.',
   alternates: {
     canonical: 'https://getgroomgrid.com/blog/free-dog-grooming-software',
   },
   openGraph: {
     title: 'Free Pet Grooming Software: Reviews, Hidden Costs & Better Alternatives',
-    description: 'Honest look at free pet grooming software — what features free tiers include, where they fall short, and when paying $29/month actually saves you money.',
+    description: 'Free pet grooming software sounds great until you count the hidden costs. We tested Google Calendar, Setmore, and SimplyBook — a $29/mo tool saves $400+/mo in lost revenue.',
     url: 'https://getgroomgrid.com/blog/free-dog-grooming-software',
     type: 'article',
   },
@@ -24,8 +23,7 @@ const articleSchema = {
   '@context': 'https://schema.org',
   '@type': 'Article',
   headline: 'Free Dog Grooming Software 2026: Reviews, Hidden Costs & Better Alternatives',
-  description:
-    'Review of every real free dog grooming software option — their actual limitations and the hidden costs that make paid software the smarter choice.',
+  description: 'Free pet grooming software sounds great until you count the hidden costs. We tested Google Calendar, Setmore, and SimplyBook — a $29/mo tool saves $400+/mo in lost revenue.',
   url: 'https://getgroomgrid.com/blog/free-dog-grooming-software',
   datePublished: '2026-04-23',
   dateModified: '2026-04-23',

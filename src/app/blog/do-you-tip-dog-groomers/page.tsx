@@ -7,15 +7,13 @@ import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
   title: 'Do You Tip Dog Groomers? How Much & When (Complete Guide) | GroomGrid',
-  description:
-    'Everything pet owners and new groomers need to know about tipping dog groomers — standard tip amounts, when to tip extra, holiday tipping, and what groomers really think about tips.',
+  description: 'Standard dog groomer tip: 15–20% or $10–$20 per groom. See when to tip more, holiday tipping etiquette, and what groomers actually prefer (hint: it\'s not always cash).',
   alternates: {
     canonical: 'https://getgroomgrid.com/blog/do-you-tip-dog-groomers',
   },
   openGraph: {
     title: 'Do You Tip Dog Groomers? How Much & When (Complete Guide)',
-    description:
-      'Standard tip amounts, when to tip extra, holiday tipping, and what groomers really think about tips.',
+    description: 'Standard dog groomer tip: 15–20% or $10–$20 per groom. See when to tip more, holiday tipping etiquette, and what groomers actually prefer (hint: it\'s not always cash).',
     url: 'https://getgroomgrid.com/blog/do-you-tip-dog-groomers',
     type: 'article',
   },
@@ -25,7 +23,7 @@ const articleSchema = {
   '@context': 'https://schema.org',
   '@type': 'Article',
   headline: 'Do You Tip Dog Groomers? How Much & When (Complete Guide)',
-  description: 'Everything you need to know about tipping dog groomers — standard amounts, when to tip extra, and what groomers think.',
+  description: 'Standard dog groomer tip: 15–20% or $10–$20 per groom. See when to tip more, holiday tipping etiquette, and what groomers actually prefer (hint: it\'s not always cash).',
   url: 'https://getgroomgrid.com/blog/do-you-tip-dog-groomers',
   datePublished: '2026-04-27',
   dateModified: '2026-04-27',

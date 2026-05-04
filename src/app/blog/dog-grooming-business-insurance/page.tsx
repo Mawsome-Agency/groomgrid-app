@@ -7,15 +7,13 @@ import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
   title: 'Dog Grooming Business Insurance: What You Need & What It Costs (2026) | GroomGrid',
-  description:
-    'Complete guide to dog grooming business insurance — general liability, professional liability, commercial auto, workers comp, and how much you should expect to pay.',
+  description: 'Dog grooming insurance costs $30–$60/month for solo groomers. Here\'s exactly what coverage you need, what you can skip, and 3 providers offering same-day quotes in 2026.',
   alternates: {
     canonical: 'https://getgroomgrid.com/blog/dog-grooming-business-insurance',
   },
   openGraph: {
     title: 'Dog Grooming Business Insurance: What You Need & What It Costs (2026)',
-    description:
-      'Complete guide to dog grooming business insurance — coverage types, costs, and what you actually need to protect your business.',
+    description: 'Dog grooming insurance costs $30–$60/month for solo groomers. Here\'s exactly what coverage you need, what you can skip, and 3 providers offering same-day quotes in 2026.',
     url: 'https://getgroomgrid.com/blog/dog-grooming-business-insurance',
     type: 'article',
   },
@@ -25,7 +23,7 @@ const articleSchema = {
   '@context': 'https://schema.org',
   '@type': 'Article',
   headline: 'Dog Grooming Business Insurance: What You Need & What It Costs (2026)',
-  description: 'Complete guide to dog grooming business insurance — general liability, professional liability, commercial auto, workers comp, and costs.',
+  description: 'Dog grooming insurance costs $30–$60/month for solo groomers. Here\'s exactly what coverage you need, what you can skip, and 3 providers offering same-day quotes in 2026.',
   url: 'https://getgroomgrid.com/blog/dog-grooming-business-insurance',
   datePublished: '2026-04-27',
   dateModified: '2026-04-27',

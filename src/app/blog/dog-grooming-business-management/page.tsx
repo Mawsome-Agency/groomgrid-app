@@ -7,15 +7,13 @@ import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
   title: 'Dog Grooming Business Management: The Complete Guide | GroomGrid',
-  description:
-    'Learn how to manage your dog grooming business like a pro — scheduling, client retention, deposits, payments, and the tools that make it all click.',
+  description: 'Run your grooming business in 2 hours/week of admin — not 10. Covers automated scheduling, deposit policies that cut no-shows 60%, and rebooking workflows that fill your calendar.',
   alternates: {
     canonical: 'https://getgroomgrid.com/blog/dog-grooming-business-management',
   },
   openGraph: {
     title: 'Dog Grooming Business Management: The Complete Guide',
-    description:
-      'Learn how to manage your dog grooming business like a pro — scheduling, client retention, deposits, payments, and the tools that make it all click.',
+    description: 'Run your grooming business in 2 hours/week of admin — not 10. Covers automated scheduling, deposit policies that cut no-shows 60%, and rebooking workflows that fill your calendar.',
     url: 'https://getgroomgrid.com/blog/dog-grooming-business-management',
     type: 'article',
   },
@@ -25,8 +23,7 @@ const articleSchema = {
   '@context': 'https://schema.org',
   '@type': 'Article',
   headline: 'Dog Grooming Business Management: The Complete Guide',
-  description:
-    'Learn how to manage your dog grooming business like a pro — scheduling, client retention, deposits, payments, and the tools that make it all click.',
+  description: 'Run your grooming business in 2 hours/week of admin — not 10. Covers automated scheduling, deposit policies that cut no-shows 60%, and rebooking workflows that fill your calendar.',
   url: 'https://getgroomgrid.com/blog/dog-grooming-business-management',
   publisher: {
     '@type': 'Organization',

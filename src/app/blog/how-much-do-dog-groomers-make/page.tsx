@@ -7,15 +7,13 @@ import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
   title: 'How Much Do Dog Groomers Make? Salary & Income Guide (2026) | GroomGrid',
-  description:
-    'Dog groomer salary breakdown for 2026 — hourly rates, annual income, mobile vs salon pay, commission structures, and how to maximize your grooming income.',
+  description: 'Dog groomers earn $30K–$75K/year — but mobile groomers hitting $100K+ isn\'t rare. See hourly rates ($15–$40+), commission vs booth rent math, and 3 moves that double your income.',
   alternates: {
     canonical: 'https://getgroomgrid.com/blog/how-much-do-dog-groomers-make',
   },
   openGraph: {
     title: 'How Much Do Dog Groomers Make? Salary & Income Guide (2026)',
-    description:
-      'Dog groomer salary breakdown — hourly rates, annual income, mobile vs salon, commission structures, and how to maximize your grooming income.',
+    description: 'Dog groomers earn $30K–$75K/year — but mobile groomers hitting $100K+ isn\'t rare. See hourly rates ($15–$40+), commission vs booth rent math, and 3 moves that double your income.',
     url: 'https://getgroomgrid.com/blog/how-much-do-dog-groomers-make',
     type: 'article',
   },
@@ -25,7 +23,7 @@ const articleSchema = {
   '@context': 'https://schema.org',
   '@type': 'Article',
   headline: 'How Much Do Dog Groomers Make? Salary & Income Guide (2026)',
-  description: 'Dog groomer salary breakdown for 2026 — hourly rates, annual income, mobile vs salon pay, commission structures, and how to maximize your grooming income.',
+  description: 'Dog groomers earn $30K–$75K/year — but mobile groomers hitting $100K+ isn\'t rare. See hourly rates ($15–$40+), commission vs booth rent math, and 3 moves that double your income.',
   url: 'https://getgroomgrid.com/blog/how-much-do-dog-groomers-make',
   datePublished: '2026-04-27',
   dateModified: '2026-04-27',

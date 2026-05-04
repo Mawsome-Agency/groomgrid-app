@@ -7,15 +7,13 @@ import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
   title: 'Dog Grooming Business Plan Template: Free Download for 2026 | GroomGrid',
-  description:
-    'Free dog grooming business plan template with executive summary, market analysis, financial projections, and operational plan. Downloadable structure for mobile, salon, and home-based grooming businesses.',
+  description: 'Download a free dog grooming business plan in under 5 minutes. Covers startup costs ($2K–$150K), a revenue model hitting $8,800/mo, and your exact break-even timeline.',
   alternates: {
     canonical: 'https://getgroomgrid.com/blog/dog-grooming-business-plan-template',
   },
   openGraph: {
     title: 'Dog Grooming Business Plan Template: Free Download for 2026',
-    description:
-      'Free dog grooming business plan template with executive summary, market analysis, financial projections, and operational plan — ready to customize for your grooming business.',
+    description: 'Download a free dog grooming business plan in under 5 minutes. Covers startup costs ($2K–$150K), a revenue model hitting $8,800/mo, and your exact break-even timeline.',
     url: 'https://getgroomgrid.com/blog/dog-grooming-business-plan-template',
     type: 'article',
   },
@@ -25,8 +23,7 @@ const articleSchema = {
   '@context': 'https://schema.org',
   '@type': 'Article',
   headline: 'Dog Grooming Business Plan Template: Free Download for 2026',
-  description:
-    'Free dog grooming business plan template with executive summary, market analysis, financial projections, and operational plan — ready to customize for your grooming business.',
+  description: 'Download a free dog grooming business plan in under 5 minutes. Covers startup costs ($2K–$150K), a revenue model hitting $8,800/mo, and your exact break-even timeline.',
   url: 'https://getgroomgrid.com/blog/dog-grooming-business-plan-template',
   datePublished: '2026-04-28',
   dateModified: '2026-04-28',

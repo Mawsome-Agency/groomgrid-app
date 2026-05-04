@@ -7,15 +7,13 @@ import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
   title: 'How to Start a Cat Grooming Business: The Complete Guide | GroomGrid',
-  description:
-    'Everything you need to start a cat grooming business — certifications, pricing ($80–$150/cat), handling techniques, scheduling, and the tools to manage it all.',
+  description: 'Start a cat grooming business charging $80–$150 per session with 3–5 clients/day. Covers NCGIA certification, feline handling safety, and scheduling tools cat groomers actually need.',
   alternates: {
     canonical: 'https://getgroomgrid.com/blog/cat-grooming-business-guide',
   },
   openGraph: {
     title: 'How to Start a Cat Grooming Business: The Complete Guide',
-    description:
-      'Everything you need to start a cat grooming business — certifications, pricing ($80–$150/cat), handling techniques, scheduling, and the tools to manage it all.',
+    description: 'Start a cat grooming business charging $80–$150 per session with 3–5 clients/day. Covers NCGIA certification, feline handling safety, and scheduling tools cat groomers actually need.',
     url: 'https://getgroomgrid.com/blog/cat-grooming-business-guide',
     type: 'article',
   },
@@ -25,8 +23,7 @@ const articleSchema = {
   '@context': 'https://schema.org',
   '@type': 'Article',
   headline: 'How to Start a Cat Grooming Business: The Complete Guide',
-  description:
-    'Everything you need to start a cat grooming business — certifications, pricing ($80–$150/cat), handling techniques, scheduling, and the tools to manage it all.',
+  description: 'Start a cat grooming business charging $80–$150 per session with 3–5 clients/day. Covers NCGIA certification, feline handling safety, and scheduling tools cat groomers actually need.',
   url: 'https://getgroomgrid.com/blog/cat-grooming-business-guide',
   publisher: {
     '@type': 'Organization',

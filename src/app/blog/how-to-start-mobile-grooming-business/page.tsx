@@ -7,15 +7,13 @@ import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
   title: 'How to Start a Mobile Dog Grooming Business: Step-by-Step Guide | GroomGrid',
-  description:
-    'Everything you need to launch a mobile dog grooming business — licensing, equipment, pricing, finding first clients, and the tools that run it all.',
+  description: 'Launch a mobile grooming business step by step: van vs trailer ($10K–$50K), state licensing, route planning, and the scheduling tool that books clients while you groom.',
   alternates: {
     canonical: 'https://getgroomgrid.com/blog/how-to-start-mobile-grooming-business',
   },
   openGraph: {
     title: 'How to Start a Mobile Dog Grooming Business: Step-by-Step Guide',
-    description:
-      'Everything you need to launch a mobile dog grooming business — licensing, equipment, pricing, and finding your first clients.',
+    description: 'Launch a mobile grooming business step by step: van vs trailer ($10K–$50K), state licensing, route planning, and the scheduling tool that books clients while you groom.',
     url: 'https://getgroomgrid.com/blog/how-to-start-mobile-grooming-business',
     type: 'article',
   },
@@ -25,8 +23,7 @@ const articleSchema = {
   '@context': 'https://schema.org',
   '@type': 'Article',
   headline: 'How to Start a Mobile Dog Grooming Business: Step-by-Step Guide',
-  description:
-    'Everything you need to launch a mobile dog grooming business — licensing, equipment, pricing, and finding your first clients.',
+  description: 'Launch a mobile grooming business step by step: van vs trailer ($10K–$50K), state licensing, route planning, and the scheduling tool that books clients while you groom.',
   url: 'https://getgroomgrid.com/blog/how-to-start-mobile-grooming-business',
   publisher: {
     '@type': 'Organization',

@@ -7,15 +7,13 @@ import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
   title: 'Dog Grooming Software: The 2026 Buyer\'s Guide for Professional Groomers | GroomGrid',
-  description:
-    'Compare the best dog grooming software for 2026. Covers scheduling, client records, automated reminders, payments, and what to look for before you buy.',
+  description: 'Dog grooming software buyer\'s guide for 2026: pricing from $0–$149/mo, feature comparison charts, and the 3 platforms worth paying for. Avoid the ones that waste your money.',
   alternates: {
     canonical: 'https://getgroomgrid.com/blog/dog-grooming-software',
   },
   openGraph: {
     title: 'Dog Grooming Software: The 2026 Buyer\'s Guide for Professional Groomers',
-    description:
-      'Compare the best dog grooming software for 2026. Covers scheduling, client records, automated reminders, and payments.',
+    description: 'Dog grooming software buyer\'s guide for 2026: pricing from $0–$149/mo, feature comparison charts, and the 3 platforms worth paying for. Avoid the ones that waste your money.',
     url: 'https://getgroomgrid.com/blog/dog-grooming-software',
     type: 'article',
   },
@@ -25,8 +23,7 @@ const articleSchema = {
   '@context': 'https://schema.org',
   '@type': 'Article',
   headline: 'Dog Grooming Software: The 2026 Buyer\'s Guide for Professional Groomers',
-  description:
-    'Compare the best dog grooming software for 2026. Covers scheduling, client records, automated reminders, payments, and what to look for before you buy.',
+  description: 'Dog grooming software buyer\'s guide for 2026: pricing from $0–$149/mo, feature comparison charts, and the 3 platforms worth paying for. Avoid the ones that waste your money.',
   url: 'https://getgroomgrid.com/blog/dog-grooming-software',
   datePublished: '2026-04-17',
   dateModified: '2026-04-17',

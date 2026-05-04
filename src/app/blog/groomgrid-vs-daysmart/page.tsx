@@ -7,15 +7,13 @@ import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
   title: 'GroomGrid vs DaySmart Pet: Which Grooming Software is Right for You? | GroomGrid',
-  description:
-    'Comparing GroomGrid vs DaySmart Pet for your grooming business? See how pricing, AI features, mobile-first design, and ease of onboarding stack up — and why independent groomers are switching.',
+  description: 'GroomGrid ($29/mo) vs DaySmart Pet ($100+/mo): AI scheduling, 5-minute onboarding, and mobile-first design vs legacy desktop software. Full feature and pricing comparison.',
   alternates: {
     canonical: 'https://getgroomgrid.com/blog/groomgrid-vs-daysmart',
   },
   openGraph: {
     title: 'GroomGrid vs DaySmart Pet: Which Grooming Software is Right for You?',
-    description:
-      'Comparing GroomGrid vs DaySmart Pet for your grooming business? See how pricing, AI features, mobile-first design, and ease of onboarding stack up.',
+    description: 'GroomGrid ($29/mo) vs DaySmart Pet ($100+/mo): AI scheduling, 5-minute onboarding, and mobile-first design vs legacy desktop software. Full feature and pricing comparison.',
     url: 'https://getgroomgrid.com/blog/groomgrid-vs-daysmart',
     type: 'article',
   },
@@ -25,8 +23,7 @@ const articleSchema = {
   '@context': 'https://schema.org',
   '@type': 'Article',
   headline: 'GroomGrid vs DaySmart Pet: Which Grooming Software is Right for You?',
-  description:
-    'Comparing GroomGrid vs DaySmart Pet for your grooming business? See how pricing, AI features, mobile-first design, and ease of onboarding stack up — and why independent groomers are switching.',
+  description: 'GroomGrid ($29/mo) vs DaySmart Pet ($100+/mo): AI scheduling, 5-minute onboarding, and mobile-first design vs legacy desktop software. Full feature and pricing comparison.',
   url: 'https://getgroomgrid.com/blog/groomgrid-vs-daysmart',
   datePublished: '2026-04-24',
   dateModified: '2026-04-24',

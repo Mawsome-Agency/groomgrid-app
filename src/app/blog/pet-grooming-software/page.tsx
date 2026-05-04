@@ -7,15 +7,13 @@ import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
   title: 'Pet Grooming Software: What It Is and Why Your Business Needs It | GroomGrid',
-  description:
-    'Pet grooming software automates booking, reminders, payments, and client records. Learn what to look for, what to avoid, and how the right tool transforms your grooming business.',
+  description: 'Pet grooming software saves 8+ hours/week on scheduling, cuts no-shows 40%, and automates payment collection. Here\'s what to look for and what\'s not worth paying for in 2026.',
   alternates: {
     canonical: 'https://getgroomgrid.com/blog/pet-grooming-software',
   },
   openGraph: {
     title: 'Pet Grooming Software: What It Is and Why Your Business Needs It',
-    description:
-      'Pet grooming software automates booking, reminders, payments, and client records. Learn what to look for, what to avoid, and how the right tool transforms your grooming business.',
+    description: 'Pet grooming software saves 8+ hours/week on scheduling, cuts no-shows 40%, and automates payment collection. Here\'s what to look for and what\'s not worth paying for in 2026.',
     url: 'https://getgroomgrid.com/blog/pet-grooming-software',
     type: 'article',
   },
@@ -25,8 +23,7 @@ const articleSchema = {
   '@context': 'https://schema.org',
   '@type': 'Article',
   headline: 'Pet Grooming Software: What It Is and Why Your Business Needs It',
-  description:
-    'Pet grooming software automates booking, reminders, payments, and client records. Learn what to look for, what to avoid, and how the right tool transforms your grooming business.',
+  description: 'Pet grooming software saves 8+ hours/week on scheduling, cuts no-shows 40%, and automates payment collection. Here\'s what to look for and what\'s not worth paying for in 2026.',
   url: 'https://getgroomgrid.com/blog/pet-grooming-software',
   publisher: {
     '@type': 'Organization',

@@ -7,15 +7,13 @@ import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
   title: 'How to Start a Dog Grooming Business at Home: Step-by-Step Guide | GroomGrid',
-  description:
-    'Start your dog grooming business at home with this complete guide — licensing, equipment, pricing, zoning rules, and the software that keeps everything organized from day one.',
+  description: 'Start a home dog grooming business for under $5,000 — covers zoning permits, equipment, pricing at $40–$80/dog, and how to book 3–5 clients/day without leaving your house.',
   alternates: {
     canonical: 'https://getgroomgrid.com/blog/how-to-start-dog-grooming-business-at-home',
   },
   openGraph: {
     title: 'How to Start a Dog Grooming Business at Home',
-    description:
-      'Start your dog grooming business at home with this complete guide — licensing, equipment, pricing, zoning rules, and the software that keeps everything organized from day one.',
+    description: 'Start a home dog grooming business for under $5,000 — covers zoning permits, equipment, pricing at $40–$80/dog, and how to book 3–5 clients/day without leaving your house.',
     url: 'https://getgroomgrid.com/blog/how-to-start-dog-grooming-business-at-home',
     type: 'article',
   },
@@ -25,8 +23,7 @@ const articleSchema = {
   '@context': 'https://schema.org',
   '@type': 'Article',
   headline: 'How to Start a Dog Grooming Business at Home: Step-by-Step Guide',
-  description:
-    'Start your dog grooming business at home with this complete guide — licensing, equipment, pricing, zoning rules, and the software that keeps everything organized from day one.',
+  description: 'Start a home dog grooming business for under $5,000 — covers zoning permits, equipment, pricing at $40–$80/dog, and how to book 3–5 clients/day without leaving your house.',
   url: 'https://getgroomgrid.com/blog/how-to-start-dog-grooming-business-at-home',
   datePublished: '2026-04-23',
   dateModified: '2026-04-23',

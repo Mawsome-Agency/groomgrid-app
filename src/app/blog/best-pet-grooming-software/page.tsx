@@ -7,15 +7,13 @@ import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
   title: 'Best Pet Grooming Software in 2026: Top Picks for Professional Groomers | GroomGrid',
-  description:
-    'The best pet grooming software for 2026 — reviewed and compared. Find the right platform for solo groomers, mobile businesses, and small salons based on features, pricing, and ease of use.',
+  description: 'We compared 7 pet grooming platforms on pricing, mobile usability, and no-show reduction. Here\'s which one wins for solo groomers, salons, and mobile businesses in 2026.',
   alternates: {
     canonical: 'https://getgroomgrid.com/blog/best-pet-grooming-software',
   },
   openGraph: {
     title: 'Best Pet Grooming Software in 2026: Top Picks for Professional Groomers',
-    description:
-      'The best pet grooming software for 2026 — reviewed and compared. Find the right platform for solo groomers, mobile businesses, and small salons based on features, pricing, and ease of use.',
+    description: 'We compared 7 pet grooming platforms on pricing, mobile usability, and no-show reduction. Here\'s which one wins for solo groomers, salons, and mobile businesses in 2026.',
     url: 'https://getgroomgrid.com/blog/best-pet-grooming-software',
     type: 'article',
   },
@@ -25,8 +23,7 @@ const articleSchema = {
   '@context': 'https://schema.org',
   '@type': 'Article',
   headline: 'Best Pet Grooming Software in 2026: Top Picks for Professional Groomers',
-  description:
-    'The best pet grooming software for 2026 — reviewed and compared. Find the right platform for solo groomers, mobile businesses, and small salons based on features, pricing, and ease of use.',
+  description: 'We compared 7 pet grooming platforms on pricing, mobile usability, and no-show reduction. Here\'s which one wins for solo groomers, salons, and mobile businesses in 2026.',
   url: 'https://getgroomgrid.com/blog/best-pet-grooming-software',
   publisher: {
     '@type': 'Organization',

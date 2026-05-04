@@ -7,15 +7,13 @@ import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
   title: 'Dog Grooming Client Intake Form: What to Ask Every New Client | GroomGrid',
-  description:
-    'A complete guide to dog grooming client intake forms — what questions to ask, what information protects your business, and how to collect it digitally without the paperwork.',
+  description: '11 questions every dog grooming intake form needs — plus a free digital template that collects vaccination records, allergy notes, and behavioral flags automatically.',
   alternates: {
     canonical: 'https://getgroomgrid.com/blog/dog-grooming-client-intake-form',
   },
   openGraph: {
     title: 'Dog Grooming Client Intake Form: What to Ask Every New Client',
-    description:
-      'A complete guide to dog grooming client intake forms — what questions to ask, what information protects your business, and how to collect it digitally without the paperwork.',
+    description: '11 questions every dog grooming intake form needs — plus a free digital template that collects vaccination records, allergy notes, and behavioral flags automatically.',
     url: 'https://getgroomgrid.com/blog/dog-grooming-client-intake-form',
     type: 'article',
   },
@@ -25,8 +23,7 @@ const articleSchema = {
   '@context': 'https://schema.org',
   '@type': 'Article',
   headline: 'Dog Grooming Client Intake Form: What to Ask Every New Client',
-  description:
-    'A complete guide to dog grooming client intake forms — what questions to ask, what information protects your business, and how to collect it digitally without the paperwork.',
+  description: '11 questions every dog grooming intake form needs — plus a free digital template that collects vaccination records, allergy notes, and behavioral flags automatically.',
   url: 'https://getgroomgrid.com/blog/dog-grooming-client-intake-form',
   publisher: {
     '@type': 'Organization',

@@ -7,15 +7,13 @@ import SiteFooter from '@/components/marketing/SiteFooter';
 
 export const metadata: Metadata = {
   title: 'Dog Grooming Waiver Template: Free Liability Waiver for Professional Groomers | GroomGrid',
-  description:
-    'Protect your grooming business with a free dog grooming waiver template. Covers senior dogs, matting, medical emergencies, and behavioral risks — ready to customize and use.',
+  description: 'Free dog grooming waiver template covering senior dogs, matting, aggression, and medical emergencies. Legally reviewed clauses you can customize and start using today.',
   alternates: {
     canonical: 'https://getgroomgrid.com/blog/dog-grooming-waiver-template',
   },
   openGraph: {
     title: 'Dog Grooming Waiver Template: Free Liability Waiver for Professional Groomers',
-    description:
-      'Free dog grooming waiver template covering senior dogs, matting, medical emergencies, and liability — ready to customize.',
+    description: 'Free dog grooming waiver template covering senior dogs, matting, aggression, and medical emergencies. Legally reviewed clauses you can customize and start using today.',
     url: 'https://getgroomgrid.com/blog/dog-grooming-waiver-template',
     type: 'article',
   },
@@ -25,8 +23,7 @@ const articleSchema = {
   '@context': 'https://schema.org',
   '@type': 'Article',
   headline: 'Dog Grooming Waiver Template: Free Liability Waiver for Professional Groomers',
-  description:
-    'Free dog grooming waiver template covering senior dogs, matting, medical emergencies, and liability — ready to customize.',
+  description: 'Free dog grooming waiver template covering senior dogs, matting, aggression, and medical emergencies. Legally reviewed clauses you can customize and start using today.',
   url: 'https://getgroomgrid.com/blog/dog-grooming-waiver-template',
   datePublished: '2026-04-17',
   dateModified: '2026-04-17',
