@@ -5,6 +5,7 @@ import { useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { useScrollReveal } from '@/hooks/use-scroll-reveal';
 import SiteFooter from '@/components/marketing/SiteFooter';
+import { DashboardMockup, FeatureShowcase, ReminderMockup } from '@/components/marketing/ProductMockups';
 
 const SIGNUP_URL = '/signup?coupon=BETA50';
 
@@ -102,7 +103,7 @@ export default function HomePage() {
       </nav>
 
       {/* ── Hero — above the fold, no scroll-reveal ── */}
-      <section className="px-6 pt-14 pb-16 max-w-3xl mx-auto text-center">
+      <section className="px-6 pt-14 pb-8 max-w-3xl mx-auto text-center">
         <p className="text-green-600 font-semibold text-sm uppercase tracking-widest mb-4">
           For solo mobile groomers
         </p>
@@ -122,10 +123,45 @@ export default function HomePage() {
           </CtaLink>
           <p className="text-sm text-stone-500">$29/mo after · Cancel anytime · No credit card</p>
         </div>
-        <p className="text-xs text-stone-400 mt-4">
-          ✓ Setup in 5 min &nbsp; ✓ Works on your phone &nbsp; ✓ No credit card needed
-        </p>
+        {/* ── Trust signals above the fold ── */}
+        <div className="mt-6 flex flex-wrap justify-center items-center gap-x-5 gap-y-2.5 text-sm">
+          <span className="flex items-center gap-1.5 text-stone-600">
+            <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-green-100 text-green-700 text-xs font-bold">✓</span>
+            Join 10+ early-adopting groomers
+          </span>
+          <span className="flex items-center gap-1.5 text-stone-600">
+            <span>💳</span>
+            Payments powered by Stripe
+          </span>
+          <span className="flex items-center gap-1.5 text-stone-600">
+            <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-green-100 text-green-700 text-xs font-bold">✓</span>
+            Setup in 5 min
+          </span>
+          <span className="flex items-center gap-1.5 text-stone-600">
+            <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-green-100 text-green-700 text-xs font-bold">✓</span>
+            No credit card needed
+          </span>
+        </div>
       </section>
+
+      {/* ── Hero Product Screenshot ── */}
+      <section className="px-6 pb-12 max-w-4xl mx-auto">
+        <DashboardMockup className="w-full" />
+        <p className="text-center text-xs text-stone-400 mt-3">Your GroomGrid dashboard — see everything at a glance</p>
+      </section>
+
+      {/* ── Social proof pull-quote (above the fold) ── */}
+      <div className="px-6 pb-8 max-w-2xl mx-auto">
+        <div className="bg-stone-50 border border-stone-100 rounded-xl px-6 py-4 text-center">
+          <p className="text-stone-600 text-sm leading-relaxed italic">
+            &ldquo;My no-show rate was 15–20%. Every missed appointment was $80–120 out the window
+            and gas I can&rsquo;t get back.&rdquo;
+          </p>
+          <p className="text-green-600 font-semibold text-xs mt-2 tracking-wide uppercase">
+            — Real feedback from a mobile groomer
+          </p>
+        </div>
+      </div>
 
       {/* ── Pain → Solution — staggered card entrance ── */}
       <section className="px-6 py-14 bg-green-50">
@@ -168,10 +204,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Features — section fades in, cards have hover lift ── */}
+      {/* ── Features — section fades in, with product screenshots ── */}
       <section
         ref={revealRef(0)}
-        className="scroll-reveal px-6 py-14 max-w-4xl mx-auto"
+        className="scroll-reveal px-6 py-14 max-w-5xl mx-auto"
       >
         <h2 className="text-2xl font-bold text-center text-stone-800 mb-2">
           Everything you need. Nothing you don&apos;t.
@@ -179,46 +215,12 @@ export default function HomePage() {
         <p className="text-center text-stone-500 mb-10">
           Built for solo mobile groomers doing 4–8 dogs a day.
         </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-          {[
-            {
-              emoji: '📅',
-              title: '2-tap booking',
-              desc: 'Schedule appointments in seconds from your phone, between jobs, with one hand.',
-            },
-            {
-              emoji: '🔔',
-              title: 'Automatic reminders',
-              desc: 'SMS and email reminders fire automatically — you set it once and forget it.',
-            },
-            {
-              emoji: '🐾',
-              title: 'Pet profiles',
-              desc: 'Store breed, coat type, grooming notes, and client preferences. No more "wait, which doodle is this?"',
-            },
-            {
-              emoji: '💳',
-              title: 'Upfront payments',
-              desc: 'Collect deposits or full payment at booking. Stripe-powered, instant transfers.',
-            },
-          ].map(({ emoji, title, desc }) => (
-            <div
-              key={title}
-              className="flex gap-4 p-5 rounded-xl border border-stone-100 hover:border-green-200 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 ease-out"
-            >
-              <span className="text-2xl flex-shrink-0 mt-0.5">{emoji}</span>
-              <div>
-                <p className="font-semibold text-stone-800 mb-1">{title}</p>
-                <p className="text-stone-500 text-sm leading-relaxed">{desc}</p>
-              </div>
-            </div>
-          ))}
-        </div>
+        <FeatureShowcase />
       </section>
 
       {/* ── Social Proof — header fades in, testimonials get parallax ── */}
       <section className="px-6 py-14 bg-stone-50">
-        <div className="max-w-3xl mx-auto text-center">
+        <div className="max-w-4xl mx-auto text-center">
           <div ref={revealRef(0)} className="scroll-reveal mb-10">
             <p className="text-green-600 font-semibold text-sm uppercase tracking-widest mb-2">
               Built from real conversations
@@ -231,7 +233,7 @@ export default function HomePage() {
             </p>
           </div>
           {/* Pain cards — what real groomers told us */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-left">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-left mb-10">
             {[
               {
                 quote:
@@ -256,6 +258,11 @@ export default function HomePage() {
                 <p className="text-stone-500 text-xs mt-1">{detail}</p>
               </div>
             ))}
+          </div>
+          {/* Reminder mockup to illustrate the "built from real conversations" section */}
+          <div className="max-w-sm mx-auto">
+            <ReminderMockup />
+            <p className="text-center text-xs text-stone-400 mt-3">Automated reminders — confirmations come straight to your clients</p>
           </div>
         </div>
       </section>
