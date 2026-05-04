@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { Plan } from '@/types';
 import { PLANS, TESTIMONIALS, FAQ_ITEMS } from '@/app/pricing/pricing-data';
 import PlanCard from '@/components/funnel/PlanCard';
+import PricingCarousel from '@/components/funnel/PricingCarousel';
 import TrustSignals from '@/components/trust/TrustSignals';
 import StickyPlanBar from '@/components/funnel/StickyPlanBar';
 import { BillingSummaryData } from '@/components/trust/BillingSummary';
@@ -267,13 +268,10 @@ function PlansPageInner() {
     }
   };
 
-  // Show skeleton while session is loading (but don't redirect unauthenticated)
-  const isLoadingSession = status === 'loading';
-
-  if (isLoadingSession) {
-    return <PlansSkeleton />;
-  }
-
+  // Render content immediately — don't block on session loading.
+  // The plans page is public-first; session status only affects the
+  // header button (Log In vs Sign Out) and the checkout handler,
+  // both of which degrade gracefully while the session resolves.
   const isAuthenticated = status === 'authenticated' && session?.user?.id;
 
   return (
@@ -415,20 +413,22 @@ function PlansPageInner() {
           </div>
         )}
 
-        {/* Plan Cards */}
-        <div ref={planGridRef} className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          {PLANS.map((plan) => (
-            <PlanCard
-              key={plan.id}
-              plan={plan}
-              selected={selectedPlan?.id === plan.id}
-              onSelect={() => handleSelectPlan(plan)}
-              isLoading={selectedPlan?.id === plan.id && isCheckoutInFlight}
-              isDimmed={isCheckoutInFlight && selectedPlan?.id !== plan.id}
-              hasError={!!checkoutError && selectedPlan?.id === plan.id}
-              discountedPrice={effectiveCoupon === 'GROOMERFOUNDING' ? 0 : undefined}
-            />
-          ))}
+        {/* Plan Cards — horizontal scroll carousel on mobile, grid on desktop */}
+        <div ref={planGridRef}>
+          <PricingCarousel defaultIndex={0} className="mb-12">
+            {PLANS.map((plan) => (
+              <PlanCard
+                key={plan.id}
+                plan={plan}
+                selected={selectedPlan?.id === plan.id}
+                onSelect={() => handleSelectPlan(plan)}
+                isLoading={selectedPlan?.id === plan.id && isCheckoutInFlight}
+                isDimmed={isCheckoutInFlight && selectedPlan?.id !== plan.id}
+                hasError={!!checkoutError && selectedPlan?.id === plan.id}
+                discountedPrice={effectiveCoupon === 'GROOMERFOUNDING' ? 0 : undefined}
+              />
+            ))}
+          </PricingCarousel>
         </div>
 
         {/* Trust Signals */}
