@@ -29,6 +29,8 @@ jest.mock('@/components/trust/TrustSignals', () => ({
   default: ({ billingData, location }: any) => (
     <div data-testid="trust-signals" data-location={location}>
       {billingData?.planName && <span data-testid="plan-name">{billingData.planName}</span>}
+      {billingData?.promoCode && <span data-testid="promo-code">{billingData.promoCode}</span>}
+      {billingData?.recurringAmount === 0 && <span data-testid="free-forever">FREE forever</span>}
     </div>
   ),
 }));
@@ -53,6 +55,11 @@ function mockFetchSuccess(data: Record<string, any> = {}) {
     json: () => Promise.resolve({
       metadata: { planName: 'Solo Groomer', planPrice: '2900', isTrial: 'true', planType: 'solo' },
       trial_end_days_left: 14,
+      isFoundingMember: false,
+      promoCode: null,
+      discountDescription: null,
+      discountPercentage: 0,
+      amountDiscount: 0,
       ...data,
     }),
   });
@@ -303,6 +310,133 @@ describe('CheckoutSuccessContent', () => {
       render(<CheckoutSuccessContent />);
       await waitFor(() => {
         expect(screen.getByText(/you're in/i)).toBeTruthy();
+      });
+    });
+  });
+
+  // ────────────────────────────────────────────────────────────────
+  // 10. FOUNDING MEMBER RENDERING
+  // ────────────────────────────────────────────────────────────────
+  describe('Founding Member (GROOMERFOUNDING)', () => {
+    it('shows founding member welcome message when isFoundingMember=true', async () => {
+      global.fetch = mockFetchSuccess({
+        isFoundingMember: true,
+        promoCode: 'GROOMERFOUNDING',
+        discountDescription: 'Founding Member — free for life',
+        metadata: { planName: 'Solo Groomer', planPrice: '2900', planType: 'solo' },
+      });
+      render(<CheckoutSuccessContent />);
+      await waitFor(() => {
+        expect(screen.getByText(/welcome, founding member/i)).toBeTruthy();
+      });
+    });
+
+    it('shows founding member badge', async () => {
+      global.fetch = mockFetchSuccess({
+        isFoundingMember: true,
+        promoCode: 'GROOMERFOUNDING',
+        discountDescription: 'Founding Member — free for life',
+        metadata: { planName: 'Solo Groomer', planPrice: '2900', planType: 'solo' },
+      });
+      render(<CheckoutSuccessContent />);
+      await waitFor(() => {
+        expect(screen.getByText(/founding member — free for life/i)).toBeTruthy();
+      });
+    });
+
+    it('shows "free for life" messaging instead of trial text', async () => {
+      global.fetch = mockFetchSuccess({
+        isFoundingMember: true,
+        promoCode: 'GROOMERFOUNDING',
+        discountDescription: 'Founding Member — free for life',
+        metadata: { planName: 'Solo Groomer', planPrice: '2900', planType: 'solo' },
+      });
+      render(<CheckoutSuccessContent />);
+      await waitFor(() => {
+        expect(screen.getByText(/your account is free for life/i)).toBeTruthy();
+      });
+      expect(screen.queryByText(/14-day free trial has started/i)).toBeNull();
+    });
+
+    it('does not show trial active banner for founding members', async () => {
+      global.fetch = mockFetchSuccess({
+        isFoundingMember: true,
+        promoCode: 'GROOMERFOUNDING',
+        discountDescription: 'Founding Member — free for life',
+        metadata: { planName: 'Solo Groomer', planPrice: '2900', planType: 'solo' },
+      });
+      render(<CheckoutSuccessContent />);
+      await waitFor(() => {
+        expect(screen.getByText(/welcome, founding member/i)).toBeTruthy();
+      });
+      expect(screen.queryByText(/trial active/i)).toBeNull();
+    });
+
+    it('passes $0 recurringAmount to TrustSignals for founding members', async () => {
+      global.fetch = mockFetchSuccess({
+        isFoundingMember: true,
+        promoCode: 'GROOMERFOUNDING',
+        discountDescription: 'Founding Member — free for life',
+        metadata: { planName: 'Solo Groomer', planPrice: '2900', planType: 'solo' },
+      });
+      render(<CheckoutSuccessContent />);
+      await waitFor(() => {
+        expect(screen.getByTestId('free-forever')).toBeTruthy();
+      });
+    });
+  });
+
+  // ────────────────────────────────────────────────────────────────
+  // 11. BETA50 DISCOUNT RENDERING
+  // ────────────────────────────────────────────────────────────────
+  describe('BETA50 Discount', () => {
+    it('shows standard trial messaging for BETA50 users', async () => {
+      global.fetch = mockFetchSuccess({
+        isFoundingMember: false,
+        promoCode: 'BETA50',
+        discountDescription: 'Launch pricing — 50% off first month',
+        discountPercentage: 50,
+        metadata: { planName: 'Solo Groomer', planPrice: '2900', isTrial: 'true', planType: 'solo' },
+      });
+      render(<CheckoutSuccessContent />);
+      await waitFor(() => {
+        expect(screen.getByText(/14-day free trial has started/i)).toBeTruthy();
+      });
+    });
+
+    it('passes BETA50 promoCode to TrustSignals', async () => {
+      global.fetch = mockFetchSuccess({
+        isFoundingMember: false,
+        promoCode: 'BETA50',
+        discountDescription: 'Launch pricing — 50% off first month',
+        discountPercentage: 50,
+        metadata: { planName: 'Solo Groomer', planPrice: '2900', isTrial: 'true', planType: 'solo' },
+      });
+      render(<CheckoutSuccessContent />);
+      await waitFor(() => {
+        expect(screen.getByTestId('promo-code')).toHaveTextContent('BETA50');
+      });
+    });
+  });
+
+  // ────────────────────────────────────────────────────────────────
+  // 12. REGULAR TRIAL USER (unchanged behavior)
+  // ────────────────────────────────────────────────────────────────
+  describe('Regular Trial User', () => {
+    it('still shows 14-day trial messaging when no coupon is used', async () => {
+      global.fetch = mockFetchSuccess();
+      render(<CheckoutSuccessContent />);
+      await waitFor(() => {
+        expect(screen.getByText(/14-day free trial has started/i)).toBeTruthy();
+        expect(screen.getByText(/trial active/i)).toBeTruthy();
+      });
+    });
+
+    it('still passes regular plan data to TrustSignals for trial users', async () => {
+      global.fetch = mockFetchSuccess();
+      render(<CheckoutSuccessContent />);
+      await waitFor(() => {
+        expect(screen.getByTestId('plan-name')).toHaveTextContent('Solo Groomer');
       });
     });
   });

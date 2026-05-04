@@ -52,6 +52,14 @@ const TRIAL_SESSION = {
   id: 'cs_test_trial_123',
   payment_intent: null,           // null during 14-day trial — no charge yet
   subscription: null,
+  amount_subtotal: 2900,
+  amount_total: 2900,
+  total_details: {
+    amount_discount: 0,
+    amount_shipping: 0,
+    amount_tax: 0,
+  },
+  discounts: [],
   metadata: {
     userId: 'user-abc',
     planType: 'solo',
@@ -261,5 +269,98 @@ describe('GET /api/checkout/success', () => {
         }),
       })
     );
+  });
+
+  // ── Discount / coupon extraction ────────────────────────────────────────────
+  it('returns isFoundingMember: false when no discount is applied', async () => {
+    const res = await GET(makeRequest('cs_test_trial_123'));
+    const body = await res.json();
+
+    expect(body.isFoundingMember).toBe(false);
+    expect(body.promoCode).toBeNull();
+    expect(body.discountDescription).toBeNull();
+    expect(body.discountPercentage).toBe(0);
+  });
+
+  it('returns isFoundingMember: true when GROOMERFOUNDING coupon is used', async () => {
+    mockGetCheckoutSession.mockResolvedValueOnce({
+      ...TRIAL_SESSION,
+      amount_subtotal: 2900,
+      amount_total: 0,
+      total_details: { amount_discount: 2900, amount_shipping: 0, amount_tax: 0 },
+      discounts: [{ coupon: 'GROOMERFOUNDING' }],
+    } as any);
+
+    const res = await GET(makeRequest('cs_test_founding_123'));
+    const body = await res.json();
+
+    expect(body.isFoundingMember).toBe(true);
+    expect(body.promoCode).toBe('GROOMERFOUNDING');
+    expect(body.discountDescription).toContain('Founding Member');
+    expect(body.discountPercentage).toBe(100);
+  });
+
+  it('returns BETA50 discount info correctly', async () => {
+    mockGetCheckoutSession.mockResolvedValueOnce({
+      ...TRIAL_SESSION,
+      amount_subtotal: 2900,
+      amount_total: 1450,
+      total_details: { amount_discount: 1450, amount_shipping: 0, amount_tax: 0 },
+      discounts: [{ coupon: 'BETA50' }],
+    } as any);
+
+    const res = await GET(makeRequest('cs_test_beta_123'));
+    const body = await res.json();
+
+    expect(body.isFoundingMember).toBe(false);
+    expect(body.promoCode).toBe('BETA50');
+    expect(body.discountDescription).toContain('50% off');
+    expect(body.discountPercentage).toBe(50);
+  });
+
+  it('detects founding member by 100% off even without exact coupon ID', async () => {
+    mockGetCheckoutSession.mockResolvedValueOnce({
+      ...TRIAL_SESSION,
+      amount_subtotal: 2900,
+      amount_total: 0,
+      total_details: { amount_discount: 2900, amount_shipping: 0, amount_tax: 0 },
+      discounts: [{ coupon: 'some_other_coupon' }],
+    } as any);
+
+    const res = await GET(makeRequest('cs_test_other_123'));
+    const body = await res.json();
+
+    expect(body.isFoundingMember).toBe(true);
+    expect(body.discountPercentage).toBe(100);
+  });
+
+  it('handles null total_details gracefully', async () => {
+    mockGetCheckoutSession.mockResolvedValueOnce({
+      ...TRIAL_SESSION,
+      total_details: null,
+      discounts: [],
+    } as any);
+
+    const res = await GET(makeRequest('cs_test_null_123'));
+    const body = await res.json();
+
+    expect(body.isFoundingMember).toBe(false);
+    expect(body.discountPercentage).toBe(0);
+  });
+
+  it('handles expanded coupon object in discounts array', async () => {
+    mockGetCheckoutSession.mockResolvedValueOnce({
+      ...TRIAL_SESSION,
+      amount_subtotal: 2900,
+      amount_total: 0,
+      total_details: { amount_discount: 2900, amount_shipping: 0, amount_tax: 0 },
+      discounts: [{ coupon: { id: 'GROOMERFOUNDING', name: 'Founding Member' } }],
+    } as any);
+
+    const res = await GET(makeRequest('cs_test_expanded_123'));
+    const body = await res.json();
+
+    expect(body.isFoundingMember).toBe(true);
+    expect(body.promoCode).toBe('GROOMERFOUNDING');
   });
 });
