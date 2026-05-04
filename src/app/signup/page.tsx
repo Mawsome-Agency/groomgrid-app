@@ -290,13 +290,22 @@ function SignupPageInner() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-stone-50 flex flex-col items-center justify-center p-4">
-      {/* BETA50 Promo Banner */}
-      <div className="w-full max-w-3xl mb-3 bg-green-600 text-white text-center py-2.5 px-4 rounded-xl text-sm font-semibold">
-        🐾 Launch pricing — <span className="font-bold">$14.50/mo</span> for founding groomers (code <span className="font-bold underline">BETA50</span>). Lock it in forever.{' '}
-        <Link href="/plans" className="underline hover:text-green-100 transition-colors">
-          View plans →
-        </Link>
-      </div>
+      {/* Promo Banner — dynamic based on coupon param */}
+      {couponParam && couponParam.toUpperCase() === 'GROOMERFOUNDING' ? (
+        <div className="w-full max-w-3xl mb-3 bg-green-600 text-white text-center py-2.5 px-4 rounded-xl text-sm font-semibold">
+          🐾 Founding Member Program — <span className="font-bold">FREE for life</span>. Our thank-you for being an early believer.{' '}
+          <Link href="/plans" className="underline hover:text-green-100 transition-colors">
+            View plans →
+          </Link>
+        </div>
+      ) : (
+        <div className="w-full max-w-3xl mb-3 bg-green-600 text-white text-center py-2.5 px-4 rounded-xl text-sm font-semibold">
+          🐾 Launch pricing — <span className="font-bold">$14.50/mo</span> for founding groomers (code <span className="font-bold underline">BETA50</span>). Lock it in forever.{' '}
+          <Link href="/plans" className="underline hover:text-green-100 transition-colors">
+            View plans →
+          </Link>
+        </div>
+      )}
 
       {/* Card — single column on mobile, two columns on md+ */}
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-3xl signup-card overflow-hidden grid md:grid-cols-[1fr_1.1fr]">

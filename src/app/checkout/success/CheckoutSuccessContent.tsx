@@ -13,6 +13,7 @@ export function CheckoutSuccessContent() {
   const [countdown, setCountdown] = useState(8);
   const [mounted, setMounted] = useState(false);
   const [billingData, setBillingData] = useState<BillingSummaryData | null>(null);
+  const [isFoundingMember, setIsFoundingMember] = useState(false);
   const [loadingBilling, setLoadingBilling] = useState(true);
 
   useEffect(() => {
@@ -35,15 +36,23 @@ export function CheckoutSuccessContent() {
 
         const sessionData = await response.json();
 
+        const sessionIsFoundingMember = sessionData.isFoundingMember === true;
+        const promoCode = sessionData.promoCode || null;
+        const discountDescription = sessionData.discountDescription || null;
+        const planPrice = parseInt(sessionData.metadata?.planPrice || '0');
+
         const data: BillingSummaryData = {
           planName: sessionData.metadata?.planName || sessionData.metadata?.planType || 'Unknown Plan',
           todayAmount: 0,
-          recurringAmount: parseInt(sessionData.metadata?.planPrice || '0'),
+          recurringAmount: sessionIsFoundingMember ? 0 : planPrice,
           currency: '$',
-          isTrial: sessionData.metadata?.isTrial === 'true' || sessionData.trial_end_days_left === 14,
+          isTrial: !sessionIsFoundingMember && (sessionData.metadata?.isTrial === 'true' || sessionData.trial_end_days_left === 14),
           trialDays: 14,
+          promoCode,
+          promoDescription: discountDescription,
         };
 
+        setIsFoundingMember(sessionIsFoundingMember);
         setBillingData(data);
         setLoadingBilling(false);
 
@@ -95,13 +104,32 @@ export function CheckoutSuccessContent() {
           </svg>
         </div>
 
-        <h1 className="text-3xl font-bold text-stone-900 mb-3">You&apos;re in!</h1>
-        <p className="text-stone-600 mb-2">
-          Your 14-day free trial has started. No charge until your trial ends.
-        </p>
-        <p className="text-stone-500 text-sm mb-6">
-          We&apos;ll send a confirmation to your email shortly.
-        </p>
+        {isFoundingMember || billingData?.promoCode === 'GROOMERFOUNDING' ? (
+          <>
+            <div className="bg-green-100 rounded-xl p-4 mb-6">
+              <p className="text-green-800 text-sm font-bold">
+                🐾 Founding Member — Free for Life
+              </p>
+            </div>
+            <h1 className="text-3xl font-bold text-stone-900 mb-3">Welcome, Founding Member! 🎉</h1>
+            <p className="text-stone-600 mb-2">
+              Your account is free for life — our thank-you for being an early believer.
+            </p>
+            <p className="text-stone-500 text-sm mb-6">
+              We&apos;ll send a confirmation to your email shortly.
+            </p>
+          </>
+        ) : (
+          <>
+            <h1 className="text-3xl font-bold text-stone-900 mb-3">You&apos;re in!</h1>
+            <p className="text-stone-600 mb-2">
+              Your 14-day free trial has started. No charge until your trial ends.
+            </p>
+            <p className="text-stone-500 text-sm mb-6">
+              We&apos;ll send a confirmation to your email shortly.
+            </p>
+          </>
+        )}
 
         {billingData && (
           <div className="mb-6">
@@ -114,11 +142,13 @@ export function CheckoutSuccessContent() {
           </div>
         )}
 
-        <div className="bg-green-50 rounded-xl p-4 mb-8">
-          <p className="text-green-700 text-sm font-medium">
-            Trial active &mdash; full access for 14 days
-          </p>
-        </div>
+        {!isFoundingMember && billingData?.promoCode !== 'GROOMERFOUNDING' && (
+          <div className="bg-green-50 rounded-xl p-4 mb-8">
+            <p className="text-green-700 text-sm font-medium">
+              Trial active &mdash; full access for 14 days
+            </p>
+          </div>
+        )}
 
         <button
           onClick={() => router.push(`/onboarding${sessionId ? `?session_id=${sessionId}` : ''}`)}

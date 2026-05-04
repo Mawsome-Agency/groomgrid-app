@@ -50,9 +50,11 @@ export default function BillingSummary({ data, className, compact = false }: Bil
             <div>
               <p className="text-sm font-medium text-stone-700">{data.planName}</p>
               <p className="text-xs text-stone-500">
-                {data.isTrial
-                  ? `Free for ${data.trialDays || 14} days, then ${formatAmount(data.recurringAmount)}/mo`
-                  : `${formatAmount(data.recurringAmount)}/mo`
+                {data.recurringAmount === 0
+                  ? 'FREE forever'
+                  : data.isTrial
+                    ? `Free for ${data.trialDays || 14} days, then ${formatAmount(data.recurringAmount)}/mo`
+                    : `${formatAmount(data.recurringAmount)}/mo`
                 }
               </p>
               {data.promoCode && (
@@ -100,7 +102,7 @@ export default function BillingSummary({ data, className, compact = false }: Bil
         <div className="flex items-center justify-between py-2 border-b border-stone-100">
           <span className="text-sm text-stone-600">Recurring</span>
           <span className="text-lg font-bold text-stone-900">
-            {formatAmount(data.recurringAmount)}/month
+            {data.recurringAmount === 0 ? 'FREE forever' : `${formatAmount(data.recurringAmount)}/month`}
           </span>
         </div>
 

@@ -351,3 +351,11 @@ export function trackBofuCtaClick(
     timestamp: new Date().toISOString(),
   });
 }
+
+export function trackABTestAssigned(testName: string, variant: string, userId?: string) {
+  trackEvent('ab_test_assigned', { test_name: testName, variant, user_id: userId });
+}
+
+export function trackABTestConverted(testName: string, variant: string, event: string, userId?: string) {
+  trackEvent('ab_test_converted', { test_name: testName, variant, event, user_id: userId });
+}

@@ -53,12 +53,25 @@ export async function createCheckoutSession({
 
   if (couponCode) {
     try {
-      // Validate the coupon exists in Stripe before applying
+      // Try as direct coupon ID first (works for codes like BETA50 which are both)
       await stripe.coupons.retrieve(couponCode);
       discountFields = { discounts: [{ coupon: couponCode }] };
     } catch {
-      console.warn(`[Checkout] Coupon code "${couponCode}" not found in Stripe, falling back to promo code entry`);
-      discountFields = { allow_promotion_codes: true };
+      // Not a coupon ID — try resolving as a promotion code
+      try {
+        const promoCodes = await stripe.promotionCodes.list({ code: couponCode, active: true });
+        if (promoCodes.data.length > 0) {
+          const couponId = promoCodes.data[0].coupon.id;
+          console.log(`[Checkout] Resolved promotion code "${couponCode}" to coupon "${couponId}"`);
+          discountFields = { discounts: [{ coupon: couponId }] };
+        } else {
+          console.warn(`[Checkout] No active promotion code found for "${couponCode}", falling back`);
+          discountFields = { allow_promotion_codes: true };
+        }
+      } catch (promoErr) {
+        console.warn(`[Checkout] Error resolving promotion code "${couponCode}":`, promoErr);
+        discountFields = { allow_promotion_codes: true };
+      }
     }
   } else {
     discountFields = { allow_promotion_codes: true };
