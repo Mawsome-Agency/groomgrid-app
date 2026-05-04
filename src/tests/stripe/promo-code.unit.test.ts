@@ -201,3 +201,57 @@ describe('createCheckoutSession — couponCode param shape', () => {
     expect(args.couponCode).toBeUndefined();
   });
 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+// GROOMERFOUNDING promotion code — passes through route to createCheckoutSession
+// ─────────────────────────────────────────────────────────────────────────────
+describe('POST /api/checkout — GROOMERFOUNDING coupon handling', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockFindFirstLockout.mockResolvedValue(null);
+    mockFindUniqueProfile.mockResolvedValue(MOCK_PROFILE as any);
+    mockCreateCheckoutSession.mockResolvedValue(MOCK_SESSION as any);
+    mockGetStripeErrorMessage.mockReturnValue({ message: 'Error', type: 'generic', declineCode: undefined });
+  });
+
+  it('passes GROOMERFOUNDING as couponCode to createCheckoutSession', async () => {
+    const req = makeReq({ userId: 'user-promo', planType: 'solo', coupon: 'GROOMERFOUNDING' });
+    await POST(req);
+
+    const [args] = mockCreateCheckoutSession.mock.calls[0];
+    expect(args.couponCode).toBe('GROOMERFOUNDING');
+  });
+
+  it('uppercases groomerfounding to GROOMERFOUNDING', async () => {
+    const req = makeReq({ userId: 'user-promo', planType: 'solo', coupon: 'groomerfounding' });
+    await POST(req);
+
+    const [args] = mockCreateCheckoutSession.mock.calls[0];
+    expect(args.couponCode).toBe('GROOMERFOUNDING');
+  });
+
+  it('passes GROOMERFOUNDING for all three plan types', async () => {
+    for (const planType of ['solo', 'salon', 'enterprise'] as const) {
+      jest.clearAllMocks();
+      mockFindFirstLockout.mockResolvedValue(null);
+      mockFindUniqueProfile.mockResolvedValue(MOCK_PROFILE as any);
+      mockCreateCheckoutSession.mockResolvedValue(MOCK_SESSION as any);
+
+      const req = makeReq({ userId: 'user-promo', planType, coupon: 'GROOMERFOUNDING' });
+      await POST(req);
+
+      const [args] = mockCreateCheckoutSession.mock.calls[0];
+      expect(args.couponCode).toBe('GROOMERFOUNDING');
+      expect(args.planType).toBe(planType);
+    }
+  });
+
+  it('returns 200 with checkout URL for GROOMERFOUNDING coupon', async () => {
+    const req = makeReq({ userId: 'user-promo', planType: 'solo', coupon: 'GROOMERFOUNDING' });
+    const res = await POST(req);
+    const body = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(body.url).toBe(MOCK_SESSION.url);
+  });
+});

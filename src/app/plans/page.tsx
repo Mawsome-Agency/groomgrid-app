@@ -79,6 +79,11 @@ const KNOWN_PROMO_CODES: Record<string, { label: string; discount: string; descr
     discount: '50% off first month',
     description: 'Launch pricing — lock in $14.50/mo for Solo Groomer',
   },
+  GROOMERFOUNDING: {
+    label: 'GROOMERFOUNDING',
+    discount: '100% off — FREE forever',
+    description: 'Founding Member — free for life. Our thank-you for being an early believer.',
+  },
 };
 
 function PlansPageInner() {
@@ -299,12 +304,20 @@ function PlansPageInner() {
         </div>
       </header>
 
-      {/* BETA50 Promo Banner */}
-      <div className="bg-green-600 text-white text-center py-3 px-4">
-        <p className="text-sm font-semibold">
-          🐾 Launch pricing — <span className="font-bold">$14.50/mo for founding groomers</span> (code BETA50). Lock it in forever.
-        </p>
-      </div>
+      {/* Promo Banner — dynamic based on applied coupon */}
+      {effectiveCoupon && KNOWN_PROMO_CODES[effectiveCoupon] ? (
+        <div className="bg-green-600 text-white text-center py-3 px-4">
+          <p className="text-sm font-semibold">
+            🐾 {KNOWN_PROMO_CODES[effectiveCoupon].description}
+          </p>
+        </div>
+      ) : (
+        <div className="bg-green-600 text-white text-center py-3 px-4">
+          <p className="text-sm font-semibold">
+            🐾 Launch pricing — <span className="font-bold">$14.50/mo for founding groomers</span> (code BETA50). Lock it in forever.
+          </p>
+        </div>
+      )}
 
       {/* Promo Code Input */}
       <div className="bg-white border-b border-stone-200">
@@ -413,6 +426,7 @@ function PlansPageInner() {
               isLoading={selectedPlan?.id === plan.id && isCheckoutInFlight}
               isDimmed={isCheckoutInFlight && selectedPlan?.id !== plan.id}
               hasError={!!checkoutError && selectedPlan?.id === plan.id}
+              discountedPrice={effectiveCoupon === 'GROOMERFOUNDING' ? 0 : undefined}
             />
           ))}
         </div>
